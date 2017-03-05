@@ -1,0 +1,14 @@
+.bar.bar-nav {
+    background-color: #ffffffb3;
+    border: none !important;
+}
+.input-group {
+    background-color: #ffffffb3 !important;
+    border: none !important;
+}
+.input-row {
+    border: none;
+}   
+.input-group {
+    margin-bottom: 10px;
+}
