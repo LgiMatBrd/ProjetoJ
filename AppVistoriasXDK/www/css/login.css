@@ -11,4 +11,8 @@
 }   
 .input-group {
     margin-bottom: 10px;
+}   
+.content {
+    background:url('http://127.0.0.1:57891/www/imagens/background-login-page.jpeg'); 
+    background-size:cover;
 }
