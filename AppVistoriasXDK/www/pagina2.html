@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Parte copiada do hello world -->
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <!-- Fim da parte copiada do hello world -->
+        
+        <!-- Parte referente ao Ratchet -->
+        <meta charset="utf-8">
+        <!-- Sets initial viewport load and disables zooming  -->
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+        <!-- Makes your prototype chrome-less once bookmarked to your phone's home screen -->
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <!-- Include the compiled Ratchet CSS -->
+        <link href="css/ratchet.css" rel="stylesheet">
+        <!-- Include index main CSS -->
+        <link rel="stylesheet" type="text/css" href="css/index.css">
+        <!-- Include the compiled Ratchet JS -->
+        <script src="js/ratchet.js"></script>
+        <title>Hello World</title>
+        <!-- Fim da parte referente ao Ratchet -->
+    </head>
+    <body>
+        <!-- Make sure all your bars are the first things in your <body> -->
+        <header class="bar bar-nav">
+            <a class="icon icon-left-nav pull-left" href="index.html" data-transition="slide-out"></a>
+            <h1 class="title">Página 2</h1>
+        </header>
+
+        <!-- Wrap all non-bar HTML in the .content div (this is actually what scrolls) -->
+        <div class="content">
+            <ul class="table-view">
+                <li class="table-view-cell">
+                  Item 1
+                  <div class="toggle">
+                    <div class="toggle-handle"></div>
+                  </div>
+                </li>
+                <li class="table-view-cell">
+                  Item 2
+                  <div class="toggle active">
+                    <div class="toggle-handle"></div>
+                  </div>
+                </li>
+                <li class="table-view-cell">
+                  Item 3
+                  <div class="toggle">
+                    <div class="toggle-handle"></div>
+                  </div>
+                </li>
+            </ul>
+        </div>
+    </body>
+</html>
+
