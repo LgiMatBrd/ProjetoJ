@@ -3,19 +3,22 @@ var app = angular.module('seyconelApp', ['ngRoute']);
 
 app.config(function($routeProvider) {
     $routeProvider
-    .when("/", {
+    .when("/", { 
         templateUrl : "paginas/clientes.html",
 		controller  : 'homeController'
     })
-    .when("/page2", {
-        templateUrl : "paginas/page2.html",
-		controller  : 'shopController'
+    .when("/vistorias/:showName?", {
+        templateUrl : "paginas/vistorias.html",
+		controller  : 'vistoriasController'
     });
 });
 
-app.controller('shopController', function($scope, $http) {
-	
-  getItem(); // Load all available items 
+app.controller('vistoriasController', function($scope, $routeParams, $http) {
+	$scope.showName=$routeParams.showName
+    $scope.goBack = function() {
+  window.history.back();
+};
+ /* getItem(); // Load all available items 
   function getItem(){  
   $http.post("http://hom.agenciageld.com.br/app_seyconel/ajax/getItem.php").success(function(data){
         $scope.items = data;
@@ -50,11 +53,16 @@ app.controller('shopController', function($scope, $http) {
       $http.post("http://hom.agenciageld.com.br/app_seyconel/ajax/updateItem.php?itemID="+item+"&status="+status).success(function(data){
         getItem();
       });
-  };
+  };*/
  
 });
 
 app.controller('homeController', function($scope, $http) {
+    
+    $scope.customNavigate=function(msg){
+        
+       $location.path("/vistorias"+msg)
+    }
 	
   getItem(); // Load all available items 
   function getItem(){
