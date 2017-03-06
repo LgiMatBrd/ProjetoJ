@@ -18,24 +18,25 @@
 				</form>
 
 			</div>
-
+ 
 			<div class="col-sm-3 hidden-xs">
 				<input type="text" ng-model="filterItem" class="form-control" placeholder="Filtro" />
 			</div>
 		</div>
-	</header>
+	</header> 
 
 	<fieldset class="items-list">
 		<label class="items-list-item" ng-repeat="item in items | filter : filterItem">
-			<input
+			<!--<input
 			type="checkbox"
 			value="{{item.STATUS}}"
 			ng-checked="item.STATUS==2"
-			ng-click="changeStatus(item.ID,item.STATUS,item.ITEM)"
+			ng-click="changeStatus(item.ID,item.STATUS,item.CLIENTE)"
 			class="items-list-cb"/>
-			<span class="items-list-mark"></span>
-			<span class="items-list-desc" ng-class="{strike:item.STATUS==2}">{{item.ITEM}} <span class="date">[{{item.CREATED_AT | date:"d MMM"}}]</span></span> 
+			<span class="items-list-mark"></span>-->
+			<span class="items-list-desc" ng-class="{strike:item.STATUS==2}">{{item.CLIENTE}} <span class="date">[{{item.CREATED_AT | date:"d MMM"}}]</span></span> 
 			<!--<a ng-click="deleteItem(item.ID)" class="pull-right red"><i class="fa fa-minus-circle"></i></a>-->
+            <span class="date" style="float: right;"><!--<i class="fa fa-archive"></i>--> [ 0 ]</span>
 		</label>
 	</fieldset>	
 
