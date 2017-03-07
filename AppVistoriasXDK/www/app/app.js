@@ -14,7 +14,7 @@ app.config(function($routeProvider) {
 });
 
 app.controller('vistoriasController', function($scope, $routeParams, $http) {
-	$scope.id= $routeParams.id;
+	/*$scope.id= $routeParams.id;
     $scope.goBack = function() {
         window.history.back();
     };
@@ -31,13 +31,13 @@ app.controller('vistoriasController', function($scope, $routeParams, $http) {
         getItem();
         $scope.itemInput = "";
       });
-    };
+    };*/
  
 });
 
 app.controller('homeController', function($scope, $http) {
     
-    $scope.customNavigate=function(id){
+    /*$scope.customNavigate=function(id){
         
        $location.path("/vistorias"+id)
     }
@@ -77,6 +77,6 @@ app.controller('homeController', function($scope, $http) {
       $http.post("http://hom.agenciageld.com.br/app_seyconel/ajax/clientes/updateClientes.php?itemID="+item+"&status="+status).success(function(data){
         getItem();
       });
-  };
+  };*/
 
 });
