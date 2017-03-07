@@ -2,7 +2,9 @@
 
 if (!defined('ROOT_DIR'))
     die('Acesso não autorizado!');
+$status = array();
 
+include_once ROOT_DIR.'/install/db.php';
 
 include_once ROOT_DIR.'/lib/login/register.php';
 
