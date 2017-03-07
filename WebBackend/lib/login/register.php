@@ -14,8 +14,9 @@ include_once ROOT_DIR.'/config/psl-config.php';
  
 $error_msg = "";
  
-if (isset($_POST['login'], $_POST['email'], $_POST['p'])) {
+if (isset($_POST['atributos'], $_POST['username'], $_POST['email'], $_POST['p'], $_POST['pnome'])) {
     // Limpa e valida os dados passados em 
+    $atributos = filter_input(INPUT_POST, 'atributos', FILTER_SANITIZE_NUMBER_INT);
     $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
     $email = filter_var($email, FILTER_VALIDATE_EMAIL);
@@ -30,13 +31,15 @@ if (isset($_POST['login'], $_POST['email'], $_POST['p'])) {
         // Caso contrário, algo muito estranho está acontecendo
         $error_msg .= '<p class="error">Invalid password configuration.</p>';
     }
- 
+    
+    $pNome = filter_input(INPUT_POST, 'pnome', FILTER_SANITIZE_STRING);
+     
     // O nome de usuário e a validade da senha foram conferidas no lado cliente.
     // Não deve haver problemas nesse passo já que ninguém ganha 
     // violando essas regras.
     //
  
-    $prep_stmt = "SELECT id FROM members WHERE email = ? LIMIT 1";
+    $prep_stmt = 'SELECT id FROM users WHERE email = ? LIMIT 1';
     $stmt = $mysqli->prepare($prep_stmt);
  
     if ($stmt) {
@@ -63,15 +66,16 @@ if (isset($_POST['login'], $_POST['email'], $_POST['p'])) {
  
         // Crie uma senha com salt 
         $password = hash('sha512', $password . $random_salt);
+        
+        $create_time = date('Y-m-d H:i:s');
  
         // Inserir o novo usuário no banco de dados 
-        if ($insert_stmt = $mysqli->prepare("INSERT INTO members (username, email, password, salt) VALUES (?, ?, ?, ?)")) {
-            $insert_stmt->bind_param('ssss', $username, $email, $password, $random_salt);
+        if ($insert_stmt = $mysqli->prepare("INSERT INTO users (username, pass, salt, email, create_time, atributos, pNome) VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+            $insert_stmt->bind_param('sssssis', $username, $password, $random_salt, $email, $create_time, $atributos, $pNome);
             // Executar a tarefa pré-estabelecida.
             if (! $insert_stmt->execute()) {
-                header('Location: ../error.php?err=Registration failure: INSERT');
+                $error_msg .= 'Falha ao registrar usuário';
             }
         }
-        header('Location: ./register_success.php');
     }
 }

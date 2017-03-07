@@ -32,9 +32,9 @@ $concreteBackgroundDesc = 'http://backgroundimages.concrete5.org/get_image_data.
                     <h3 class="uk-panel-title">Faça login para continuar</h3>
                     <form id="form1" class="uk-form uk-form-stacked uk-text-left" action="login/process_login.php" method="post" name="login_form">                      
                         <div class="uk-form-row">
-                            <label class="uk-form-label" for="email">Login</label>
+                            <label class="uk-form-label" for="user">Usuário</label>
                             <div class="uk-form-controls">
-                                <input class="uk-width-1-1 uk-form-large" type="text" id="email" name="email" />
+                                <input class="uk-width-1-1 uk-form-large" type="text" id="user" name="username" />
                             </div>
                         </div>
                         <div class="uk-form-row">

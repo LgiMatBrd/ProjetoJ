@@ -45,6 +45,7 @@ if (isset($_POST['instalar']))
                     <div class="uk-panel-title"></div>
                     <form id="form1" class="uk-form uk-form-horizontal" action="index.php" method="post" name="login_form">                      
                         <input type="hidden" name="instalar" value="true" />
+                        <input type="hidden" name="atributos" value="1" />
                         <fieldset>
                             <legend>Informações do banco de dados</legend>
                             <div class="uk-form-row">
@@ -75,9 +76,9 @@ if (isset($_POST['instalar']))
                         <fieldset>
                             <legend>Informações do usuário administrador</legend>
                             <div class="uk-form-row">
-                                <label class="uk-form-label">Login:</label>
+                                <label class="uk-form-label">Usuário:</label>
                                 <div class="uk-form-controls">
-                                    <input class="uk-width-1-1" type="text" name="login" />
+                                    <input class="uk-width-1-1" type="text" name="username" />
                                 </div>
                             </div>
                             <div class="uk-form-row">
@@ -92,16 +93,28 @@ if (isset($_POST['instalar']))
                                     <input class="uk-width-1-1" type="password" id="user-pass2" name="password" />
                                 </div>
                             </div>
+                            <div class="uk-form-row">
+                                <label class="uk-form-label">Email:</label>
+                                <div class="uk-form-controls">
+                                    <input class="uk-width-1-1" type="email" id="user-email1" />
+                                </div>
+                            </div>
+                            <div class="uk-form-row">
+                                <label class="uk-form-label">Confirmação de email:</label>
+                                <div class="uk-form-controls">
+                                    <input class="uk-width-1-1" type="email" id="user-email2" name="email" />
+                                </div>
+                            </div>
                             <div class="uk-form-row uk-margin-large-bottom">
                                 <label class="uk-form-label">Primeiro nome:</label>
                                 <div class="uk-form-controls">
-                                    <input class="uk-width-1-1" type="text" name="user-pnome" />
+                                    <input class="uk-width-1-1" type="text" name="pnome" />
                                 </div>
                             </div>
                         </fieldset>
                         <div class="uk-form-row">
                             <a class="uk-width-1-1 uk-button uk-button-primary uk-button-large" type="button" 
-                               onclick="form1.submit();">Instalar</a>
+                               onclick="formhash(form1, form1.password);">Instalar</a>
                         </div>
                     </form>
                 </div>

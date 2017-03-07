@@ -5,6 +5,7 @@ if (!defined('ROOT_DIR'))
 
 
 include_once ROOT_DIR.'/lib/login/register.php';
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -15,12 +16,8 @@ include_once ROOT_DIR.'/lib/login/register.php';
         <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
         <link rel="apple-touch-icon-precomposed" href="images/apple-touch-icon.png">
         <link rel="stylesheet" href="css/uikit.gradient.min.css" />
-        <link rel="stylesheet" href="css/components/form-password.min.css" />
         <script src="js/jquery.min.js"></script>
         <script src="js/uikit.min.js"></script>
-        <script src="js/components/form-password.min.js"></script>
-        <script type="text/JavaScript" src="js/sha512.js"></script> 
-        <script type="text/JavaScript" src="js/forms.js"></script> 
     </head>
     <body>
         <div class="uk-width-1-1">
@@ -29,6 +26,7 @@ include_once ROOT_DIR.'/lib/login/register.php';
                     <h2 class="uk-text-center">Instalação e configuração</h2>
                     <div class="uk-panel-title"></div>
                     <?php
+                    echo $error_msg;
                     function aguarde_view()
                     {
                     ?>
