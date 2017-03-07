@@ -14,7 +14,7 @@ include_once ROOT_DIR.'/config/psl-config.php';
  
 $error_msg = "";
  
-if (isset($_POST['username'], $_POST['email'], $_POST['p'])) {
+if (isset($_POST['login'], $_POST['email'], $_POST['p'])) {
     // Limpa e valida os dados passados em 
     $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);

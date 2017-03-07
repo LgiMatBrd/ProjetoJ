@@ -8,6 +8,12 @@
 
 define('ROOT_DIR', dirname(__FILE__));
 
+if (!file_exists(ROOT_DIR.'/config/version.php'))
+{
+    include 'install/index.php';
+    exit;
+}
+
 include_once ROOT_DIR.'/config/db_connect.php';
 include_once ROOT_DIR.'/lib/login/functions.php';
  
