@@ -7,10 +7,10 @@
 				<form class="form-inline" name="shopList">
 					<div class="form-actions">
 						<div class="input-group">
-							<input type="text" class="form-control" ng-model="itemInput" placeholder="Nome do item" autofocus required />
-							<div class="input-group-btn">
+							<!--<input type="text" class="form-control" ng-model="itemInput" placeholder="Nome do item" autofocus required />
+							--><div class="input-group-btn">
 								<button class="btn btn-info" type="submit" ng-click="addItem(itemInput); itemInput = null" ng-disabled="shopList.$invalid">
-									<i class="fa fa-plus"></i>&nbsp;
+									<i class="fa fa-plus"></i>&nbsp; Adicionar nova vistoria
 								</button>
 							</div>
 						</div>
@@ -18,25 +18,13 @@
 				</form>
 
 			</div>
-            {{ showName }}
-			<div class="col-sm-3 hidden-xs">
-				<input type="text" ng-model="filterItem" class="form-control" placeholder="Filtro" />
-			</div>
-		</div>
+		</div> 
 	</header> 
 
 	<fieldset class="items-list">
-		<label class="items-list-item" ng-repeat="item in items | filter : filterItem">
-			<!--<input
-			type="checkbox"
-			value="{{item.STATUS}}"
-			ng-checked="item.STATUS==2"
-			ng-click="changeStatus(item.ID,item.STATUS,item.CLIENTE)"
-			class="items-list-cb"/>
-			<span class="items-list-mark"></span>-->
-			<span class="items-list-desc" ng-class="{strike:item.STATUS==2}">{{item.CLIENTE}} <span class="date">[{{item.CREATED_AT | date:"d MMM"}}]</span></span> 
-			<!--<a ng-click="deleteItem(item.ID)" class="pull-right red"><i class="fa fa-minus-circle"></i></a>-->
-            <span class="date" style="float: right;"><!--<i class="fa fa-archive"></i>--> [ 0 ]</span>
+		<label class="items-list-item" ng-repeat="item in items">
+			<span class="items-list-desc" ng-class="">{{item.cliente}} <span class="date"><br />[{{item.created_at | date:"d MMM"}}]</span></span> 
+            <span class="date" style="float: right;"> [ 0 ]</span>
 		</label>
 	</fieldset>	
 
