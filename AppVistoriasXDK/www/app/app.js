@@ -1,13 +1,6 @@
 //Define an angular module for our app 
 var app = angular.module('seyconelApp', ['ngRoute','ngStorage']); 
 
-/*app.controller('Ctrl', function( $scope, $localStorage ) {
-    $scope.$storage = $localStorage.$default({
-        x: 42,
-        y: 2 
-    }); 
-});*/
-
 app.config(function($routeProvider) {
     $routeProvider
     .when("/", { 
@@ -22,8 +15,43 @@ app.config(function($routeProvider) {
 
 app.controller('homeController', function($scope, $http, $localStorage) {
     
-  /*
-  $scope.addItem = function (item) {
+    /* Luigi, se souber como faz, coloca esse pequeno trecho na parte de app.config */
+    if ($localStorage.clientes.version !== 'v0.1')
+    {
+        $localStorage.clientes = {
+            nextID: 0,
+            version: 'v0.1',
+            db: {}
+        }; 
+    }
+    /* Luigi, o pequeno trecho vai até aqui */
+    
+    $scope.addItem = function ($valor)
+    {
+        
+        id = $localStorage.clientes.nextID;
+        
+        cliente = new ClienteObj(); // Definições do objeto estão no arquivo dbObj.js
+        cliente.id = id;
+        cliente.nome = $valor;
+        $localStorage.clientes.db[id] = cliente;
+        
+        id = id + 1;
+        $localStorage.clientes.nextID = id;
+        console.log($localStorage);
+    };
+    
+    $scope.readClientes = function ()
+    {
+        return $localStorage.clientes.db;
+    };
+    
+    $scope.deleteItem = function ($id)
+    {
+        delete $localStorage.clientes.db[$id];
+    };
+    
+  /*$scope.addItem = function (item) {
     $http.post("http://hom.agenciageld.com.br/app_seyconel/ajax/clientes/addClientes.php?item="+item).success(function(data){
         getItem();
         $scope.itemInput = "";
@@ -66,7 +94,7 @@ app.controller('vistoriasController', function($scope, $routeParams, $http) {
     $http.post("http://hom.agenciageld.com.br/app_seyconel/ajax/vistorias/getVistorias.php?id_cliente="+$scope.id).success(function(data){
         $scope.items = data;
        });
-    };
+    }
 
     $scope.addItem = function (item) {
     $http.post("http://hom.agenciageld.com.br/app_seyconel/ajax/vistorias/addVistorias.php?item="+item).success(function(data){
