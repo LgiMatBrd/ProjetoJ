@@ -1,5 +1,12 @@
 //Define an angular module for our app 
-var app = angular.module('seyconelApp', ['ngRoute']);
+var app = angular.module('seyconelApp', ['ngRoute','ngStorage']); 
+
+/*app.controller('Ctrl', function( $scope, $localStorage ) {
+    $scope.$storage = $localStorage.$default({
+        x: 42,
+        y: 2 
+    }); 
+});*/
 
 app.config(function($routeProvider) {
     $routeProvider
@@ -13,42 +20,9 @@ app.config(function($routeProvider) {
     });
 });
 
-app.controller('vistoriasController', function($scope, $routeParams, $http) {
-	/*$scope.id= $routeParams.id;
-    $scope.goBack = function() {
-        window.history.back();
-    };
-     
-    getItem(); // Load all available items 
-    function getItem(){  
-    $http.post("http://hom.agenciageld.com.br/app_seyconel/ajax/vistorias/getVistorias.php?id_cliente="+$scope.id).success(function(data){
-        $scope.items = data;
-       });
-    };
-
-    $scope.addItem = function (item) {
-    $http.post("http://hom.agenciageld.com.br/app_seyconel/ajax/vistorias/addVistorias.php?item="+item).success(function(data){
-        getItem();
-        $scope.itemInput = "";
-      });
-    };*/
- 
-});
-
-app.controller('homeController', function($scope, $http) {
+app.controller('homeController', function($scope, $http, $localStorage) {
     
-    /*$scope.customNavigate=function(id){
-        
-       $location.path("/vistorias"+id)
-    }
-	
-  getItem(); // Load all available items 
-  function getItem(){
-  $http.post("http://hom.agenciageld.com.br/app_seyconel/ajax/clientes/getClientes.php").success(function(data){
-        $scope.items = data;
-       });
-  };
-  
+  /*
   $scope.addItem = function (item) {
     $http.post("http://hom.agenciageld.com.br/app_seyconel/ajax/clientes/addClientes.php?item="+item).success(function(data){
         getItem();
@@ -79,4 +53,26 @@ app.controller('homeController', function($scope, $http) {
       });
   };*/
 
+});
+
+app.controller('vistoriasController', function($scope, $routeParams, $http) {
+	$scope.id= $routeParams.id;
+    $scope.goBack = function() {
+        window.history.back();
+    };
+    
+    getItem(); // Load all available items 
+    function getItem(){  
+    $http.post("http://hom.agenciageld.com.br/app_seyconel/ajax/vistorias/getVistorias.php?id_cliente="+$scope.id).success(function(data){
+        $scope.items = data;
+       });
+    };
+
+    $scope.addItem = function (item) {
+    $http.post("http://hom.agenciageld.com.br/app_seyconel/ajax/vistorias/addVistorias.php?item="+item).success(function(data){
+        getItem();
+        $scope.itemInput = "";
+      });
+    };
+ 
 });

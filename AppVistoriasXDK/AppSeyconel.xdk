@@ -5,7 +5,7 @@
       "projectTypeName": "com.intel.xdk.projecttype.jsapp",
       "src": "jsapp/template-blank-cordova-project-lite/sample.zip",
       "projectGuid": "82606458-0726-45b5-b3d1-bea1407cd611",
-      "lastModifiedDate": 1488893924836,
+      "lastModifiedDate": 1488905183581,
       "creationDate": 1488809141554
     },
     "XDK-app-designer": "false",
@@ -78,25 +78,31 @@
         "checksum": "47137083"
       },
       {
-        "id": "cordova-sqlite-plugin",
-        "name": "Cordova SQLite Plugin",
-        "version": "3.1.1",
+        "id": "cordova-plugin-camera",
+        "name": "Camera",
+        "version": "2.3.0",
         "originType": "cordova.io",
-        "origin": "cordova-sqlite-plugin",
+        "origin": "cordova-plugin-camera",
         "gitref": "",
-        "paramvals": {},
-        "sourceLocation": "plugins/cordova-sqlite-plugin",
+        "paramvals": {
+          "CAMERA_USAGE_DESCRIPTION": " ",
+          "PHOTOLIBRARY_USAGE_DESCRIPTION": " "
+        },
+        "sourceLocation": "plugins/cordova-plugin-camera",
         "selectedState": "Included",
-        "checksum": "5ee58481",
-        "dependsOn": [],
+        "checksum": "42288131",
+        "dependsOn": [
+          "cordova-plugin-compat"
+        ],
         "topLevel": true,
-        "cordovaVersion": ">=6.0.0",
-        "author": "Various",
-        "permissions": {},
-        "description": "Low-level interface to SQLite",
+        "permissions": {
+          "android:name": [
+            "android.permission.WRITE_EXTERNAL_STORAGE"
+          ]
+        },
+        "description": "Cordova Camera Plugin",
         "data": {},
-        "dependedBy": [],
-        "custom": "true"
+        "dependedBy": []
       }
     ],
     "buildConfigurations": {

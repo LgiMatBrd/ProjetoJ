@@ -47,7 +47,7 @@
 window.dev = window.dev || {} ;         // could be predefined in index.html file...
 
 
-
+ 
 // Use performance counter if it is available, otherwise, use milliseconds since 1970
 
 if( window.performance && performance.now ) {
