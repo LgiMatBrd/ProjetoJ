@@ -16,7 +16,7 @@ app.config(function($routeProvider) {
 app.controller('homeController', function($scope, $http, $localStorage) {
     
     /* Luigi, se souber como faz, coloca esse pequeno trecho na parte de app.config */
-    if ($localStorage.clientes.version !== 'v0.1')
+    if (typeof $localStorage.clientes === 'undefined' || typeof $localStorage.clientes.version === 'undefined' || $localStorage.clientes.version !== 'v0.1')
     {
         $localStorage.clientes = {
             nextID: 0,
@@ -38,7 +38,7 @@ app.controller('homeController', function($scope, $http, $localStorage) {
         
         id = id + 1;
         $localStorage.clientes.nextID = id;
-        console.log($localStorage);
+        
     };
     
     $scope.readClientes = function ()
