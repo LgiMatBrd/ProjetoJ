@@ -28,11 +28,11 @@
 	<fieldset class="items-list">
         <!--<a href="#/vistorias/mike2">haha</a>-->
 		<!--<label ng-click="verVistorias22(cliente.id);" class="items-list-item" ng-repeat="cliente in lerVistorias() | filter : filtroVistorias">-->
-		<label ng-click="verVistorias22(cliente.id);" class="items-list-item" ng-repeat="cliente in lerVistorias()">
-			<span class="items-list-desc" ng-class="{strike:cliente.STATUS==2}">{{cliente.nome}} 
-                <span class="date">[{{cliente.data_criacao | date:"d MMM"}}]</span>
+		<label ng-click="verVistorias22(vistoria.id);" class="items-list-item" ng-repeat="vistoria in lerVistorias(id_dono)">
+			<span class="items-list-desc" ng-class="{strike:vistoria.STATUS==2}">{{vistoria.nome}} 
+                <span class="date">[{{vistoria.data_criacao | date:"d MMM"}}]</span>
             </span> 
-            <a confirmed-click="deletarVistoria(cliente.id);" ng-confirm-click="Você quer deletar este item?" class="pull-right red"><i class="fa fa-minus-circle"></i></a>
+            <a confirmed-click="deletarVistoria(vistoria.id);" ng-confirm-click="Você quer deletar este item?" class="pull-right red"><i class="fa fa-minus-circle"></i></a>
 		</label>
 	</fieldset>	
 

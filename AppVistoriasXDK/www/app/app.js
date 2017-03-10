@@ -21,19 +21,19 @@ app.config(function($routeProvider) {
 });
 
 app.run(function($localStorage) {
-    if (typeof $localStorage.clientes === 'undefined' || typeof $localStorage.clientes.version === 'undefined' || $localStorage.clientes.version !== 'v0.1')
+    if (typeof $localStorage.clientes === 'undefined' || typeof $localStorage.clientes.version === 'undefined' || $localStorage.clientes.version !== 'v0.2')
     {
         $localStorage.clientes = {
             nextID: 0,
-            version: 'v0.1',
+            version: 'v0.2',
             db: {}
         }; 
     }
-    if (typeof $localStorage.vistorias === 'undefined' || typeof $localStorage.vistorias.version === 'undefined' || $localStorage.vistorias.version !== 'v0.1')
+    if (typeof $localStorage.vistorias === 'undefined' || typeof $localStorage.vistorias.version === 'undefined' || $localStorage.vistorias.version !== 'v0.2')
     {
         $localStorage.vistorias = {
             nextID: 0,
-            version: 'v0.1',
+            version: 'v0.2',
             db: {}
         }; 
     } 
@@ -104,17 +104,20 @@ app.controller('vistoriasController', function($scope, $routeParams, $http, $loc
     };
 
     // ler vistorias
-    $scope.lerVistorias = function (id_dono) 
+    $scope.lerVistorias = function ($id_dono) 
     {  
-        var resultado = new Object();
-
-        for (var vist in $localStorage.vistorias.db)
+        var resultado = new Object;
+        var db = $localStorage.vistorias.db;
+        
+        for (var vist_key in db)
         {
-            if (vist.id_dono == id_dono)
-                resultado[vist] = vist;
-            console.dir(resultado);
+            if (db.hasOwnProperty(vist_key))
+            {
+                if (db[vist_key].id_dono == $id_dono)
+                    resultado[vist_key] = Object.create(db[vist_key]);
+            }
         }
-
+        
         return resultado;
     };
    

@@ -5,7 +5,7 @@
       "projectTypeName": "com.intel.xdk.projecttype.jsapp",
       "src": "jsapp/template-blank-cordova-project-lite/sample.zip",
       "projectGuid": "82606458-0726-45b5-b3d1-bea1407cd611",
-      "lastModifiedDate": 1489029821514,
+      "lastModifiedDate": 1489150689249,
       "creationDate": 1488809141554
     },
     "XDK-app-designer": "false",
@@ -91,7 +91,9 @@
         "sourceLocation": "plugins/cordova-plugin-camera",
         "selectedState": "Included",
         "checksum": "42288131",
-        "dependsOn": [],
+        "dependsOn": [
+          "cordova-plugin-compat"
+        ],
         "topLevel": true,
         "permissions": {
           "android:name": [
@@ -114,11 +116,13 @@
         "selectedState": "Included",
         "checksum": "61c62eb",
         "dependsOn": [],
-        "topLevel": false,
+        "topLevel": true,
         "permissions": {},
         "description": "Cordova Compatibility Plugin",
         "data": {},
-        "dependedBy": [],
+        "dependedBy": [
+          "cordova-plugin-camera"
+        ],
         "custom": "true"
       }
     ],
@@ -134,7 +138,7 @@
           "android-signed": true
         },
         "isActive_": true,
-        "certificateId_": "WN954LLJv0Oo3AABAriLWA2",
+        "certificateId_": "",
         "appName_": "AppSeyconel",
         "appID_": "seyconel.vistorias.app",
         "appAccess_": {
