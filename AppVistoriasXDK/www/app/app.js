@@ -74,7 +74,7 @@ app.controller('homeController', function($scope, $http, $localStorage, $locatio
     console.dir($localStorage);
 });
 
-app.controller('vistoriasController', function($scope, $routeParams, $http, $localStorage) {
+app.controller('vistoriasController', function($scope, $routeParams, $http, $localStorage, $filter) {
 	
     // id do cliente
     $scope.id = $routeParams.id;
@@ -100,15 +100,24 @@ app.controller('vistoriasController', function($scope, $routeParams, $http, $loc
         
         id = id + 1;
         $localStorage.vistorias.nextID = id;
-        
+         
     };
-    
+
     // ler vistorias
-    $scope.lerVistorias = function () 
+    $scope.lerVistorias = function (id_dono) 
     {  
-        return $localStorage.vistorias.db;   
+        var resultado = new Object();
+
+        for (var vist in $localStorage.vistorias.db)
+        {
+            if (vist.id_dono == id_dono)
+                resultado[vist] = vist;
+            console.dir(resultado);
+        }
+
+        return resultado;
     };
-    
+   
     // deletar vistoria
     $scope.deletarVistoria = function ($id)
     {
