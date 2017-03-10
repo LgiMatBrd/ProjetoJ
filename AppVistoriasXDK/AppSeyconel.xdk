@@ -5,7 +5,7 @@
       "projectTypeName": "com.intel.xdk.projecttype.jsapp",
       "src": "jsapp/template-blank-cordova-project-lite/sample.zip",
       "projectGuid": "82606458-0726-45b5-b3d1-bea1407cd611",
-      "lastModifiedDate": 1489150689249,
+      "lastModifiedDate": 1489165785517,
       "creationDate": 1488809141554
     },
     "XDK-app-designer": "false",
@@ -91,9 +91,7 @@
         "sourceLocation": "plugins/cordova-plugin-camera",
         "selectedState": "Included",
         "checksum": "42288131",
-        "dependsOn": [
-          "cordova-plugin-compat"
-        ],
+        "dependsOn": [],
         "topLevel": true,
         "permissions": {
           "android:name": [
@@ -116,13 +114,11 @@
         "selectedState": "Included",
         "checksum": "61c62eb",
         "dependsOn": [],
-        "topLevel": true,
+        "topLevel": false,
         "permissions": {},
         "description": "Cordova Compatibility Plugin",
         "data": {},
-        "dependedBy": [
-          "cordova-plugin-camera"
-        ],
+        "dependedBy": [],
         "custom": "true"
       }
     ],
@@ -138,7 +134,7 @@
           "android-signed": true
         },
         "isActive_": true,
-        "certificateId_": "",
+        "certificateId_": "WN954LLJv0Oo3AABAriLWA2",
         "appName_": "AppSeyconel",
         "appID_": "seyconel.vistorias.app",
         "appAccess_": {
@@ -160,53 +156,81 @@
         "icons_": [
           {
             "density": "ldpi",
-            "relPath": "package-assets/icon.png",
+            "relPath": "package-assets/36x36.png",
             "width": 36,
             "height": 36
           },
           {
             "density": "mdpi",
-            "relPath": "package-assets/icon-2.png",
+            "relPath": "package-assets/48x48.png",
             "width": 48,
             "height": 48
           },
           {
             "density": "hdpi",
-            "relPath": "package-assets/icon-3.png",
+            "relPath": "package-assets/72x72.png",
             "width": 72,
             "height": 72
           },
           {
             "density": "xhdpi",
-            "relPath": "package-assets/icon-4.png",
+            "relPath": "package-assets/96x96.png",
             "width": 96,
             "height": 96
           }
         ],
         "splashes_": [
           {
-            "relPath": "package-assets/splash-screen.png",
+            "relPath": "package-assets/426x320.png",
+            "density": "ldpi",
+            "height": 320,
+            "width": 426,
+            "orientation": "landscape"
+          },
+          {
+            "relPath": "package-assets/470x320.png",
+            "density": "mdpi",
+            "height": 320,
+            "width": 470,
+            "orientation": "landscape"
+          },
+          {
+            "relPath": "package-assets/640x480.png",
+            "density": "hdpi",
+            "height": 480,
+            "width": 640,
+            "orientation": "landscape"
+          },
+          {
+            "relPath": "package-assets/960x720.png",
+            "density": "xhdpi",
+            "height": 720,
+            "width": 960,
+            "orientation": "landscape"
+          },
+          {
+            "relPath": "package-assets/320x426.png",
             "density": "ldpi",
             "height": 426,
             "width": 320,
             "orientation": "portrait"
           },
           {
-            "relPath": "package-assets/splash-screen-2.png",
+            "relPath": "package-assets/320x470.png",
             "density": "mdpi",
             "height": 470,
             "width": 320,
             "orientation": "portrait"
           },
           {
-            "relPath": "package-assets/splash-screen-3.png",
+            "relPath": "package-assets/480x640.png",
             "density": "hdpi",
             "height": 640,
             "width": 480,
             "orientation": "portrait"
           },
           {
-            "relPath": "package-assets/splash-screen-4.png",
+            "relPath": "package-assets/720x960.png",
             "density": "xhdpi",
             "height": 960,
             "width": 720,
