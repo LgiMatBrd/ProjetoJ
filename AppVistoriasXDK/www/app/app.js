@@ -1,7 +1,7 @@
 //Define an angular module for our app 
-var app = angular.module('seyconelApp', ['ngRoute','ngStorage']); 
+var app = angular.module('seyconelApp', ['ngRoute','ngStorage','ngMaterial','ngMessages', 'material.svgAssetsCache']); 
 
-app.config(function($routeProvider) {
+app.config(function($routeProvider,$mdIconProvider) {
     $routeProvider
     .when("/", { 
         templateUrl : "paginas/clientes.html",
@@ -17,7 +17,14 @@ app.config(function($routeProvider) {
     })
     .otherwise({
        redirectTo: '/'
-    });
+    }); 
+    
+    $mdIconProvider
+        .iconSet('social', 'img/icons/sets/social-icons.svg', 24)
+        .iconSet('call', 'img/icons/sets/communication-icons.svg', 24)
+        .iconSet('device', 'img/icons/sets/device-icons.svg', 24)
+        .iconSet('communication', 'img/icons/sets/communication-icons.svg', 24)
+        .defaultIconSet('img/icons/sets/core-icons.svg', 24);
 });
 
 app.run(function($localStorage) {
@@ -47,40 +54,42 @@ app.run(function($localStorage) {
     } 
 });
 
-app.controller('homeController', function($scope, $http, $localStorage, $location) {
+app.controller('homeController', function($scope, $http, $localStorage, $location, $mdDialog) {
+
+  $scope.people = [
+    { name: 'Janet Perkins', img: 'img/100-0.jpeg', newMessage: true },
+    { name: 'Mary Johnson', img: 'img/100-1.jpeg', newMessage: false },
+    { name: 'Peter Carlsson', img: 'img/100-2.jpeg', newMessage: false }
+  ];
+
+
     
+    // Ver vistorias
     $scope.verVistorias = function (id) {
         $location.path('/vistorias/' + id);
     };
 
-    $scope.addCliente = function($valor)
-    {
-        var data_criacao = new Date();
-        id = $localStorage.clientes.nextID;
-        
-        cliente = new Cliente(); // Definições do objeto estão no arquivo dbObj.js
-        cliente.id = id;
-        cliente.nome = $valor;
-        cliente.data_criacao = data_criacao; 
-        $localStorage.clientes.db[id] = cliente;
-        
-        id = id + 1;
-        $localStorage.clientes.nextID = id;
-        
+    $scope.navigateTo = function(to, event) {
+        $mdDialog.show(
+          $mdDialog.alert()
+            .title('Navigating')
+            .textContent('Imagine being taken to ' + to)
+            .ariaLabel('Navigation demo')
+            .ok('Neat!')
+            .targetEvent(event)
+        );
+    };
+
+    $scope.verDadosCliente = function(person, event) {
+        $mdDialog.show(
+          $mdDialog.alert()
+            .title(person.name)
+            .textContent('Aqui ficarão algumas estátisticas do cliente.')
+            .ok('Fechar')
+            .targetEvent(event)
+        );
     };
     
-    $scope.lerClientes = function ()
-    {
-        return $localStorage.clientes.db;
-    }; 
-    
-    $scope.deletarCliente = function ($id)
-    {
-        window.history.back();
-        delete $localStorage.clientes.db[$id];
-    };
-    
-    console.dir($localStorage);
 });
 
 app.controller('vistoriasController', function($scope, $routeParams, $http, $localStorage, $location) {
@@ -208,7 +217,21 @@ app.controller('vistoriasController', function($scope, $routeParams, $http, $loc
         delete $localStorage.vistorias.db[$id]; 
     };
  
-});*/
+});*/ 
+app.directive('backButton', function(){
+    return {
+      restrict: 'A',
+
+      link: function(scope, element, attrs) {
+        element.bind('click', goBack);
+
+        function goBack() {
+          history.back();
+          scope.$apply();
+        }
+      }
+    }
+});
 
 app.directive('ngConfirmClick', [
     function(){

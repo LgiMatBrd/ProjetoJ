@@ -1,27 +1,13 @@
-<div class="navbar navbar-default" id="navbar">
-    <div class="container" id="navbar-container">
-       <div class="navbar-header navbar-brand" style="margin-right: 2px;">
-           <!--<a ng-click="goBack()"><i style="color: #555 !important;" class="fa fa-chevron-left"></i></a>-->
-           <button ng-click="goBack()" type="button" class="btn btn-default" aria-label="Left Align">
-               Voltar
-           </button>
-        </div>    	
-       <div class="navbar-header navbar-brand"><!--<i class="fa fa-check-square-o"></i>-->&nbsp;Vistorias </div>
-       <div class="pull-right">
-            <!--<button class="btn btn-default btn-sm mt-10" ng-click="clearItem()">
-                <i class="fa fa-trash-o" aria-hidden="true"></i>
-            </button>-->
-       </div>    	
+<md-toolbar>
+    <div class="md-toolbar-tools">
+        <a href back-button style="margin-right: 10px;">Voltar</a>
+        <h2><span>SeyService</span></h2>
     </div>
-</div>
+</md-toolbar>
 
-
-<div class="container">
-   <div class="row">
-
-        <div class="col-lg-12 col-sm-12">
-            <div ng-include src="'templates/lista-vistorias.html'"></div>
-        </div>
-
-    </div>
-</div> 
+<md-subheader class="md-no-sticky">Todos as vistorias</md-subheader>
+<md-list-item ng-repeat="person in people" ng-click="verVistorias('1')" class="noright">
+    <p>{{ person.name }}</p>
+    <!--<md-checkbox class="md-secondary" ng-model="person.selected"></md-checkbox>-->
+    <md-icon class="md-secondary" ng-click="verDadosCliente(person, $event)" aria-label="Chat" md-svg-icon="communication:message">r</md-icon>
+</md-list-item>
