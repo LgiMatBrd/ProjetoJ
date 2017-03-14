@@ -6,8 +6,8 @@
 </md-toolbar>
 
 <md-subheader class="md-no-sticky">Todos as vistorias</md-subheader>
-<md-list-item ng-repeat="person in people" ng-click="verVistorias('1')" class="noright">
-    <p>{{ person.name }}</p>
+<md-list-item ng-repeat="person in vistorias2" ng-click="verVistoria('1')" class="noright">
+    <p>{{ person.nome }}</p>
     <!--<md-checkbox class="md-secondary" ng-model="person.selected"></md-checkbox>-->
     <md-icon class="md-secondary" ng-click="verDadosCliente(person, $event)" aria-label="Chat" md-svg-icon="communication:message">r</md-icon>
 </md-list-item>

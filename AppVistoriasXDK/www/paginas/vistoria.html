@@ -1,27 +1,135 @@
-<div class="navbar navbar-default" id="navbar">
-    <div class="container" id="navbar-container">
-       <div class="navbar-header navbar-brand" style="margin-right: 2px;">
-           <!--<a ng-click="goBack()"><i style="color: #555 !important;" class="fa fa-chevron-left"></i></a>-->
-           <button ng-click="goBack()" type="button" class="btn btn-default" aria-label="Left Align">
-               Voltar
-           </button>
-        </div>    	
-       <div class="navbar-header navbar-brand"><!--<i class="fa fa-check-square-o"></i>-->&nbsp;Vistoria </div>
-       <div class="pull-right">
-            <!--<button class="btn btn-default btn-sm mt-10" ng-click="clearItem()">
-                <i class="fa fa-trash-o" aria-hidden="true"></i>
-            </button>-->
-       </div>    	
+<md-toolbar>
+    <div class="md-toolbar-tools">
+        <a href back-button style="margin-right: 10px;">Voltar</a>
+        <h2><span>SeyService</span></h2>
     </div>
+</md-toolbar>
+
+<md-subheader class="md-no-sticky">Vistoria X</md-subheader>
+<md-card class="_md">
+	<img ng-src="https://material.angularjs.org/latest/img/washedout.png" class="md-card-image" alt="Teste 1" src="https://material.angularjs.org/latest/img/washedout.png">
+    <md-card-title>
+        <md-card-title-text>
+            <span class="md-headline">Titulo</span>
+        </md-card-title-text>
+    </md-card-title>
+    <md-card-actions layout="row" layout-align="center center" class="layout-align-center center layout-row">
+        <md-button sclass="md-raised md-primary">Ver</md-button>
+	</md-card-actions>
+</md-card>
+<md-button class="md-fab md-fab-bottom-right" aria-label="Add" ng-click="showAdvanced($event)" style="background-color: #1364b4;">
+    <md-icon md-svg-src="img/icons/menu.svg"></md-icon>
+</md-button>
+
+<script type="text/ng-template" id="formulario-vistoria.tmpl.html">
+<md-dialog aria-label="Form">
+
+<md-content layout-padding="">
+<div>
+  <form name="userForm">
+	<h3>Adicionar vistoria</h3>
+	
+	  <md-input-container class="md-block" flex-gt-sm="">
+		<label>Item</label>
+		<md-select ng-model="user.state">
+		  <md-option value="1">Linga de corrente (NR-11/NBR 15516 1 e 2/NBR ISO 3076/NBR ISO 1834)</md-option>
+		  <md-option value="2">Eslingas, cintas planas e tubulares. (NR-11 NBR 15637 1 e 2)</md-option>
+		</md-select>
+	  </md-input-container>
+
+	  <md-input-container class="md-block" flex-gt-sm="">
+		<label>Setor:</label>
+		<input ng-model="theMax">
+	  </md-input-container>
+
+	  <md-input-container class="md-block" flex-gt-sm="">
+		<label>Comprimento:</label>
+		<input ng-model="theMax">
+	  </md-input-container>
+	
+		<md-input-container class="md-block">
+          <label>Descrição</label>
+          <textarea ng-model="user.biography" md-maxlength="150" rows="5" md-select-on-focus=""></textarea>
+        </md-input-container>
+		
+	  <md-input-container class="md-block" flex-gt-sm="">
+		<label>Ramais</label>
+		<md-select ng-model="user.state">
+		  <md-option value="1">Ramal 1</md-option>
+		  <md-option value="2">Ramal 2</md-option>
+		  <md-option value="3">Ramal 3</md-option>
+		  <md-option value="4">Ramal 4</md-option>
+		</md-select>
+	  </md-input-container>
+
+	  <md-input-container class="md-block" flex-gt-sm="">
+		<label>Capacidade:</label>
+		<input ng-model="theMax">
+	  </md-input-container>
+	  
+	<md-switch md-invert="" ng-model="data.cb1" aria-label="Switch 1">
+	<label>Danos nos olhais:</label>
+	</md-switch>
+	  
+	<md-switch md-invert="" ng-model="data.cb2" aria-label="Switch 1">
+	<label>Danos costura do corpo:</label>
+	</md-switch>
+	  
+	<md-switch md-invert="" ng-model="data.cb3" aria-label="Switch 1">
+	<label>Danos costura principal (transpasse):</label>
+	</md-switch>
+	  
+	<md-switch md-invert="" ng-model="data.cb4" aria-label="Switch 1">
+	<label>Cortes:</label>
+	</md-switch>
+	  
+	<md-switch md-invert="" ng-model="data.cb5" aria-label="Switch 1">
+	<label>Abrasão:</label>
+	</md-switch>
+
+	<md-input-container class="md-block" flex-gt-sm="">
+	<label>Elemento inicial:</label>
+	<input ng-model="theMax">
+	</md-input-container>
+
+	<md-input-container class="md-block" flex-gt-sm="">
+	<label>Elemento de ligação:</label>
+	<input ng-model="theMax">
+	</md-input-container>
+
+	<md-input-container class="md-block" flex-gt-sm="">
+	<label>Elemento final:</label>
+	<input ng-model="theMax">
+	</md-input-container>
+	  
+	<md-switch md-invert="" ng-model="data.cb6" aria-label="Switch 1">
+	<label>Etiqueta de identificação:</label>
+	</md-switch>
+	
+	<md-input-container class="md-block">
+	  <label>Observação</label>
+	  <textarea ng-model="user.biography" md-maxlength="150" rows="5" md-select-on-focus=""></textarea>
+	</md-input-container>
+
+	<md-input-container class="md-block" flex-gt-sm="">
+	<label>Placa de rastreabilidade Seyconel:</label>
+	<input ng-model="theMax">
+	</md-input-container>
+	  
+	<md-switch md-invert="" ng-model="data.cb7" aria-label="Switch 1">
+	<label>APROVADO?</label>
+	</md-switch>
+
+
+
+  </form>
 </div>
+</md-content>
 
-
-<div class="container">
-   <div class="row">
-
-        <div class="col-lg-12 col-sm-12">
-            <div ng-include src="'templates/lista-vistorias.html'"></div>
-        </div>
-
-    </div>
-</div> 
+   <md-dialog-actions layout="row">
+      <span flex></span> 
+      <md-button ng-click="answer(\'not useful\')"> Cancel </md-button>
+      <md-button ng-click="answer(\'useful\')" class="md-primary"> Save </md-button>
+   </md-dialog-actions>
+</md-dialog>
+</script>

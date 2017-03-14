@@ -62,8 +62,6 @@ app.controller('homeController', function($scope, $http, $localStorage, $locatio
     { name: 'Peter Carlsson', img: 'img/100-2.jpeg', newMessage: false }
   ];
 
-
-    
     // Ver vistorias
     $scope.verVistorias = function (id) {
         $location.path('/vistorias/' + id);
@@ -94,6 +92,13 @@ app.controller('homeController', function($scope, $http, $localStorage, $locatio
 
 app.controller('vistoriasController', function($scope, $routeParams, $http, $localStorage, $location) {
 	$scope.vistorias = {};
+    
+    $scope.vistorias2 = [
+        { id: '1', id_dono: '1', nome: 'Johnson', data_criacao: 'Johnson'},
+        { id: '1', id_dono: '1', nome: 'Johnson', data_criacao: 'Johnson'},
+        { id: '1', id_dono: '1', nome: 'Johnson', data_criacao: 'Johnson'}
+    ];
+    
     // chama a função para preencher a variável que armazena as vistorias desse cliente
     populaVistorias($routeParams.id);
     
@@ -159,8 +164,18 @@ app.controller('vistoriasController', function($scope, $routeParams, $http, $loc
     
 });
 
-/*app.controller('vistoriaController', function($scope, $routeParams, $http, $localStorage, $filter) {
+app.controller('vistoriaController', function($scope, $routeParams, $http, $localStorage, $filter, $mdDialog) {
 	
+    $scope.showAdvanced = function(ev) {
+        $mdDialog.show({
+            templateUrl: 'formulario-vistoria.tmpl.html',
+            parent: angular.element(document.body),
+            targetEvent: ev,
+            clickOutsideToClose:true,
+            fullscreen: $scope.customFullscreen // Only for -xs, -sm breakpoints. 
+        }); 
+    };
+    
     // id do cliente
     $scope.id = $routeParams.id;
     $scope.id_dono = $routeParams.id;
@@ -217,7 +232,9 @@ app.controller('vistoriasController', function($scope, $routeParams, $http, $loc
         delete $localStorage.vistorias.db[$id]; 
     };
  
-});*/ 
+});
+
+
 app.directive('backButton', function(){
     return {
       restrict: 'A',
