@@ -90,7 +90,7 @@ app.controller('homeController', function($scope, $http, $localStorage, $locatio
     
 });
 
-app.controller('vistoriasController', function($scope, $routeParams, $http, $localStorage, $location) {
+app.controller('vistoriasController', function($scope, $routeParams, $http, $localStorage, $location, $mdDialog) {
 	$scope.vistorias = {};
     
     $scope.vistorias2 = [
@@ -168,13 +168,28 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
 	
     $scope.showAdvanced = function(ev) {
         $mdDialog.show({
+            controller: DialogController,
             templateUrl: 'formulario-vistoria.tmpl.html',
             parent: angular.element(document.body),
             targetEvent: ev,
             clickOutsideToClose:true,
-            fullscreen: $scope.customFullscreen // Only for -xs, -sm breakpoints. 
+            fullscreen: $scope.customFullscreen
         }); 
     };
+
+    function DialogController($scope, $mdDialog) {
+        $scope.hide = function() {
+            $mdDialog.hide();
+        };
+
+        $scope.cancel = function() {
+            $mdDialog.cancel();
+        };
+
+        $scope.answer = function(answer) {
+            $mdDialog.hide(answer);
+        };
+    }
     
     // id do cliente
     $scope.id = $routeParams.id;
