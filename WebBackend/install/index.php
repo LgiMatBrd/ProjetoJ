@@ -9,6 +9,13 @@
 if (!defined('ROOT_DIR'))
     die('Diretório raiz não foi previamente definido!');
 
+// Verifica se a instalação está atualizada (conforme arquivo version.php)
+$installerVersion = '0.1';
+include_once ROOT_DIR.'/config/version.php';
+
+if ($version !== $installerVersion)
+{
+
 $time = date(Ymd);
 $concreteBackgroundWallPaper = 'http://backgroundimages.concrete5.org/wallpaper/'.$time.'.jpg';
 $concreteBackgroundDesc = 'http://backgroundimages.concrete5.org/get_image_data.php?image='.$time.'.jpg';
@@ -17,7 +24,9 @@ $concreteBackgroundDesc = 'http://backgroundimages.concrete5.org/get_image_data.
 if (isset($_POST['instalar']))
 {
     include ROOT_DIR.'/install/install.php';
-} else {
+} 
+else
+{
 ?>
 
 <!DOCTYPE html>
@@ -127,5 +136,7 @@ if (isset($_POST['instalar']))
     </body>
 </html>
 <?php
+}
+exit;
 }
 ?>

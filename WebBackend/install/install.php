@@ -8,6 +8,8 @@ include_once ROOT_DIR.'/install/db.php';
 
 include_once ROOT_DIR.'/lib/login/register.php';
 
+include_once ROOT_DIR.'/install/version.php';
+
 ?>
 <!DOCTYPE html>
 <html>

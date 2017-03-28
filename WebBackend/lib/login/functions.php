@@ -31,7 +31,8 @@ function sec_session_start() {
     // Estabelece o nome fornecido acima como o nome da sessão.
     session_name($session_name);
     session_start();            // Inicia a sessão PHP 
-    session_regenerate_id();    // Recupera a sessão e deleta a anterior. 
+    session_regenerate_id();    // Recupera a sessão e deleta a anterior.
+    define('SESSION_START', true);
 }
 
 function login($loginTxt, $password, $mysqli) {

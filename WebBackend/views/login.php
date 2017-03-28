@@ -1,4 +1,12 @@
 <?php
+
+// Esta view possui um controller, por este motivo, este arquivo não deve ser 
+// acessado de forma direta ou através de outro arquivo não previsto.
+// 
+// Testa se este arquivo foi incluído pelo seu controller
+if (!defined('LOGIN_CONTROLLER'))
+    die;
+
 $time = date(Ymd);
 $concreteBackgroundWallPaper = 'http://backgroundimages.concrete5.org/wallpaper/'.$time.'.jpg';
 $concreteBackgroundDesc = 'http://backgroundimages.concrete5.org/get_image_data.php?image='.$time.'.jpg';
@@ -30,7 +38,9 @@ $concreteBackgroundDesc = 'http://backgroundimages.concrete5.org/get_image_data.
             <div class="uk-vertical-align-middle uk-width-9-10 uk-width-medium-1-3 uk-margin-small uk-margin-small-top">
                 <div class="uk-panel uk-panel-box uk-panel-header">
                     <h3 class="uk-panel-title">Faça login para continuar</h3>
-                    <form id="form1" class="uk-form uk-form-stacked uk-text-left" action="login/process_login.php" method="post" name="login_form">                      
+                    <form id="form1" class="uk-form uk-form-stacked uk-text-left" action="/login" method="post" name="login_form">                      
+                        <input type="hidden" name="makelogin" value="yes" />
+                        <input type="hidden" name="gotopage" value="<? echo $gotopage; ?>" />
                         <div class="uk-form-row">
                             <label class="uk-form-label" for="user">Usuário</label>
                             <div class="uk-form-controls">
