@@ -30,7 +30,7 @@ if (login_check($mysqli) == true) {
             include ROOT_DIR.'/controllers'.$recurso.'.php';
     
     else if ($recurso == '/index.php')
-            header('Location: ./home');
+            header('Location: /home');
     
     else if (file_exists(ROOT_DIR.'/views'.$recurso.'.php'))
             include ROOT_DIR.'/views'.$recurso.'.php';
