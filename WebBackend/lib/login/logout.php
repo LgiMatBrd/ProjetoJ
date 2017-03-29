@@ -10,7 +10,9 @@ if (!defined('ROOT_DIR'))
     die;
 
 include_once ROOT_DIR.'/lib/login/functions.php';
-sec_session_start();
+// Se não houve sessão segura iniciada, deve-se iniciar
+if (!defined('SESSION_START'))
+    sec_session_start();
  
 // Desfaz todos os valores da sessão  
 $_SESSION = array();
@@ -28,4 +30,5 @@ setcookie(session_name(),
  
 // Destrói a sessão 
 session_destroy();
-header('Location: ../index.php');
+$logged = 'out';
+header('Location: /index.php');

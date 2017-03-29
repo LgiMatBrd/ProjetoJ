@@ -13,6 +13,7 @@ include_once ROOT_DIR.'/config/psl-config.php';
  
 function sec_session_start() {
     $session_name = 'sec_session_id';   // Estabeleça um nome personalizado para a sessão
+        
     $secure = SECURE;
     // Isso impede que o JavaScript possa acessar a identificação da sessão.
     $httponly = true;
@@ -23,15 +24,17 @@ function sec_session_start() {
     }
     // Obtém params de cookies atualizados.
     $cookieParams = session_get_cookie_params();
+    
+    session_name($session_name);
+    session_start();            // Inicia a sessão PHP 
+    session_regenerate_id(true);    // Recupera a sessão e deleta a anterior.
+    
     session_set_cookie_params($cookieParams['lifetime'],
         $cookieParams['path'], 
         $cookieParams['domain'], 
         $secure,
         $httponly);
-    // Estabelece o nome fornecido acima como o nome da sessão.
-    session_name($session_name);
-    session_start();            // Inicia a sessão PHP 
-    session_regenerate_id();    // Recupera a sessão e deleta a anterior.
+    // Estabelece o nome fornecido acima como o nome da sessão.    
     define('SESSION_START', true);
 }
 
@@ -136,12 +139,14 @@ function login_check($mysqli) {
         if ($stmt = $mysqli->prepare("SELECT pass 
                                       FROM users 
                                       WHERE id = ? LIMIT 1")) {
+ 
             // Atribui "$user_id" ao parâmetro. 
             $stmt->bind_param('i', $user_id);
             $stmt->execute();   // Execute the prepared query.
             $stmt->store_result();
  
             if ($stmt->num_rows == 1) {
+
                 // Caso o usuário exista, pega variáveis a partir do resultado.                 
                 $stmt->bind_result($password);
                 $stmt->fetch();
