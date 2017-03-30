@@ -1,0 +1,13 @@
+<md-toolbar>
+    <div class="md-toolbar-tools">
+        <a href back-button style="margin-right: 10px;">Voltar</a>
+        <h2><span>SeyService</span></h2>
+    </div>
+</md-toolbar>
+
+<md-subheader class="md-no-sticky">Todos as vistorias</md-subheader>
+<md-list-item ng-repeat="person in vistorias2" ng-click="verVistoria('1')" class="noright">
+    <p>{{ person.nome }}</p>
+    <!--<md-checkbox class="md-secondary" ng-model="person.selected"></md-checkbox>-->
+    <md-icon class="md-secondary" ng-click="verDadosCliente(person, $event)" aria-label="Chat" md-svg-icon="communication:message">r</md-icon>
+</md-list-item>

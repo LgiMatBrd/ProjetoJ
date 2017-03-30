@@ -55,27 +55,66 @@ app.run(function($localStorage) {
 });
 
 app.controller('homeController', function($scope, $http, $localStorage, $location, $mdDialog) {
+    
+    $scope.showAdvanced = function(ev) {
+        $mdDialog.show({
+            controller: DialogController,
+            templateUrl: 'formulario-add-cliente.tmpl.html',
+            parent: angular.element(document.body),
+            targetEvent: ev,
+            clickOutsideToClose:true,
+            fullscreen: $scope.customFullscreen
+        }); 
+    };
 
-  $scope.people = [
-    { name: 'Janet Perkins', img: 'img/100-0.jpeg', newMessage: true },
-    { name: 'Mary Johnson', img: 'img/100-1.jpeg', newMessage: false },
-    { name: 'Peter Carlsson', img: 'img/100-2.jpeg', newMessage: false }
-  ];
+    function DialogController($scope, $mdDialog) {
+        $scope.addCliente = function($valor) {
+            var data_criacao = new Date();
+            id = $localStorage.clientes.nextID;
+
+            cliente = new Cliente(); // Definições do objeto estão no arquivo dbObj.js
+            cliente.id = id;
+            cliente.nome = $valor;
+            cliente.data_criacao = data_criacao; 
+            $localStorage.clientes.db[id] = cliente;
+
+            id = id + 1;
+            $localStorage.clientes.nextID = id;
+            $mdDialog.hide();
+
+        };
+        
+        $scope.hide = function() {
+            $mdDialog.hide();
+        };
+
+        $scope.salvar = function() {
+            console.log('eff');
+            $scope.resultadoAdicionar =  'fwewefwef';
+        };
+
+        $scope.cancel = function() {
+            $mdDialog.cancel();
+        };
+
+        $scope.answer = function(answer) {
+            $mdDialog.hide(answer);
+        };
+    }
+
+    $scope.lerClientes = function ()
+    {
+        return $localStorage.clientes.db;
+    }; 
 
     // Ver vistorias
     $scope.verVistorias = function (id) {
         $location.path('/vistorias/' + id);
     };
 
-    $scope.navigateTo = function(to, event) {
-        $mdDialog.show(
-          $mdDialog.alert()
-            .title('Navigating')
-            .textContent('Imagine being taken to ' + to)
-            .ariaLabel('Navigation demo')
-            .ok('Neat!')
-            .targetEvent(event)
-        );
+    $scope.deletarCliente = function ($id)
+    {
+        delete $localStorage.clientes.db[$id];
     };
 
     $scope.verDadosCliente = function(person, event) {
@@ -91,23 +130,22 @@ app.controller('homeController', function($scope, $http, $localStorage, $locatio
 });
 
 app.controller('vistoriasController', function($scope, $routeParams, $http, $localStorage, $location, $mdDialog) {
+   
 	$scope.vistorias = {};
-    
-    $scope.vistorias2 = [
-        { id: '1', id_dono: '1', nome: 'Johnson', data_criacao: 'Johnson'},
-        { id: '1', id_dono: '1', nome: 'Johnson', data_criacao: 'Johnson'},
-        { id: '1', id_dono: '1', nome: 'Johnson', data_criacao: 'Johnson'}
-    ];
-    
-    // chama a função para preencher a variável que armazena as vistorias desse cliente
-    populaVistorias($routeParams.id);
     
     // id do cliente
     $scope.id = $routeParams.id;
+    $scope.nome = $localStorage.vistorias.db[$scope.id].nome;
     $scope.id_dono = $routeParams.id;
+     
+    console.dir(populaVistorias('10'));
+    console.dir($localStorage);
+    
+    // chama a função para preencher a variável que armazena as vistorias desse cliente
+    populaVistorias($scope.id);
     
     // botão de voltar
-    $scope.goBack = function() {
+    $scope.goBack = function() { 
         window.history.back();
     }; 
     
@@ -117,28 +155,28 @@ app.controller('vistoriasController', function($scope, $routeParams, $http, $loc
     };
     
     // adicionar vistoria
-    $scope.addVistoria = function($valor)
+    $scope.addVistoria = function($valor,$id_dono)
     {
         var data_criacao = new Date();
         id = $localStorage.vistorias.nextID;
         
         vistoria = new Vistoria(); 
         vistoria.id = id;
-        vistoria.id_dono = $scope.id_dono; 
+        vistoria.id_dono = $id_dono;
         vistoria.nome = $valor;
-        vistoria.data_criacao = data_criacao; 
+        vistoria.data_criacao = data_criacao;
         $localStorage.vistorias.db[id] = vistoria;
         
         id = id + 1;
         $localStorage.vistorias.nextID = id;
         // Repopula a variavel de escopo $scope.vistorias
-        populaVistorias($scope.id_dono);
-         
-    }; 
+        //populaVistorias($id_dono);
+        $location.path('/vistorias/' + $id_dono);
+    };
 
     // ler vistorias
     // popula a variavel $scope.vistorias
-    function populaVistorias ($id_dono) 
+    function populaVistorias($id_dono)
     {  
         var db = $localStorage.vistorias.db;
         $scope.vistorias = {};
@@ -153,14 +191,51 @@ app.controller('vistoriasController', function($scope, $routeParams, $http, $loc
         }
     };
    
-    // deletar vistoria
+    // deletar vistoria 
     $scope.deletarVistoria = function ($id)
     {
-        window.history.back();
-        delete $localStorage.vistorias.db[$id]; 
+        delete $localStorage.vistorias.db[$id];
         // Repopula a variavel de escopo $scope.vistorias
         populaVistorias($scope.id_dono);
     };
+    
+    $scope.showAdvanced = function(ev) {
+        $mdDialog.show({
+            controller: DialogController,
+            templateUrl: 'formulario-add-vistoria.tmpl.html',
+            id_dono: $scope.id_dono,
+            parent: angular.element(document.body),
+            targetEvent: ev,
+            clickOutsideToClose:true,
+            fullscreen: $scope.customFullscreen
+        }); 
+    }; 
+
+    function DialogController($scope, $mdDialog, id_dono) {
+        console.log(id_dono);
+        $scope.addVistoria = function($valor) {
+            var data_criacao = new Date();
+            id = $localStorage.vistorias.nextID;
+
+            vistoria = new Vistoria(); 
+            vistoria.id = id;
+            vistoria.id_dono = id_dono;
+            vistoria.nome = $valor;
+            vistoria.data_criacao = data_criacao; 
+            $localStorage.vistorias.db[id] = vistoria;
+
+            id = id + 1;
+            $localStorage.vistorias.nextID = id;
+            // Repopula a variavel de escopo $scope.vistorias
+            populaVistorias(id_dono);
+            $mdDialog.hide();
+
+        };
+        
+        $scope.cancel = function() {
+            $mdDialog.cancel();
+        };
+    }
     
 });
 
