@@ -6,23 +6,27 @@
 </md-toolbar>
 
 <md-subheader class="md-no-sticky">Vistoria X</md-subheader>
+
+<md-list-item ng-repeat="person in itensVistoriados" ng-click="" class="noright">
 <md-card class="_md">
 	<img ng-src="https://material.angularjs.org/latest/img/washedout.png" class="md-card-image" alt="Teste 1" src="https://material.angularjs.org/latest/img/washedout.png">
     <md-card-title>
         <md-card-title-text>
-            <span class="md-headline">Titulo</span>
+            <span class="md-headline" style="font-size: 13px;"><strong>{{ person.nome }}</strong></span>
         </md-card-title-text>
     </md-card-title>
     <md-card-actions layout="row" layout-align="center center" class="layout-align-center center layout-row">
         <md-button sclass="md-raised md-primary">Ver</md-button>
 	</md-card-actions>
 </md-card>
+</md-list-item>
 
 
-
-
-<md-button class="md-fab md-fab-bottom-right" aria-label="Add" ng-click="showAdvanced($event)" style="background-color: #1364b4;">
+<!--<md-button class="md-fab md-fab-bottom-right" aria-label="Add" ng-click="showAdvanced($event)" style="background-color: #1364b4;">
     <md-icon md-svg-src="img/icons/menu.svg"></md-icon>
+</md-button>-->
+<md-button class="md-fab md-fab-bottom-right" aria-label="Add" ng-click="showAdvanced($event)" style="background-color: #1364b4;">
+    <i class="fa fa-plus fa-lg" aria-hidden="true"></i>
 </md-button>
 
 <script type="text/ng-template" id="formulario-vistoria.tmpl.html">
@@ -41,14 +45,14 @@
 	  <md-input-container class="md-block" flex-gt-sm="">
 		<label>Item</label>
 		<md-select ng-model="user.state">
-		  <md-option value="1">Linga de corrente (NR-11/NBR 15516 1 e 2/NBR ISO 3076/NBR ISO 1834)</md-option>
-		  <md-option value="2">Eslingas, cintas planas e tubulares. (NR-11 NBR 15637 1 e 2)</md-option>
+		  <md-option value="Linga de corrente (NR-11/NBR 15516 1 e 2/NBR ISO 3076/NBR ISO 1834)">Linga de corrente (NR-11/NBR 15516 1 e 2/NBR ISO 3076/NBR ISO 1834)</md-option>
+		  <md-option value="Eslingas, cintas planas e tubulares. (NR-11 NBR 15637 1 e 2)">Eslingas, cintas planas e tubulares. (NR-11 NBR 15637 1 e 2)</md-option>
 		</md-select>
 	  </md-input-container>
 
 	  <md-input-container class="md-block" flex-gt-sm="">
 		<label>Setor:</label>
-		<input ng-model="theMax">
+		<input ng-model="setor">
 	  </md-input-container>
 
 	  <md-input-container class="md-block" flex-gt-sm="">
@@ -138,7 +142,7 @@
    <md-dialog-actions layout="row">
       <span flex></span> 
       <md-button ng-click="cancel()"> Cancel </md-button>
-      <md-button ng-click="answer(\'useful\')" class="md-primary"> Save </md-button>
+      <md-button ng-click="addItem(user.state,setor)" class="md-primary"> Save </md-button>
    </md-dialog-actions>
 </md-dialog>
 </script>

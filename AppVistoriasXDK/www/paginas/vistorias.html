@@ -11,10 +11,13 @@
 <md-list-item ng-repeat="person in vistorias" ng-click="verVistoria(person.id)" class="noright">
     <p>{{ person.nome }}</p>
     <!--<md-checkbox class="md-secondary" ng-model="person.selected"></md-checkbox>-->
-    <md-icon class="md-secondary" ng-click="deletarVistoria(person.id)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>
+    <!--<md-icon class="md-secondary" ng-click="verDadosVistorias(person.id)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>-->
     <!--<md-icon confirmed-click="deletarVistoria(vistoria.id);" ng-confirm-click="Você quer deletar este item?" class="md-secondary" ng-click="deletarCliente(person.id)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>-->
     <!--<md-icon confirmed-click="deletarVistoria2(vistoria.id);" ng-confirm-click="Você quer deletar este item?" class="md-secondary" ng-click="deletarCliente(person.id)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>-->
-</md-list-item>
+    <!--<md-button ng-click="deletarVistoria(person.id)">Deletar</md-button>-->
+    <md-icon ng-click="verDadosVistorias(person.id)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>
+    <md-icon ng-click="deletarVistoria(person.id)">delete_forever</md-icon>
+</md-list-item> 
 
 <md-button class="md-fab md-fab-bottom-right" aria-label="Add" ng-click="showAdvanced($event)" style="background-color: #1364b4;">
     <i class="fa fa-plus fa-lg" aria-hidden="true"></i>
