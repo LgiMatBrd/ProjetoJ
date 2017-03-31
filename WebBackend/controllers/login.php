@@ -1,5 +1,7 @@
 <?php
-// Arquivo controller da view 'login'
+/*
+ *  Arquivo controller da view 'login'
+ */
 
 if (!defined('ROOT_DIR')) // Impossibilita o acesso direto ao arquivo
     die;
@@ -32,7 +34,6 @@ if (isset($_POST['makelogin']) && filter_input(INPUT_POST, 'makelogin', FILTER_S
     }
     else
     {
-        echo 'Login incorreto';
         // Falha ao logar
         $error = '<p class="error">Erro ao fazer o login!</p>';
         // Importa o código da view para o usuário tentar logar novamente!
