@@ -195,7 +195,7 @@ app.controller('vistoriasController', function($scope, $routeParams, $http, $loc
                     $scope.vistorias[vist_key] = Object.create(db[vist_key]);
             }
         }
-    };
+    }
    
     // deletar vistoria 
     $scope.deletarVistoria = function ($id)
@@ -268,19 +268,26 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
     console.dir('ID:'+$scope.id_dono);
     
     $scope.showAdvanced = function(ev) {
-        $mdDialog.show({
+        $mdDialog
+            .show({
             controller: DialogController,
             templateUrl: 'formulario-vistoria.tmpl.html',
             id_dono: $scope.id_dono,
+            locals: {
+                tiposVistorias: $scope.tiposVistorias
+            },
+            bindToController: true,
+            onRemoving: function() { populaVistorias($scope.id_dono); },
             parent: angular.element(document.body),
             targetEvent: ev,
             clickOutsideToClose:true,
             fullscreen: $scope.customFullscreen
-        }); 
+            });
     }; 
 
-    function DialogController($scope, $mdDialog, id_dono) {
+    function DialogController($scope, $mdDialog, id_dono, tiposVistorias) {
         console.log(id_dono);
+        $scope.tiposVistorias = tiposVistorias;
         $scope.addItem = function($item,$setor) {
             var data_criacao = new Date();
             id = $localStorage.itensVistoriados.nextID;
@@ -299,8 +306,7 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
 
             id = id + 1;
             $localStorage.itensVistoriados.nextID = id;
-            // Repopula a variavel de escopo $scope.vistorias
-            populaVistorias($scope.id_dono);
+            
             $mdDialog.hide();
 
         };
@@ -325,7 +331,8 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
                     $scope.itensVistoriados[vist_key] = Object.create(db[vist_key]);
             }
         }
-    };
+    }
+    
     
     // botão de voltar
     $scope.goBack = function() {
@@ -358,7 +365,7 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
     // ler vistorias
     $scope.lerVistorias = function ($id_dono) 
     {
-        var resultado = new Object;
+        var resultado = {};
         var db = $localStorage.vistorias.db; 
         
         for (var vist_key in db)
@@ -378,7 +385,13 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
     {
         delete $localStorage.vistorias.db[$id]; 
     };
- 
+    
+    $scope.tiposVistorias = {
+        'linc': 'Linga de corrente (NR-11/NBR 15516 1 e 2/NBR ISO 3076/NBR ISO 1834)',
+        'ectu': 'Eslingas, cintas planas e tubulares. (NR-11 NBR 15637 1 e 2)'
+    };
+    
+    console.log($scope.tiposVistorias);
 });
 
 
@@ -394,7 +407,7 @@ app.directive('backButton', function(){
           scope.$apply();
         }
       }
-    }
+    };
 });
 
 app.directive('ngConfirmClick', [
@@ -405,11 +418,11 @@ app.directive('ngConfirmClick', [
                 var clickAction = attr.confirmedClick;
                 element.bind('click',function (event) {
                     if ( window.confirm(msg) ) {
-                        scope.$eval(clickAction)
+                        scope.$eval(clickAction);
                     } else {
                         window.history.back();
                     }
                 });
             }
         };
-}])
+}]);

@@ -5,7 +5,7 @@
       "projectTypeName": "com.intel.xdk.projecttype.jsapp",
       "src": "jsapp/template-blank-cordova-project-lite/sample.zip",
       "projectGuid": "82606458-0726-45b5-b3d1-bea1407cd611",
-      "lastModifiedDate": 1489165785517,
+      "lastModifiedDate": 1491001556275,
       "creationDate": 1488809141554
     },
     "XDK-app-designer": "false",
@@ -134,7 +134,7 @@
           "android-signed": true
         },
         "isActive_": true,
-        "certificateId_": "WN954LLJv0Oo3AABAriLWA2",
+        "certificateId_": "",
         "appName_": "AppSeyconel",
         "appID_": "seyconel.vistorias.app",
         "appAccess_": {

@@ -1,3 +1,5 @@
+
+
 <md-toolbar>
     <div class="md-toolbar-tools">
         <a href back-button style="margin-right: 10px;"><i class="fa fa-chevron-left" aria-hidden="true"></i></a>
@@ -9,10 +11,11 @@
 
 <md-list-item ng-repeat="person in itensVistoriados" ng-click="" class="noright">
 <md-card class="_md">
-	<img ng-src="https://material.angularjs.org/latest/img/washedout.png" class="md-card-image" alt="Teste 1" src="https://material.angularjs.org/latest/img/washedout.png">
+	<img ng-src="https://unsplash.it/300/200/?random" class="md-card-image" alt="Teste 1" src="https://unsplash.it/300/200/?random">
+    <!-- Imagem antiga: https://material.angularjs.org/latest/img/washedout.png -->
     <md-card-title>
         <md-card-title-text>
-            <span class="md-headline" style="font-size: 13px;"><strong>{{ person.nome }}</strong></span>
+            <span class="md-headline" style="font-size: 13px;"><strong>{{ tiposVistorias[person.nome] }}</strong></span>
         </md-card-title-text>
     </md-card-title>
     <md-card-actions layout="row" layout-align="center center" class="layout-align-center center layout-row">
@@ -34,7 +37,7 @@
 <md-toolbar>
 <div class="md-toolbar-tools">
   <md-button aria-label="fechaDialog" class="md-icon-button" ng-click="cancel()">
-    <md-icon class="fa fa-times fa-2x"></md-icon>
+    <md-icon md-font-set="fa" class="fa-times fa-2x"></md-icon>
   </md-button>
   <h2 flex="flex">Adicionar vistoria</h2>
 </div>
@@ -44,20 +47,19 @@
   <form name="userForm">
 	  <md-input-container class="md-block" flex-gt-sm="">
 		<label>Item</label>
-		<md-select ng-model="user.state">
-		  <md-option value="Linga de corrente (NR-11/NBR 15516 1 e 2/NBR ISO 3076/NBR ISO 1834)">Linga de corrente (NR-11/NBR 15516 1 e 2/NBR ISO 3076/NBR ISO 1834)</md-option>
-		  <md-option value="Eslingas, cintas planas e tubulares. (NR-11 NBR 15637 1 e 2)">Eslingas, cintas planas e tubulares. (NR-11 NBR 15637 1 e 2)</md-option>
+		<md-select name="item" ng-model="user.state">
+		  <md-option value="{{valor}}" ng-repeat="(valor,nome) in tiposVistorias">{{nome}}</md-option>
 		</md-select>
 	  </md-input-container>
 
 	  <md-input-container class="md-block" flex-gt-sm="">
 		<label>Setor:</label>
-		<input ng-model="setor">
+		<input ng-model="setor" />
 	  </md-input-container>
 
 	  <md-input-container class="md-block" flex-gt-sm="">
 		<label>Comprimento:</label>
-		<input ng-model="theMax">
+		<input ng-model="theMax" />
 	  </md-input-container>
 	
 		<md-input-container class="md-block">
@@ -77,7 +79,7 @@
 
 	  <md-input-container class="md-block" flex-gt-sm="">
 		<label>Capacidade:</label>
-		<input ng-model="theMax">
+		<input ng-model="theMax" />
 	  </md-input-container>
 	  
 	<md-switch md-invert="" ng-model="data.cb1" aria-label="Switch 1">
@@ -102,17 +104,17 @@
 
 	<md-input-container class="md-block" flex-gt-sm="">
 	<label>Elemento inicial:</label>
-	<input ng-model="theMax">
+	<input ng-model="theMax" />
 	</md-input-container>
 
 	<md-input-container class="md-block" flex-gt-sm="">
 	<label>Elemento de ligação:</label>
-	<input ng-model="theMax">
+	<input ng-model="theMax" />
 	</md-input-container>
 
 	<md-input-container class="md-block" flex-gt-sm="">
 	<label>Elemento final:</label>
-	<input ng-model="theMax">
+	<input ng-model="theMax" />
 	</md-input-container>
 	  
 	<md-switch md-invert="" ng-model="data.cb6" aria-label="Switch 1">
@@ -126,7 +128,7 @@
 
 	<md-input-container class="md-block" flex-gt-sm="">
 	<label>Placa de rastreabilidade Seyconel:</label>
-	<input ng-model="theMax">
+	<input ng-model="theMax" />
 	</md-input-container>
 	  
 	<md-switch md-invert="" ng-model="data.cb7" aria-label="Switch 1">

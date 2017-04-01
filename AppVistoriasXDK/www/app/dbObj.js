@@ -17,7 +17,7 @@ function Vistoria()
     this.data_criacao = '';
 } 
 
-// Objeto da vistoria
+// Objeto do item vistoriado
 function itemVitoriado()
 {
     this.id = 0;
@@ -27,4 +27,4 @@ function itemVitoriado()
     this.item = '';
     this.setor = '';
     this.data_criacao = '';
-} 
+}
