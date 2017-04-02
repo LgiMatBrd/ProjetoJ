@@ -60,7 +60,8 @@ class PDF extends FPDF
     // Calcula a altura das células baseado na entrelinhas
     function GetCellHeight($entrelinha)
     {
-        return round(($this->FontSize*$entrelinha), 0, PHP_ROUND_HALF_UP);
+        //return round(($this->FontSize*($entrelinha + 0.18)), 0, PHP_ROUND_HALF_UP);
+        return ($this->FontSize*($entrelinha+0.215));
     }
     // Calcula a largura das células baseado nos recuos das margens
     function GetCellWidth()
@@ -91,6 +92,109 @@ class PDF extends FPDF
         $str = utf8_decode($str);
         $this->SetFont('', $style);
         $this->Cell($this->GetStringWidth($str),$h, $str);
+    }
+    // Load data
+    function LoadData($file)
+    {
+        // Read file lines
+        $lines = explode("\n", $file);
+        $data = array();
+        foreach($lines as $line)
+            $data[] = explode(';.',trim($line));
+        return $data;
+    }
+    // Decodifica todas as colunas da row
+    function _row_decodeUTF8(&$row)
+    {
+        foreach ($row as $key => $str)
+            $row[$key] = utf8_decode($str);
+            //var_dump($str);
+    }
+    
+    
+    
+    
+    
+    
+    
+    // Calcula a altura da célula para a linha a ser impressa na tabela
+    function _countRowLinhas($row, &$qtdmulticells, $maxw)
+    {
+        $h = 0;
+        foreach($row as $key => $col)
+        {
+            $qtdmulticells[$key] = 1;
+            //$col = utf8_decode($col);
+            $ws = $this->GetStringWidth($col);
+            $w = $ws;
+            while ($w > $maxw[$key])
+            {
+                $qtdmulticells[$key]++;
+                $w -= $maxw[$key];
+            }
+            $qtdlinhas = $qtdmulticells[$key]+substr_count($col, "\n");
+            if ($qtdlinhas > $h)
+                $h = $qtdlinhas;
+        }
+        return $h;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    // Imprime uma linha inteira da tabela, celula por celula
+    function PrintRow($wcols, $row, $entrelinhas, $border=0, $align='J', $fill=false)
+    {
+        $this->_row_decodeUTF8($row);
+        
+        $qtdmulticells = array();
+        $rowh = $this->_countRowLinhas($row, $qtdmulticells, $wcols);
+        
+        $h = $this->GetCellHeight($rowh*$entrelinhas);
+        
+        foreach ($row as $key => $txt)
+        {
+            $this->_printCell($wcols[$key], $h, $qtdmulticells[$key], $rowh, $entrelinhas, $txt, $border, $align, $fill);
+            
+        }
+        $this->Ln($h);
+    }
+    
+    function _printCell($w, $h, $cellh, $rowh, $entrelinhas, $txt, $border=0, $align='J', $fill=false)
+    {
+        $ax = $this->GetX(); // Coordenadas atuais
+        $ay = $this->GetY();
+        
+        $this->Cell($w, $h, '', $border, 0, '', $fill);
+        if ($cellh != $rowh)
+            // Calcula a posição vertical do texto
+            $ypos = $ay + $this->GetCellHeight( (($rowh - $cellh)/2)*$entrelinhas - 0.215);
+        else
+            $ypos = $ay;
+        
+        $this->SetXY($ax, $ypos);
+        
+        parent::MultiCell($w, $this->GetCellHeight($entrelinhas), $txt, '', $align);
+        
+        $this->SetXY($ax + $w, $ay);
+    }
+    // Simple table
+    function BasicTable($header, $data)
+    {
+        $maxw = array(17,30,21,27,28,15,21,31);
+        // Header
+        
+        $this->PrintRow($maxw, $header, 1.0, 1, 'C');
+        
+        // Data
+        foreach($data as $row)
+        {
+            $this->PrintRow($maxw, $row, 1.0, 1, 'J');
+        }
     }
     // Page header
     function Header()
@@ -166,6 +270,12 @@ Os critérios utilizados para a inspeção das lingas foram a inspeção visual 
 
 O gabarito foi utilizado seguindo o esquema descrito na Tabela 1 a seguir.
 EOT;
+$tabela = <<< EOT
+299;.XXX;.Linga;.20;.6800;.1;.NÃO;.Identificação de carga ilegível, corrente muito.
+300;.XXX;.Linga;.20;.4000;.2;.NÃO;.Alongamento no diâmetro nominal , sem identificação de.
+312;.XXX;.Linga;.16;.3000;.2;.NÃO;.Identificação de carga ilegível, alongamentaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+EOT;
+
 
 /* Gera o conteúdo das páginas */
 $wCell = $pdf->GetCellWidth(); // Calcula a largura máxima da célula
@@ -181,6 +291,13 @@ $pdf->PrintTitulo('INPEÇÃO');
 $pdf->PrintTexto($hCell, 'Data da inspeção: ', 'B');
 $pdf->PrintTexto($hCell, 'XXX');
 $pdf->Ln();
+
+// Column headings
+$header = array('Nº','RASTREAMENTO/ SETOR','Material','CORRENTE[mm] CINTA  [t]','COMPRIMENTO DA LINGA/CINTA','RAMAIS','APROVADA','MOTIVO');
+// Data loading
+$data = $pdf->LoadData($tabela);
+$pdf->BasicTable($header, $data);
+
 $pdf->PrintTitulo('TEXTO DE EXEMPLO: LOREM IPSUM');
 $pdf->MultiCell($wCell,$hCell,$lorem);
 $pdf->Cell(10,10,'Hello Worldddddddddd!');
