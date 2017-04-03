@@ -30,7 +30,7 @@
 </md-button>-->
 <md-button class="md-fab md-fab-bottom-right" aria-label="Add" ng-click="showAdvanced($event)" style="background-color: #1364b4;">
     <i class="fa fa-plus fa-lg" aria-hidden="true"></i>
-</md-button>
+</md-button> 
 
 <script type="text/ng-template" id="formulario-vistoria.tmpl.html">
 <md-dialog class="fullscreen-dialog" aria-label="Form">
@@ -45,31 +45,34 @@
 <md-content layout-padding="">
 <div>
   <form name="userForm">
+      
 	  <md-input-container class="md-block" flex-gt-sm="">
 		<label>Item</label>
-		<md-select name="item" ng-model="user.state">
+		<md-select name="item" ng-model="item.nome">
 		  <md-option value="{{valor}}" ng-repeat="(valor,nome) in tiposVistorias">{{nome}}</md-option>
 		</md-select>
 	  </md-input-container>
-
+      
+      <!-- FORMULÁRIO 1 -->
+      <!-- Linga de corrente (NR-11/NBR 15516 1 e 2/NBR ISO 3076/NBR ISO 1834) -->
 	  <md-input-container class="md-block" flex-gt-sm="">
 		<label>Setor:</label>
-		<input ng-model="setor" />
+		<input ng-show="item.nome=='linc'" ng-model="setor" />
 	  </md-input-container>
 
 	  <md-input-container class="md-block" flex-gt-sm="">
 		<label>Comprimento:</label>
-		<input ng-model="theMax" />
+		<input ng-show="item.nome=='linc'" ng-model="comprimento" />
 	  </md-input-container>
 	
 		<md-input-container class="md-block">
           <label>Descrição</label>
-          <textarea ng-model="user.biography" md-maxlength="150" rows="5" md-select-on-focus=""></textarea>
+          <textarea ng-show="item.nome=='linc'" ng-model="descricao" md-maxlength="150" rows="5" md-select-on-focus=""></textarea>
         </md-input-container>
 		
 	  <md-input-container class="md-block" flex-gt-sm="">
 		<label>Ramais</label>
-		<md-select ng-model="user.state">
+		<md-select ng-show="item.nome=='linc'" ng-model="ramal">
 		  <md-option value="1">Ramal 1</md-option>
 		  <md-option value="2">Ramal 2</md-option>
 		  <md-option value="3">Ramal 3</md-option>
@@ -79,63 +82,361 @@
 
 	  <md-input-container class="md-block" flex-gt-sm="">
 		<label>Capacidade:</label>
-		<input ng-model="theMax" />
+		<input ng-show="item.nome=='linc'" ng-model="capacidade" />
 	  </md-input-container>
 	  
-	<md-switch md-invert="" ng-model="data.cb1" aria-label="Switch 1">
+	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="danos_olhais" aria-label="Switch 1">
 	<label>Danos nos olhais:</label>
 	</md-switch>
 	  
-	<md-switch md-invert="" ng-model="data.cb2" aria-label="Switch 1">
+	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="danos_costura_corpo" aria-label="Switch 1">
 	<label>Danos costura do corpo:</label>
 	</md-switch>
 	  
-	<md-switch md-invert="" ng-model="data.cb3" aria-label="Switch 1">
+	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="danos_costura_principal" aria-label="Switch 1">
 	<label>Danos costura principal (transpasse):</label>
 	</md-switch>
 	  
-	<md-switch md-invert="" ng-model="data.cb4" aria-label="Switch 1">
+	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="cortes" aria-label="Switch 1">
 	<label>Cortes:</label>
 	</md-switch>
 	  
-	<md-switch md-invert="" ng-model="data.cb5" aria-label="Switch 1">
+	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="abrasao" aria-label="Switch 1">
 	<label>Abrasão:</label>
 	</md-switch>
 
 	<md-input-container class="md-block" flex-gt-sm="">
 	<label>Elemento inicial:</label>
-	<input ng-model="theMax" />
+	<input ng-show="item.nome=='linc'" ng-model="elemento_inicial" />
 	</md-input-container>
 
 	<md-input-container class="md-block" flex-gt-sm="">
 	<label>Elemento de ligação:</label>
-	<input ng-model="theMax" />
+	<input ng-show="item.nome=='linc'" ng-model="elemento_de_ligacao" />
 	</md-input-container>
 
 	<md-input-container class="md-block" flex-gt-sm="">
 	<label>Elemento final:</label>
-	<input ng-model="theMax" />
+	<input ng-show="item.nome=='linc'" ng-model="elemento_final" />
 	</md-input-container>
 	  
-	<md-switch md-invert="" ng-model="data.cb6" aria-label="Switch 1">
+	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="etiqueta_identificacao" aria-label="Switch 1">
 	<label>Etiqueta de identificação:</label>
 	</md-switch>
 	
 	<md-input-container class="md-block">
 	  <label>Observação</label>
-	  <textarea ng-model="user.biography" md-maxlength="150" rows="5" md-select-on-focus=""></textarea>
+	  <textarea ng-show="item.nome=='linc'" ng-model="observacao" md-maxlength="150" rows="5" md-select-on-focus=""></textarea>
 	</md-input-container>
 
 	<md-input-container class="md-block" flex-gt-sm="">
 	<label>Placa de rastreabilidade Seyconel:</label>
-	<input ng-model="theMax" />
+	<input ng-show="item.nome=='linc'" ng-model="placa_rastreabilidade_seyconel" />
 	</md-input-container>
 	  
-	<md-switch md-invert="" ng-model="data.cb7" aria-label="Switch 1">
+	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="item_aprovado" aria-label="Switch 1">
 	<label>APROVADO?</label>
 	</md-switch>
 
 
+      
+    <!-- FORMULÁRIO 2 -->
+    <!-- Eslingas, cintas planas e tubulares. (NR-11 NBR 15637 1 e 2) -->
+	  <md-input-container class="md-block" flex-gt-sm="">
+		<label>Setor:</label>
+		<input ng-show="item.nome=='ectu'" ng-model="setor" />
+	  </md-input-container>
+
+	  <md-input-container class="md-block" flex-gt-sm="">
+		<label>Comprimento:</label>
+		<input ng-show="item.nome=='ectu'" ng-model="comprimento" />
+	  </md-input-container>
+	
+		<md-input-container class="md-block">
+          <label>Descrição</label>
+          <textarea ng-show="item.nome=='ectu'" ng-model="descricao" md-maxlength="150" rows="5" md-select-on-focus=""></textarea>
+        </md-input-container>
+		
+	  <md-input-container class="md-block" flex-gt-sm="">
+		<label>Ramais</label>
+		<md-select ng-show="item.nome=='ectu'" ng-model="ramal">
+		  <md-option value="1">Ramal 1</md-option>
+		  <md-option value="2">Ramal 2</md-option>
+		  <md-option value="3">Ramal 3</md-option>
+		  <md-option value="4">Ramal 4</md-option>
+		</md-select>
+	  </md-input-container>
+
+	  <md-input-container class="md-block" flex-gt-sm="">
+		<label>Capacidade:</label>
+		<input ng-show="item.nome=='ectu'" ng-model="capacidade" />
+	  </md-input-container>
+	  
+	<md-switch ng-show="item.nome=='ectu'" md-invert="" ng-model="danos_olhais" aria-label="Switch 1">
+	<label>Danos nos olhais:</label>
+	</md-switch>
+	  
+	<md-switch ng-show="item.nome=='ectu'" md-invert="" ng-model="danos_costura_corpo" aria-label="Switch 1">
+	<label>Danos costura do corpo:</label>
+	</md-switch>
+	  
+	<md-switch ng-show="item.nome=='ectu'" md-invert="" ng-model="danos_costura_principal" aria-label="Switch 1">
+	<label>Danos costura principal (transpasse):</label>
+	</md-switch>
+	  
+	<md-switch ng-show="item.nome=='ectu'" md-invert="" ng-model="cortes" aria-label="Switch 1">
+	<label>Cortes:</label>
+	</md-switch>
+	  
+	<md-switch ng-show="item.nome=='ectu'" md-invert="" ng-model="abrasao" aria-label="Switch 1">
+	<label>Abrasão:</label>
+	</md-switch>
+
+	<md-input-container class="md-block" flex-gt-sm="">
+	<label>Elemento inicial:</label>
+	<input ng-show="item.nome=='ectu'" ng-model="elemento_inicial" />
+	</md-input-container>
+
+	<md-input-container class="md-block" flex-gt-sm="">
+	<label>Elemento de ligação:</label>
+	<input ng-show="item.nome=='ectu'" ng-model="elemento_de_ligacao" />
+	</md-input-container>
+
+	<md-input-container class="md-block" flex-gt-sm="">
+	<label>Elemento final:</label>
+	<input ng-show="item.nome=='ectu'" ng-model="elemento_final" />
+	</md-input-container>
+	  
+	<md-switch ng-show="item.nome=='ectu'" md-invert="" ng-model="etiqueta_identificacao" aria-label="Switch 1">
+	<label>Etiqueta de identificação:</label>
+	</md-switch>
+	
+	<md-input-container class="md-block">
+	  <label>Observação</label>
+	  <textarea ng-show="item.nome=='ectu'" ng-model="observacao" md-maxlength="150" rows="5" md-select-on-focus=""></textarea>
+	</md-input-container>
+
+	<md-input-container class="md-block" flex-gt-sm="">
+	<label>Placa de rastreabilidade Seyconel:</label>
+	<input ng-show="item.nome=='ectu'" ng-model="placa_rastreabilidade_seyconel" />
+	</md-input-container>
+	  
+	<md-switch ng-show="item.nome=='ectu'" md-invert="" ng-model="item_aprovado" aria-label="Switch 1">
+	<label>APROVADO?</label>
+	</md-switch>
+
+
+
+      
+    <!-- FORMULÁRIO 3 -->
+    <!-- Acessórios  (Ganchos, Cadeados, olhais, Manilhas) (NR-11/NBR 13545/NBR 16798) -->
+	  <md-input-container class="md-block" flex-gt-sm="">
+		<label>Setor:</label>
+		<input ng-model="setor" />
+	  </md-input-container>
+	
+		<md-input-container class="md-block">
+          <label>Descrição</label>
+          <textarea ng-model="descricao" md-maxlength="150" rows="5" md-select-on-focus=""></textarea>
+        </md-input-container>
+
+	  <md-input-container class="md-block" flex-gt-sm="">
+		<label>Capacidade:</label>
+		<input ng-model="capacidade" />
+	  </md-input-container>
+	  
+	<md-switch md-invert="" ng-model="identificacao" aria-label="Switch 1">
+	<label>Identificação:</label>
+	</md-switch>
+	  
+	<md-switch md-invert="" ng-model="deformacao" aria-label="Switch 1">
+	<label>Deformação:</label>
+	</md-switch>
+	  
+	<md-switch md-invert="" ng-model="alongamento" aria-label="Switch 1">
+	<label>Alongamento:</label>
+	</md-switch>
+	  
+	<md-switch md-invert="" ng-model="travas" aria-label="Switch 1">
+	<label>Travas:</label>
+	</md-switch>
+	
+	<md-input-container class="md-block">
+	  <label>Observação</label>
+	  <textarea ng-model="observacao" md-maxlength="150" rows="5" md-select-on-focus=""></textarea>
+	</md-input-container>
+
+	<md-input-container class="md-block" flex-gt-sm="">
+	<label>Placa de rastreabilidade Seyconel:</label>
+	<input ng-model="placa_rastreabilidade_seyconel" />
+	</md-input-container>
+	  
+	<md-switch md-invert="" ng-model="item_aprovado" aria-label="Switch 1">
+	<label>APROVADO?</label>
+	</md-switch>
+
+
+
+
+      
+    <!-- FORMULÁRIO 4 -->
+    <!-- Garras de elevação  (NR-11) -->
+	  <md-input-container class="md-block" flex-gt-sm="">
+		<label>Setor:</label>
+		<input ng-model="setor" />
+	  </md-input-container>
+	
+		<md-input-container class="md-block">
+          <label>Descrição</label>
+          <textarea ng-model="descricao" md-maxlength="150" rows="5" md-select-on-focus=""></textarea>
+        </md-input-container>
+
+	  <md-input-container class="md-block" flex-gt-sm="">
+		<label>Capacidade:</label>
+		<input ng-model="capacidade" />
+	  </md-input-container>
+	  
+	<md-switch md-invert="" ng-model="deformacao" aria-label="Switch 1">
+	<label>Deformação:</label>
+	</md-switch>
+	  
+	<md-switch md-invert="" ng-model="carne_danificado" aria-label="Switch 1">
+	<label>Carne Danificado:</label>
+	</md-switch>
+	  
+	<md-switch md-invert="" ng-model="olhal_danificado" aria-label="Switch 1">
+	<label>Olhal Danificado:</label>
+	</md-switch>
+	  
+	<md-switch md-invert="" ng-model="trava_danificado" aria-label="Switch 1">
+	<label>Trava Danificado:</label>
+	</md-switch>
+	  
+	<md-switch md-invert="" ng-model="pinos_danificado" aria-label="Switch 1">
+	<label>Pinos Danificado:</label>
+	</md-switch>
+	
+	<md-input-container class="md-block">
+	  <label>Observação:</label>
+	  <textarea ng-model="observacao" md-maxlength="150" rows="5" md-select-on-focus=""></textarea>
+	</md-input-container>
+
+	<md-input-container class="md-block" flex-gt-sm="">
+	<label>Placa de rastreabilidade Seyconel:</label>
+	<input ng-model="placa_rastreabilidade_seyconel" />
+	</md-input-container>
+	  
+	<md-switch md-invert="" ng-model="item_aprovado" aria-label="Switch 1">
+	<label>APROVADO?</label>
+	</md-switch>
+
+
+
+
+      
+    <!-- FORMULÁRIO 5 -->
+    <!-- Levantador magnético  (NR 11) -->
+	  <md-input-container class="md-block" flex-gt-sm="">
+		<label>Setor:</label>
+		<input ng-model="setor" />
+	  </md-input-container>
+	
+		<md-input-container class="md-block">
+          <label>Descrição</label>
+          <textarea ng-model="descricao" md-maxlength="150" rows="5" md-select-on-focus=""></textarea>
+        </md-input-container>
+
+	  <md-input-container class="md-block" flex-gt-sm="">
+		<label>Capacidade:</label>
+		<input ng-model="capacidade" />
+	  </md-input-container>
+	  
+	<md-switch md-invert="" ng-model="olhal_danificado" aria-label="Switch 1">
+	<label>Olhal Danificado?</label>
+	</md-switch>
+	  
+	<md-switch md-invert="" ng-model="exrt_ext_danificada" aria-label="Switch 1">
+	<label>Estrutura Externa Danf?:</label>
+	</md-switch>
+	  
+	<md-switch md-invert="" ng-model="alavanca_danificada" aria-label="Switch 1">
+	<label>Alavanca Danificada?</label>
+	</md-switch>
+	  
+	<md-switch md-invert="" ng-model="base_inferior_danificada" aria-label="Switch 1">
+	<label>Base Inferior Danf?</label>
+	</md-switch>
+	
+	<md-input-container class="md-block">
+	  <label>Observação</label>
+	  <textarea ng-model="observacao" md-maxlength="150" rows="5" md-select-on-focus=""></textarea>
+	</md-input-container>
+
+	<md-input-container class="md-block" flex-gt-sm="">
+	<label>Placa de rastreabilidade Seyconel:</label>
+	<input ng-model="placa_rastreabilidade_seyconel" />
+	</md-input-container>
+	  
+	<md-switch md-invert="" ng-model="item_aprovado" aria-label="Switch 1">
+	<label>APROVADO?</label>
+	</md-switch>
+
+
+
+
+      
+    <!-- FORMULÁRIO 6 -->
+    <!-- Dispositivos Especiais: (NR 11) -->
+	  <md-input-container class="md-block" flex-gt-sm="">
+		<label>Setor:</label>
+		<input ng-model="setor" />
+	  </md-input-container>
+	
+		<md-input-container class="md-block">
+          <label>Descrição</label>
+          <textarea ng-model="descricao" md-maxlength="150" rows="5" md-select-on-focus=""></textarea>
+        </md-input-container>
+
+	  <md-input-container class="md-block" flex-gt-sm="">
+		<label>Capacidade:</label>
+		<input ng-model="capacidade" />
+	  </md-input-container>
+	  
+	<md-switch md-invert="" ng-model="desenho_tecnico" aria-label="Switch 1">
+	<label>Desenho Técnico?</label>
+	</md-switch>
+	  
+	<md-switch md-invert="" ng-model="medidas_batem_com_desenho" aria-label="Switch 1">
+	<label>Medidas batem com desenho??:</label>
+	</md-switch>
+	  
+	<md-switch md-invert="" ng-model="deformacoes" aria-label="Switch 1">
+	<label>Deformações?</label>
+	</md-switch>
+	  
+	<md-switch md-invert="" ng-model="olhal_em_bom_estado" aria-label="Switch 1">
+	<label>Olhal em bom estado?</label>
+	</md-switch>
+	
+	<md-input-container class="md-block">
+	  <label>Observação</label>
+	  <textarea ng-model="observacao" md-maxlength="150" rows="5" md-select-on-focus=""></textarea>
+	</md-input-container>
+
+	<md-input-container class="md-block" flex-gt-sm="">
+	<label>Placa de rastreabilidade Seyconel:</label>
+	<input ng-model="placa_rastreabilidade_seyconel" />
+	</md-input-container>
+	  
+	<md-switch md-invert="" ng-model="item_aprovado" aria-label="Switch 1">
+	<label>APROVADO?</label>
+	</md-switch>
+
+
+
+      
+    <!-- FORMULÁRIO 7 -->
+    <!-- Lingas e Laços de cabos de aço -->
 
   </form>
 </div>

@@ -64,6 +64,7 @@ app.run(function($localStorage) {
 
 app.controller('homeController', function($scope, $http, $localStorage, $location, $mdDialog) {
     
+    console.dir($localStorage);
     $scope.showAdvanced = function(ev) {
         $mdDialog.show({
             controller: DialogController,
@@ -256,10 +257,11 @@ app.controller('vistoriasController', function($scope, $routeParams, $http, $loc
 });
 
 app.controller('vistoriaController', function($scope, $routeParams, $http, $localStorage, $filter, $mdDialog) {
-    
-	$scope.id_dono = $routeParams.id;
+
+	
+    $scope.id_dono = $routeParams.id;
 	$scope.id = $routeParams.id; 
-//	$scope.nomeVistoria = $localStorage.itensVistoriados[].nome;
+    //	$scope.nomeVistoria = $localStorage.itensVistoriados[].nome;
    
     // chama a função para preencher a variável que armazena as vistorias desse cliente
 	$scope.itensVistoriados = {};
@@ -344,19 +346,24 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
         $location.path('/vistoria/' + id);
     };
     
-    // adicionar vistoria
+    // adicionar vistoria 
     $scope.addItem = function($valor)
     {
         var data_criacao = new Date();
         id = $localStorage.vistorias.nextID;
         
         vistoria = new Vistoria(); 
+        
+        // Váriaveis padrões
         vistoria.id = id;
         vistoria.id_dono = $scope.id_dono; 
-        vistoria.nome = $valor;
-        vistoria.data_criacao = data_criacao; 
-        $localStorage.vistorias.db[id] = vistoria;
+        vistoria.data_criacao = data_criacao;
         
+        // Váriaveis do Item
+        vistoria.nome = $valor;
+        
+        
+        $localStorage.vistorias.db[id] = vistoria;
         id = id + 1;
         $localStorage.vistorias.nextID = id;
          
