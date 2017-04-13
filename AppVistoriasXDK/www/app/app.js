@@ -290,7 +290,19 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
     function DialogController($scope, $mdDialog, id_dono, tiposVistorias) {
         console.log(id_dono);
         $scope.tiposVistorias = tiposVistorias;
-        $scope.addItem = function($item,$setor) {
+        $scope.addItem = function(userForm) {
+            
+            console.log('enviando..')
+            angular.forEach(userForm, function (element, name) {
+                if (!name.startsWith('$')) {
+                    // element is a form element!
+                    console.dir(userForm);
+                    console.dir(element);
+                    console.dir(name);
+                    
+                }
+            });
+            /*
             var data_criacao = new Date();
             id = $localStorage.itensVistoriados.nextID;
 
@@ -309,7 +321,7 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
             id = id + 1;
             $localStorage.itensVistoriados.nextID = id;
             
-            $mdDialog.hide();
+            $mdDialog.hide();*/
 
         };
         
@@ -349,6 +361,7 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
     // adicionar vistoria 
     $scope.addItem = function($valor)
     {
+        console.log('enviando..');
         var data_criacao = new Date();
         id = $localStorage.vistorias.nextID;
         
@@ -395,7 +408,24 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
     
     $scope.tiposVistorias = {
         'linc': 'Linga de corrente (NR-11/NBR 15516 1 e 2/NBR ISO 3076/NBR ISO 1834)',
-        'ectu': 'Eslingas, cintas planas e tubulares. (NR-11 NBR 15637 1 e 2)'
+        'ectu': 'Eslingas, cintas planas e tubulares. (NR-11 NBR 15637 1 e 2)',
+        'ectu3': 'Acessórios  (Ganchos, Cadeados, olhais, Manilhas) (NR-11/NBR 13545/NBR 16798)',
+        'ectu4': 'Garras de elevação  (NR-11)',
+        'ectu5': 'Levantador magnético  (NR 11)',
+        'ectu6': 'Dispositivos Especiais: (NR 11)',
+        'ectu7': 'Lingas e Laços de cabos de aço'
+    };
+   
+    // deletar vistoria
+    $scope.enviarForm = function ($scope)
+    {
+        console.log('enviando..')
+        angular.forEach($scope.test, function (element, name) {
+            if (!name.startsWith('$')) {
+                // element is a form element!
+                console.log('item:'+element+':'+name)
+            }
+        });
     };
     
     console.log($scope.tiposVistorias);
