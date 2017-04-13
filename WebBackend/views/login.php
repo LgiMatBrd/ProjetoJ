@@ -7,7 +7,7 @@
 if (!defined('LOGIN_CONTROLLER'))
     die;
 
-$time = date(Ymd);
+$time = date('Ymd');
 $concreteBackgroundWallPaper = 'http://backgroundimages.concrete5.org/wallpaper/'.$time.'.jpg';
 $concreteBackgroundDesc = 'http://backgroundimages.concrete5.org/get_image_data.php?image='.$time.'.jpg';
 ?>

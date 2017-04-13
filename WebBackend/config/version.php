@@ -9,4 +9,4 @@
  * de modo a refletir ao estado atual da instalação.
  */
 
-$version = '0.0';
+$version = '0.1';

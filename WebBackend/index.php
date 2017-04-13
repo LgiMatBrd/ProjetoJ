@@ -15,6 +15,32 @@ if (file_exists(ROOT_DIR.'/install/index.php'))
     
 }
 
+// Obtém o recurso solicitado ao servidor   
+$recurso = filter_var($_SERVER['REQUEST_URI'], FILTER_SANITIZE_URL);
+$url_base = 'http://app.igoroliveira.eng.br';
+
+// Verifica se o arquivo solicitado é de acesso liberado e se existe e corrige a URL
+if ($recurso[0] === '/') {
+    include ROOT_DIR.'/config/freeaccess.php';
+    foreach ($freeaccess as $pasta)
+    {
+        $pos = strpos($recurso, $pasta);
+        if ($pos !== FALSE)
+        {
+            $arq = substr($recurso, $pos);
+            if (file_exists(ROOT_DIR.$arq))
+            {
+                header("HTTP/1.1 301 Moved Permanently");
+                header('Location: '.$url_base.$arq);
+                die;
+            }
+            else
+                die;
+        }
+    }
+}
+
+
 // Importa a conexão à DB e as funções da biblioteca de login
 include_once ROOT_DIR.'/config/db_connect.php';
 include_once ROOT_DIR.'/lib/login/functions.php';
@@ -22,8 +48,6 @@ include_once ROOT_DIR.'/lib/login/functions.php';
 // Inicia uma sessão segura
 sec_session_start();
 
-// Obtém o recurso solicitado ao servidor   
-$recurso = filter_var($_SERVER['REQUEST_URI'], FILTER_SANITIZE_URL);
 
 // Verifica se o usuário já está logado
 if (login_check($mysqli) == true) {

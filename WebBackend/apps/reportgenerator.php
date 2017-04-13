@@ -16,7 +16,15 @@ class PDF extends FPDF
     private $pageBorder;            // Posição da borda da página
     protected $recuoEsquerda;       // Recuo a partir da margem esquerda
     protected $recuoDireita;        // Recuo a partir da margem direita
-
+    protected $hHeader;             // Posição Y após o header
+    //protected $acceptPageBreak;     // (Boolean) Controla a quebra automática de página
+    public $fatorWord;              // (Boolean) Valor que é necessário somar à entrelinhas para se aproximar ao Word
+    
+    public function __construct($orientation = 'P', $unit = 'mm', $size = 'A4') {
+        $this->fatorWord = 0.215; // Valor a ser somado à entrelinhas para se aproximar ao Word
+        $this->hHeader = 0;
+        parent::__construct($orientation, $unit, $size);
+    }
 
     // Desenha a borda da página
     private function _pageBorder()
@@ -58,10 +66,12 @@ class PDF extends FPDF
         return $this->rMargin;
     }
     // Calcula a altura das células baseado na entrelinhas
-    function GetCellHeight($entrelinha)
+    function GetCellHeight($entrelinha, $ftWord = 0)
     {
         //return round(($this->FontSize*($entrelinha + 0.18)), 0, PHP_ROUND_HALF_UP);
-        return ($this->FontSize*($entrelinha+0.215));
+        if ($ftWord)
+            return ($this->FontSize*($entrelinha+$this->fatorWord));
+        return ($this->FontSize*($entrelinha));
     }
     // Calcula a largura das células baseado nos recuos das margens
     function GetCellWidth()
@@ -104,83 +114,190 @@ class PDF extends FPDF
         return $data;
     }
     // Decodifica todas as colunas da row
-    function _row_decodeUTF8(&$row)
+    protected function _row_decodeUTF8(&$row)
     {
         foreach ($row as $key => $str)
             $row[$key] = utf8_decode($str);
-            //var_dump($str);
     }
-    
-    
-    
-    
-    
-    
     
     // Calcula a altura da célula para a linha a ser impressa na tabela
-    function _countRowLinhas($row, &$qtdmulticells, $maxw)
+    protected function _countRowLinhas($row, &$qtdmulticells, $maxw)
     {
         $h = 0;
-        foreach($row as $key => $col)
+        
+        // Calcula a quantidade de linhas com quebra automatica de linhas ou 
+        // quebra de linha explícita
+	if(!isset($this->CurrentFont))
+		$this->Error('No font has been set');
+	$cw = &$this->CurrentFont['cw'];
+        foreach ($row as $key => $txt)
         {
-            $qtdmulticells[$key] = 1;
-            //$col = utf8_decode($col);
-            $ws = $this->GetStringWidth($col);
-            $w = $ws;
-            while ($w > $maxw[$key])
+            $w = $maxw[$key];
+            if($w==0)
+                    $w = $this->w-$this->rMargin-$this->x;
+            $wmax = ($w-2*$this->cMargin)*1000/$this->FontSize;
+            $s = str_replace("\r",'',$txt);
+            $nb = strlen($s);
+            if($nb>0 && $s[$nb-1]=="\n")
+                    $nb--;
+
+            $sep = -1; // Posição do último caractere de espaço
+            $i = 0; // Posição atual do caractere
+            $j = 0; //Posição do caractere anterior
+            $l = 0; // Comprimento da linha atual
+            $ns = 0; // Quantidade de caracteres de espaço na linha
+            $nl = 1; // Quantidade de linhas
+            while($i<$nb)
             {
-                $qtdmulticells[$key]++;
-                $w -= $maxw[$key];
+                    // Get next character
+                    $c = $s[$i];
+                    if($c=="\n")
+                    {
+                            // Explicit line break
+                            $i++;
+                            $sep = -1;
+                            $j = $i;
+                            $l = 0;
+                            $ns = 0;
+                            $nl++;
+                            continue;
+                    }
+                    if($c==' ')
+                    {
+                            $sep = $i;
+                            $ns++;
+                    }
+                    $l += $cw[$c]; // Adiciona a largura do caractere atual ao comprimento da linha
+                    if($l>$wmax)
+                    {
+                            // Automatic line break
+                            if($sep==-1)
+                            {
+                                    if($i==$j)
+                                            $i++;
+                            }
+                            else
+                            {
+                                    $i = $sep+1;
+                            }
+                            $sep = -1;
+                            $j = $i;
+                            $l = 0;
+                            $ns = 0;
+                            $nl++;
+                    }
+                    else
+                            $i++;
             }
-            $qtdlinhas = $qtdmulticells[$key]+substr_count($col, "\n");
-            if ($qtdlinhas > $h)
-                $h = $qtdlinhas;
+            $qtdmulticells[$key] = $nl;
+            if ($nl > $h)
+                $h = $nl;
         }
+        
         return $h;
     }
-    
-    
-    
-    
-    
-    
-    
     
     // Imprime uma linha inteira da tabela, celula por celula
     function PrintRow($wcols, $row, $entrelinhas, $border=0, $align='J', $fill=false)
     {
+        $lx = $this->x;
         $this->_row_decodeUTF8($row);
         
         $qtdmulticells = array();
         $rowh = $this->_countRowLinhas($row, $qtdmulticells, $wcols);
         
-        $h = $this->GetCellHeight($rowh*$entrelinhas);
-        
+        $h = $this->GetCellHeight($rowh*($entrelinhas+$this->fatorWord));
+        $sp = $this->page;
+        $ep = 1;
+        $ly = 0;
         foreach ($row as $key => $txt)
         {
-            $this->_printCell($wcols[$key], $h, $qtdmulticells[$key], $rowh, $entrelinhas, $txt, $border, $align, $fill);
+            $this->page = $sp;
+            $ly = $this->_printCell($wcols[$key], $h, $qtdmulticells[$key], $rowh, $entrelinhas, $txt, $border, $align, $fill);
             
+            if ($this->page > $ep)
+            {
+                $ep = $this->page;
+                //$ly = $cy;
+            }
         }
-        $this->Ln($h);
+        $this->page = $ep;
+        $this->y = $ly;
+        $this->x = $lx;
+        //$this->Ln();
+        
     }
     
-    function _printCell($w, $h, $cellh, $rowh, $entrelinhas, $txt, $border=0, $align='J', $fill=false)
+    protected function _printCell($w, $h, $cellh, $rowh, $entrelinhas, $txt, $border=0, $align='J', $fill=false)
     {
         $ax = $this->GetX(); // Coordenadas atuais
         $ay = $this->GetY();
+        $lh = $this->GetCellHeight($entrelinhas,1);
+        $p = $this->page;
         
-        $this->Cell($w, $h, '', $border, 0, '', $fill);
-        if ($cellh != $rowh)
-            // Calcula a posição vertical do texto
-            $ypos = $ay + $this->GetCellHeight( (($rowh - $cellh)/2)*$entrelinhas - 0.215);
+        // Checa se a célula cabe no restante da página
+        if ($ay+$h > $this->PageBreakTrigger)
+        {
+            // Não cabe no resto da página. Calcula o posicionamento vertical com base no restante a ser impresso.
+            // 1. Calcula quantas linhas cabem.
+            $resto = $this->PageBreakTrigger - $ay;
+            $qtdlinhas = floor($resto/$lh);
+            // 2. Calcula a posição vertical
+            if ($qtdlinhas > $cellh)
+            
+                $ypos = $ay + (($resto - $cellh*$lh)/2);
+            else
+                $ypos = $ay;
+            
+            // Desenha um pedaço da borda na página atual
+            $rrh = $rowh;
+            while ($rrh > 0)
+            {
+                $this->x = $ax;
+                $resto = $this->PageBreakTrigger - $this->y;
+                $qtdlinhas = floor($resto/$lh);
+                if ($qtdlinhas == 0)
+                {
+                    $this->AddPage();
+                    continue;
+                }
+                if ($qtdlinhas < $rrh)
+                {
+                    $semih = $qtdlinhas*$lh;
+                    $rrh -= $qtdlinhas;
+                }
+                else
+                {
+                    $semih = $rrh*$lh;
+                    $rrh = 0;
+                }
+                $this->Cell($w, $semih, '', $border, 1, '', $fill);
+                if ($rrh > 0)
+                    $this->AddPage();
+            }
+            
+            $this->page = $p;
+        }
         else
-            $ypos = $ay;
+        {
+            $this->Cell($w, $h, '', $border, 1, '', $fill);
+            if ($cellh != $rowh)
+                // Calcula a posição vertical do texto
+                $ypos = $ay + ((($rowh - $cellh)/2)*$lh);
+            else
+                $ypos = $ay;
+        }
+        $ly = $this->y;
+         
+        //$this->Cell($w, $h, '', $border, 0, '', $fill);
+        
         
         $this->SetXY($ax, $ypos);
         
-        parent::MultiCell($w, $this->GetCellHeight($entrelinhas), $txt, '', $align);
+        parent::MultiCell($w, $lh, $txt, '', $align);
         
         $this->SetXY($ax + $w, $ay);
+        return $ly;
     }
     // Simple table
     function BasicTable($header, $data)
@@ -196,6 +313,43 @@ class PDF extends FPDF
             $this->PrintRow($maxw, $row, 1.0, 1, 'J');
         }
     }
+    
+    function AddPage($orientation = '', $size = '', $rotation = 0) {
+        if ($this->page == count($this->pages))
+            parent::AddPage($orientation, $size, $rotation);
+        else
+        {
+            $this->page++;
+            $this->x = $this->lMargin;
+            if ($this->hHeader)
+                $this->y = $this->hHeader;
+            else
+                $this->y = $this->tMargin;
+        }
+    }
+    
+     /*function Ln($h = null) {
+        // Line feed; default value is the last cell height
+	$this->x = $this->lMargin;
+	if($h===null)
+		$this->y += $this->lasth;
+	else
+        {
+            $rh = $h;
+            $hln = $this->y + $h;
+            if ($hln > $this->PageBreakTrigger)
+            {
+                $hp = $this->PageBreakTrigger - $this->tMargin - $this->hHeader;
+                $rhln = $hln;
+                while ($rhln >= $hp)
+                {
+                    $this->AddPage();
+                    $rhln -= $hp;
+                }
+                $this->y = $this->hHeader + $rhln;
+            }
+        }
+    }*/
     // Page header
     function Header()
     {
@@ -230,6 +384,7 @@ class PDF extends FPDF
         $this->Ln($this->GetCellHeight(2.5));
         // Borda da página
         $this->_pageBorder();
+        $this->hHeader = $this->y;
     }
     // Page footer
     function Footer()
@@ -272,8 +427,10 @@ O gabarito foi utilizado seguindo o esquema descrito na Tabela 1 a seguir.
 EOT;
 $tabela = <<< EOT
 299;.XXX;.Linga;.20;.6800;.1;.NÃO;.Identificação de carga ilegível, corrente muito.
-300;.XXX;.Linga;.20;.4000;.2;.NÃO;.Alongamento no diâmetro nominal , sem identificação de.
-312;.XXX;.Linga;.16;.3000;.2;.NÃO;.Identificação de carga ilegível, alongamentaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+300;.XXX;.Linga;.20;.4000;.2;.NÃO;.Alongamento no diâmetro nominal, sem identificação de.
+312;.XXX;.Linga;.16;.3000;.2;.NÃO;.Identificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+312;.XXX;.Linga;.16;.3000;.2;.Identificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa;.NÃO
+300;.XXX;.Linga;.20;.4000;.2;.NÃO;.Alongamento no diâmetro nominal, sem identificação de.
 EOT;
 
 
@@ -281,7 +438,7 @@ EOT;
 $wCell = $pdf->GetCellWidth(); // Calcula a largura máxima da célula
 $pdf->AddPage();
 $pdf->SetFont('Calibri','B',11);
-$hCell = $pdf->GetCellHeight($entrelinhas); // Calcula a altura da celula
+$hCell = $pdf->GetCellHeight($entrelinhas, 1); // Calcula a altura da celula com o fator Word
 
 $pdf->PrintTitulo('OBJETIVO');
 $pdf->MultiCell($wCell,$hCell,$txtObjetivo);
@@ -293,7 +450,7 @@ $pdf->PrintTexto($hCell, 'XXX');
 $pdf->Ln();
 
 // Column headings
-$header = array('Nº','RASTREAMENTO/ SETOR','Material','CORRENTE[mm] CINTA  [t]','COMPRIMENTO DA LINGA/CINTA','RAMAIS','APROVADA','MOTIVO');
+$header = array('Nº','RASTREAMENTO/ SETOR','Material','CORRENTE [mm] CINTA [t]','COMPRIMENTO DA LINGA/CINTA','RAMAIS','APROVADA','MOTIVO');
 // Data loading
 $data = $pdf->LoadData($tabela);
 $pdf->BasicTable($header, $data);
