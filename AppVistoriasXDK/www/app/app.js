@@ -256,7 +256,6 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
     $scope.id_dono = $routeParams.id;
 	$scope.id = $routeParams.id;
 	$scope.nome = $localStorage.vistorias.db[$scope.id].nome;
-    console.log('ID Visotria: '+$scope.id);
     
     // chama a função para preencher a variável que armazena as vistorias desse cliente
 	$scope.itensVistoriados = {};
@@ -278,7 +277,7 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
             clickOutsideToClose:true,
             fullscreen: $scope.customFullscreen
             });
-    }; 
+    };
 
     function DialogController($scope, $mdDialog, id_dono, tiposVistorias) {
         
@@ -406,9 +405,15 @@ app.directive('ngConfirmClick', [
                     if ( window.confirm(msg) ) {
                         scope.$eval(clickAction);
                     } else {
-                        window.history.back();
+                        //window.history.back();
                     }
                 });
             }
         };
 }]);
+
+app.filter('iif', function () {
+   return function(input, trueValue, falseValue) {
+        return input ? trueValue : falseValue;
+   };
+});
