@@ -8,7 +8,7 @@
 
 <md-subheader class="md-no-sticky">Todos as vistorias: <strong>{{nome}}</strong> ID: {{id}}</md-subheader>
 
-<md-list-item ng-repeat="person in vistorias" ng-click="verVistoria(person.id)" class="noright">
+<md-list-item ng-repeat="person in vistorias" ng-click="verVistoria(id)" class="noright">
     <p>{{ person.nome }}</p>
     <!--<md-checkbox class="md-secondary" ng-model="person.selected"></md-checkbox>-->
     <!--<md-icon class="md-secondary" ng-click="verDadosVistorias(person.id)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>-->

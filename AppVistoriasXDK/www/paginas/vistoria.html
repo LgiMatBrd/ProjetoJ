@@ -7,7 +7,7 @@
     </div>
 </md-toolbar>
 
-<md-subheader class="md-no-sticky">Vistoria X</md-subheader>
+<md-subheader class="md-no-sticky">Vistoria <strong>{{nome}}</strong> ID: {{id}}</md-subheader>
 
 <md-list-item ng-repeat="person in itensVistoriados" ng-click="" class="noright">
 <md-card class="_md">
@@ -19,7 +19,8 @@
         </md-card-title-text>
     </md-card-title>
     <md-card-actions layout="row" layout-align="center center" class="layout-align-center center layout-row">
-        <md-button sclass="md-raised md-primary">Ver</md-button>
+        <md-button ng-click="verVistoria(id)"sclass="md-raised md-primary">Ver</md-button>
+        <md-button ng-click="deletarVistoria(id)" sclass="md-raised md-primary">Deletar</md-button>
 	</md-card-actions>
 </md-card>
 </md-list-item>
@@ -44,35 +45,36 @@
 </md-toolbar>
 <md-content layout-padding="">
 <div>
-  <form name="userForm">
+  <form id="itemForm" name="itemForm">
       
-	  <md-input-container class="md-block" flex-gt-sm="">
+	  <md-input-container class="md-block" flex-gt-sm="" required>
 		<label>Item</label>
 		<md-select name="item" ng-model="item.nome">
 		  <md-option value="{{valor}}" ng-repeat="(valor,nome) in tiposVistorias">{{nome}}</md-option>
 		</md-select>
 	  </md-input-container>
       
+      <pre>item = {{item | json}}</pre>
       <!-- FORMULÁRIO 1 -->
       <!-- Linga de corrente (NR-11/NBR 15516 1 e 2/NBR ISO 3076/NBR ISO 1834) -->
-	  <md-input-container ng-show="item.nome=='linc'" class="md-block" flex-gt-sm="">
+	  <md-input-container ng-show="item.nome=='linc'" class="md-block" flex-gt-sm="" required>
 		<label>Setor:</label>
-		<input ng-model="setor" />
+		<input ng-model="item.setor" />
 	  </md-input-container>
 
-	  <md-input-container ng-show="item.nome=='linc'" class="md-block" flex-gt-sm="">
+	  <md-input-container ng-show="item.nome=='linc'" class="md-block" flex-gt-sm="" required>
 		<label>Comprimento:</label>
-		<input ng-model="comprimento" />
+		<input ng-model="item.comprimento" />
 	  </md-input-container>
 	
-		<md-input-container ng-show="item.nome=='linc'" class="md-block">
+		<md-input-container ng-show="item.nome=='linc'" class="md-block" required>
           <label>Descrição</label>
-          <textarea ng-model="descricao" md-maxlength="150" rows="5" md-select-on-focus=""></textarea>
+          <textarea ng-model="item.descricao" md-maxlength="150" rows="5" md-select-on-focus=""></textarea>
         </md-input-container>
 		
-	  <md-input-container ng-show="item.nome=='linc'" class="md-block" flex-gt-sm="">
+	  <md-input-container ng-show="item.nome=='linc'" class="md-block" flex-gt-sm="" required>
 		<label>Ramais</label>
-		<md-select ng-model="ramal">
+		<md-select ng-model="item.ramal">
 		  <md-option value="1">Ramal 1</md-option>
 		  <md-option value="2">Ramal 2</md-option>
 		  <md-option value="3">Ramal 3</md-option>
@@ -80,61 +82,61 @@
 		</md-select>
 	  </md-input-container>
 
-	  <md-input-container ng-show="item.nome=='linc'" class="md-block" flex-gt-sm="">
+	  <md-input-container ng-show="item.nome=='linc'" class="md-block" flex-gt-sm="" required>
 		<label>Capacidade:</label>
-		<input ng-model="capacidade" />
+		<input ng-model="item.capacidade" />
 	  </md-input-container>
 	  
-	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="danos_olhais" aria-label="Switch 1">
+	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="item.danos_olhais" aria-label="Switch 1" required>
 	<label>Danos nos olhais:</label>
 	</md-switch>
 	  
-	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="danos_costura_corpo" aria-label="Switch 1">
+	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="item.danos_costura_corpo" aria-label="Switch 1" required>
 	<label>Danos costura do corpo:</label>
 	</md-switch>
 	  
-	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="danos_costura_principal" aria-label="Switch 1">
+	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="item.danos_costura_principal" aria-label="Switch 1" required>
 	<label>Danos costura principal:</label>
 	</md-switch>
 	  
-	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="cortes" aria-label="Switch 1">
+	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="item.cortes" aria-label="Switch 1" required>
 	<label>Cortes:</label>
 	</md-switch>
 	  
-	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="abrasao" aria-label="Switch 1">
+	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="item.abrasao" aria-label="Switch 1" required>
 	<label>Abrasão:</label>
 	</md-switch>
 
-	<md-input-container ng-show="item.nome=='linc'" class="md-block" flex-gt-sm="">
+	<md-input-container ng-show="item.nome=='linc'" class="md-block" flex-gt-sm="" required>
 	<label>Elemento inicial:</label>
-	<input ng-model="elemento_inicial" />
+	<input ng-model="item.elemento_inicial" />
 	</md-input-container>
 
-	<md-input-container ng-show="item.nome=='linc'" class="md-block" flex-gt-sm="">
+	<md-input-container ng-show="item.nome=='linc'" class="md-block" flex-gt-sm="" required>
 	<label>Elemento de ligação:</label>
-	<input ng-model="elemento_de_ligacao" />
+	<input ng-model="item.elemento_de_ligacao" />
 	</md-input-container>
 
-	<md-input-container ng-show="item.nome=='linc'" class="md-block" flex-gt-sm="">
+	<md-input-container ng-show="item.nome=='linc'" class="md-block" flex-gt-sm="" required>
 	<label>Elemento final:</label>
-	<input ng-model="elemento_final" />
+	<input ng-model="item.elemento_final" />
 	</md-input-container>
 	  
-	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="etiqueta_identificacao" aria-label="Switch 1">
+	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="item.etiqueta_identificacao" aria-label="Switch 1" required>
 	<label>Etiqueta de identificação:</label>
 	</md-switch>
 	
-	<md-input-container ng-show="item.nome=='linc'" class="md-block">
+	<md-input-container ng-show="item.nome=='linc'" class="md-block" required>
 	  <label>Observação</label>
-	  <textarea ng-model="observacao" md-maxlength="150" rows="5" md-select-on-focus=""></textarea>
+	  <textarea ng-model="item.observacao" md-maxlength="150" rows="5" md-select-on-focus=""></textarea>
 	</md-input-container>
 
-	<md-input-container ng-show="item.nome=='linc'" class="md-block" flex-gt-sm="">
+	<md-input-container ng-show="item.nome=='linc'" class="md-block" flex-gt-sm="" required>
 	<label>Placa de rastreabilidade Seyconel:</label>
-	<input ng-model="placa_rastreabilidade_seyconel" />
+	<input ng-model="item.placa_rastreabilidade_seyconel" />
 	</md-input-container>
 	  
-	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="item_aprovado" aria-label="Switch 1">
+	<md-switch ng-show="item.nome=='linc'" md-invert="" ng-model="item.item_aprovado" aria-label="Switch 1" required>
 	<label>APROVADO?</label>
 	</md-switch>
 
@@ -445,7 +447,7 @@
    <md-dialog-actions layout="row">
       <span flex></span> 
       <md-button ng-click="cancel()"> Cancel </md-button>
-      <md-button ng-click="addItem(userForm)" class="md-primary"> Save </md-button>
+      <md-button ng-click="addItem(itemForm)" class="md-primary"> Save </md-button>
    </md-dialog-actions>
 </md-dialog>
 </script>

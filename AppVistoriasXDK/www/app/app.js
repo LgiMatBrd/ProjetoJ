@@ -44,14 +44,6 @@ app.run(function($localStorage) {
             db: {}
         }; 
     } 
-    if (typeof $localStorage.vistoria === 'undefined' || typeof $localStorage.vistoria.db === 'undefined' || $localStorage.vistoria.version !== 'v0.2')
-    {
-        $localStorage.vistoria = {
-            nextID: 0,
-            version: 'v0.2',
-            db: {}
-        }; 
-    } 
     if (typeof $localStorage.itensVistoriados === 'undefined' || typeof $localStorage.itensVistoriados.db === 'undefined' || $localStorage.itensVistoriados.version !== 'v0.1')
     {
         $localStorage.itensVistoriados = {
@@ -65,6 +57,11 @@ app.run(function($localStorage) {
 app.controller('homeController', function($scope, $http, $localStorage, $location, $mdDialog) {
     
     console.dir($localStorage);
+    /*delete $localStorage.vistoria;
+    delete $localStorage.vistorias;
+    delete $localStorage.clientes;
+    delete $localStorage.itensVistoriados;*/ 
+    
     $scope.showAdvanced = function(ev) {
         $mdDialog.show({
             controller: DialogController,
@@ -73,8 +70,8 @@ app.controller('homeController', function($scope, $http, $localStorage, $locatio
             targetEvent: ev,
             clickOutsideToClose:true,
             fullscreen: $scope.customFullscreen
-        }); 
-    };
+        });
+    }; 
 
     function DialogController($scope, $mdDialog) {
         $scope.addCliente = function($valor) {
@@ -98,7 +95,6 @@ app.controller('homeController', function($scope, $http, $localStorage, $locatio
         };
 
         $scope.salvar = function() {
-            console.log('eff');
             $scope.resultadoAdicionar =  'fwewefwef';
         };
 
@@ -146,7 +142,6 @@ app.controller('vistoriasController', function($scope, $routeParams, $http, $loc
     $scope.id = $routeParams.id;
     $scope.nome = $localStorage.clientes.db[$scope.id].nome;
     $scope.id_dono = $routeParams.id;
-    console.dir($localStorage);
     
     // chama a função para preencher a variável que armazena as vistorias desse cliente
     populaVistorias($scope.id);
@@ -154,7 +149,7 @@ app.controller('vistoriasController', function($scope, $routeParams, $http, $loc
     // botão de voltar
     $scope.goBack = function() { 
         window.history.back();
-    }; 
+    };
     
     // ver vistoria
     $scope.verVistoria = function (id) {
@@ -165,17 +160,17 @@ app.controller('vistoriasController', function($scope, $routeParams, $http, $loc
     $scope.addVistoria = function($valor,$id_dono)
     {
         var data_criacao = new Date();
-        id = $localStorage.vistorias.nextID;
+        nextId = $localStorage.vistorias.nextID;
         
         vistoria = new Vistoria(); 
-        vistoria.id = id;
+        vistoria.id = nextId;
         vistoria.id_dono = $id_dono;
         vistoria.nome = $valor;
         vistoria.data_criacao = data_criacao;
-        $localStorage.vistorias.db[id] = vistoria;
+        $localStorage.vistorias.db[nextId] = vistoria;
         
-        id = id + 1;
-        $localStorage.vistorias.nextID = id;
+        nextId = nextId + 1;
+        $localStorage.vistorias.nextID = nextId;
         // Repopula a variavel de escopo $scope.vistorias
         //populaVistorias($id_dono);
         $location.path('/vistorias/' + $id_dono);
@@ -219,7 +214,7 @@ app.controller('vistoriasController', function($scope, $routeParams, $http, $loc
     }; 
 
     function DialogController($scope, $mdDialog, id_dono) {
-        console.log(id_dono);
+        
         $scope.addVistoria = function($valor) {
             var data_criacao = new Date();
             id = $localStorage.vistorias.nextID;
@@ -257,17 +252,15 @@ app.controller('vistoriasController', function($scope, $routeParams, $http, $loc
 });
 
 app.controller('vistoriaController', function($scope, $routeParams, $http, $localStorage, $filter, $mdDialog) {
-
 	
     $scope.id_dono = $routeParams.id;
-	$scope.id = $routeParams.id; 
-    //	$scope.nomeVistoria = $localStorage.itensVistoriados[].nome;
-   
+	$scope.id = $routeParams.id;
+	$scope.nome = $localStorage.vistorias.db[$scope.id].nome;
+    console.log('ID Visotria: '+$scope.id);
+    
     // chama a função para preencher a variável que armazena as vistorias desse cliente
 	$scope.itensVistoriados = {};
     populaVistorias($scope.id_dono);
-    
-    console.dir('ID:'+$scope.id_dono);
     
     $scope.showAdvanced = function(ev) {
         $mdDialog
@@ -288,40 +281,32 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
     }; 
 
     function DialogController($scope, $mdDialog, id_dono, tiposVistorias) {
-        console.log(id_dono);
+        
         $scope.tiposVistorias = tiposVistorias;
-        $scope.addItem = function(userForm) {
+        $scope.addItem = function(itemForm) {
             
-            console.log('enviando..')
-            angular.forEach(userForm, function (element, name) {
-                if (!name.startsWith('$')) {
-                    // element is a form element!
-                    console.dir(userForm);
-                    console.dir(element);
-                    console.dir(name);
-                    
-                }
-            });
-            /*
             var data_criacao = new Date();
             id = $localStorage.itensVistoriados.nextID;
 
+            /* OBJETO
+            this.id = 0;
+            this.id_dono = '';
+            this.data_criacao = '';
+            this.dados = '';
+            */
             item = new itemVitoriado(); 
             item.id = id;
             item.id_dono = id_dono;
-            item.nome = $item;
-            
-            item.id_vistorias_pai = 'teste';
-            item.item = $item;
-            item.setor = $setor;
-            
             item.data_criacao = data_criacao; 
+            
+            item.dados = $scope.item;
+            
             $localStorage.itensVistoriados.db[id] = item;
 
-            id = id + 1;
+            id = id + 1; 
             $localStorage.itensVistoriados.nextID = id;
             
-            $mdDialog.hide();*/
+            $mdDialog.hide();
 
         };
         
@@ -357,30 +342,6 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
     $scope.verVistoria = function (id) {
         $location.path('/vistoria/' + id);
     };
-    
-    // adicionar vistoria 
-    $scope.addItem = function($valor)
-    {
-        console.log('enviando..');
-        var data_criacao = new Date();
-        id = $localStorage.vistorias.nextID;
-        
-        vistoria = new Vistoria(); 
-        
-        // Váriaveis padrões
-        vistoria.id = id;
-        vistoria.id_dono = $scope.id_dono; 
-        vistoria.data_criacao = data_criacao;
-        
-        // Váriaveis do Item
-        vistoria.nome = $valor;
-        
-        
-        $localStorage.vistorias.db[id] = vistoria;
-        id = id + 1;
-        $localStorage.vistorias.nextID = id;
-         
-    }; 
 
     // ler vistorias
     $scope.lerVistorias = function ($id_dono) 
@@ -401,9 +362,10 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
     };
    
     // deletar vistoria
-    $scope.deletarVistoria = function ($id)
+    $scope.deletarVistoria = function ()
     {
-        delete $localStorage.vistorias.db[$id]; 
+        delete $localStorage.itensVistoriados.db[$scope.id]; 
+        populaVistorias($scope.id);
     };
     
     $scope.tiposVistorias = {
@@ -415,20 +377,7 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
         'ectu6': 'Dispositivos Especiais: (NR 11)',
         'ectu7': 'Lingas e Laços de cabos de aço'
     };
-   
-    // deletar vistoria
-    $scope.enviarForm = function ($scope)
-    {
-        console.log('enviando..')
-        angular.forEach($scope.test, function (element, name) {
-            if (!name.startsWith('$')) {
-                // element is a form element!
-                console.log('item:'+element+':'+name)
-            }
-        });
-    };
     
-    console.log($scope.tiposVistorias);
 });
 
 

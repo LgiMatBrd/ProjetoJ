@@ -21,10 +21,7 @@ function Vistoria()
 function itemVitoriado()
 {
     this.id = 0;
-    this.nome = '';
     this.id_dono = '';
-    this.id_vistorias_pai = '';
-    this.item = '';
-    this.setor = '';
     this.data_criacao = '';
+    this.dados = {};
 }
