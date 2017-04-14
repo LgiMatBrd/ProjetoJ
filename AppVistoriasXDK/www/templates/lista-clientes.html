@@ -1,0 +1,40 @@
+<section class="items">
+	
+	<header class="items-header">
+		<div class="row">
+			<div class="col-sm-9 col-xs-12">
+
+				<form class="form-inline" name="shopList">
+					<div class="form-actions">
+						<div class="input-group">
+							<input type="text" class="form-control" ng-model="itemInput" placeholder="Nome do cliente" required />
+							<div class="input-group-btn">
+								<button class="btn btn-info" type="submit" ng-click="addCliente(itemInput); itemInput = null" ng-disabled="shopList.$invalid">
+									<i class="fa fa-plus"></i>&nbsp;
+								</button>
+							</div>
+						</div>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</header> 
+
+	<fieldset class="items-list">
+        <!--<a href="#/vistorias/mike2">haha</a>-->
+		<label ng-click="verVistorias(cliente.id);" class="items-list-item" ng-repeat="cliente in lerClientes()">
+			<!--<input
+			type="checkbox"
+			value="{{item.STATUS}}"
+			ng-checked="item.STATUS==2"
+			ng-click="changeStatus(item.ID,item.STATUS,item.CLIENTE)"
+			class="items-list-cb"/>
+			<span class="items-list-mark"></span>-->
+			<span class="items-list-desc" ng-class="{strike:cliente.STATUS==2}">{{cliente.nome}} <span class="date">[{{cliente.data_criacao | date:"d MMM"}}]</span></span> 
+           <a confirmed-click="deletarVistoria(vistoria.id);" ng-confirm-click="Você quer deletar este item?" class="pull-right red"><button  class="btn btn-default" aria-label="Right Align">D</button></a><!--<a href="#/vistorias/{{cliente.id}}" class="pull-right green"><i class="fa fa-chevron-right"></i></a>-->
+            <!--<span class="date" style="float: right;"> [ 0 ]</span>-->
+		</label>
+	</fieldset>	
+
+</section>

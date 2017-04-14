@@ -1,0 +1,59 @@
+<md-toolbar>
+    <div class="md-toolbar-tools">
+        <h2 md-truncate flex><span>SeyService</span></h2>
+        <md-button>Sincronizar</md-button>
+    </div>
+</md-toolbar>
+
+<!--
+<md-toolbar>
+    <div class="md-toolbar-tools">
+        <h2 md-truncate flex>My App's Title</h2>
+        <md-button>Right Bar Button</md-button>
+    </div>
+</md-toolbar>
+-->
+<md-subheader class="md-no-sticky">Todos os clientes</md-subheader>
+
+<md-list-item ng-repeat="person in lerClientes()" ng-click="verVistorias(person.id)" class="noright">
+    <p>{{ person.nome }}</p>
+    <!--<md-checkbox class="md-secondary" ng-model="person.selected"></md-checkbox>-->
+    <md-icon class="md-secondary" ng-click="verDadosCliente(person, $event)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>
+    <!--<md-icon confirmed-click="deletarVistoria(vistoria.id);" ng-confirm-click="Você quer deletar este item?" class="md-secondary" ng-click="deletarCliente(person.id)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>-->
+    <md-button ng-click="deletarCliente(person.id)">Deletar</md-button>
+</md-list-item>
+
+<md-button class="md-fab md-fab-bottom-right" aria-label="Add" ng-click="showAdvanced($event)" style="background-color: #1364b4;">
+    <i class="fa fa-plus fa-lg" aria-hidden="true"></i>
+</md-button>
+
+
+<script type="text/ng-template" id="formulario-add-cliente.tmpl.html">
+<md-dialog class="fullscreen-dialog" aria-label="Form">
+<md-toolbar>
+<div class="md-toolbar-tools">
+  <md-button aria-label="fechaDialog" class="md-icon-button" ng-click="cancel()">
+    <md-icon md-font-set="fa" class="fa-times fa-2x"></md-icon>
+  </md-button>
+  <h2 flex="flex">Adicionar cliente</h2>
+</div>
+</md-toolbar>
+<md-content layout-padding="">
+<div>
+{{resultadoAdicionar}}
+  <form name="userForm">
+	  <md-input-container class="md-block" flex-gt-sm="">
+		<label>Nome do cliente</label>
+		<input ng-model="theMax">
+	  </md-input-container>
+  </form>
+</div>
+</md-content>
+
+   <md-dialog-actions layout="row">
+      <span flex></span> 
+      <md-button ng-click="cancel()"> Cancelar </md-button>
+      <md-button ng-click="addCliente(theMax)" class="md-primary"> Adicionar </md-button>
+   </md-dialog-actions>
+</md-dialog>
+</script>

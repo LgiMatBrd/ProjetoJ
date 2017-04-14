@@ -5,7 +5,7 @@
       "projectTypeName": "com.intel.xdk.projecttype.jsapp",
       "src": "jsapp/template-blank-cordova-project-lite/sample.zip",
       "projectGuid": "82606458-0726-45b5-b3d1-bea1407cd611",
-      "lastModifiedDate": 1488809345769,
+      "lastModifiedDate": 1491001556275,
       "creationDate": 1488809141554
     },
     "XDK-app-designer": "false",
@@ -76,6 +76,50 @@
         "name": "Splashscreen",
         "description": "Cordova Splashscreen Plugin",
         "checksum": "47137083"
+      },
+      {
+        "id": "cordova-plugin-camera",
+        "name": "Camera",
+        "version": "2.3.0",
+        "originType": "cordova.io",
+        "origin": "cordova-plugin-camera",
+        "gitref": "",
+        "paramvals": {
+          "CAMERA_USAGE_DESCRIPTION": " ",
+          "PHOTOLIBRARY_USAGE_DESCRIPTION": " "
+        },
+        "sourceLocation": "plugins/cordova-plugin-camera",
+        "selectedState": "Included",
+        "checksum": "42288131",
+        "dependsOn": [],
+        "topLevel": true,
+        "permissions": {
+          "android:name": [
+            "android.permission.WRITE_EXTERNAL_STORAGE"
+          ]
+        },
+        "description": "Cordova Camera Plugin",
+        "data": {},
+        "dependedBy": []
+      },
+      {
+        "id": "cordova-plugin-compat",
+        "name": "Compat",
+        "version": "1.0.0",
+        "originType": "cordova.io",
+        "origin": "cordova-plugin-compat",
+        "gitref": "",
+        "paramvals": {},
+        "sourceLocation": "plugins/cordova-plugin-compat",
+        "selectedState": "Included",
+        "checksum": "61c62eb",
+        "dependsOn": [],
+        "topLevel": false,
+        "permissions": {},
+        "description": "Cordova Compatibility Plugin",
+        "data": {},
+        "dependedBy": [],
+        "custom": "true"
       }
     ],
     "buildConfigurations": {
@@ -92,7 +136,7 @@
         "isActive_": true,
         "certificateId_": "",
         "appName_": "AppSeyconel",
-        "appID_": "xdk.intel.cordova.template.lite",
+        "appID_": "seyconel.vistorias.app",
         "appAccess_": {
           "mode": "whitelist",
           "network": [
@@ -109,15 +153,97 @@
           ],
           "navigation": []
         },
-        "icons_": [],
-        "splashes_": [],
+        "icons_": [
+          {
+            "density": "ldpi",
+            "relPath": "package-assets/36x36.png",
+            "width": 36,
+            "height": 36
+          },
+          {
+            "density": "mdpi",
+            "relPath": "package-assets/48x48.png",
+            "width": 48,
+            "height": 48
+          },
+          {
+            "density": "hdpi",
+            "relPath": "package-assets/72x72.png",
+            "width": 72,
+            "height": 72
+          },
+          {
+            "density": "xhdpi",
+            "relPath": "package-assets/96x96.png",
+            "width": 96,
+            "height": 96
+          }
+        ],
+        "splashes_": [
+          {
+            "relPath": "package-assets/426x320.png",
+            "density": "ldpi",
+            "height": 320,
+            "width": 426,
+            "orientation": "landscape"
+          },
+          {
+            "relPath": "package-assets/470x320.png",
+            "density": "mdpi",
+            "height": 320,
+            "width": 470,
+            "orientation": "landscape"
+          },
+          {
+            "relPath": "package-assets/640x480.png",
+            "density": "hdpi",
+            "height": 480,
+            "width": 640,
+            "orientation": "landscape"
+          },
+          {
+            "relPath": "package-assets/960x720.png",
+            "density": "xhdpi",
+            "height": 720,
+            "width": 960,
+            "orientation": "landscape"
+          },
+          {
+            "relPath": "package-assets/320x426.png",
+            "density": "ldpi",
+            "height": 426,
+            "width": 320,
+            "orientation": "portrait"
+          },
+          {
+            "relPath": "package-assets/320x470.png",
+            "density": "mdpi",
+            "height": 470,
+            "width": 320,
+            "orientation": "portrait"
+          },
+          {
+            "relPath": "package-assets/480x640.png",
+            "density": "hdpi",
+            "height": 640,
+            "width": 480,
+            "orientation": "portrait"
+          },
+          {
+            "relPath": "package-assets/720x960.png",
+            "density": "xhdpi",
+            "height": 960,
+            "width": 720,
+            "orientation": "portrait"
+          }
+        ],
         "addlPermissions_": "",
         "excludedLibraries_": "",
         "cordovaCLIVersion_": "6.2.0",
         "crosswalkVersion_": "19",
         "appVersion_": "0.0.1",
-        "appDescription_": "Universal init code for Intel XDK and Cordova device ready detection, as well as within browser.",
-        "appAuthor_": "Intel XDK",
+        "appDescription_": "Aplicativo para controle de vistorias Seyconel.",
+        "appAuthor_": "Luigi Matheus Afornalli Breda",
         "appVersionCode_": "1",
         "signed_": true
       },
@@ -132,7 +258,7 @@
         "isActive_": true,
         "certificateId_": "",
         "appName_": "AppSeyconel",
-        "appID_": "xdk.intel.cordova.template.lite",
+        "appID_": "seyconel.vistorias.app",
         "appAccess_": {
           "mode": "whitelist",
           "network": [
@@ -157,10 +283,10 @@
         "excludedLibraries_": "",
         "iosProvs_": [],
         "cordovaCLIVersion_": "6.2.0",
-        "appAuthor_": "Intel XDK",
+        "appAuthor_": "Luigi Matheus Afornalli Breda",
         "crosswalkVersion_": "19",
         "appVersion_": "0.0.1",
-        "appDescription_": "Universal init code for Intel XDK and Cordova device ready detection, as well as within browser."
+        "appDescription_": "Aplicativo para controle de vistorias Seyconel."
       },
       "Windows8": {
         "platform_": "windows8",
@@ -173,7 +299,7 @@
         "isActive_": true,
         "certificateId_": "",
         "appName_": "AppSeyconel",
-        "appID_": "xdk.intel.cordova.template.lite",
+        "appID_": "seyconel.vistorias.app",
         "appAccess_": {
           "mode": "whitelist",
           "network": [
@@ -196,9 +322,9 @@
         "excludedLibraries_": "",
         "cordovaCLIVersion_": "6.2.0",
         "crosswalkVersion_": "19",
-        "appAuthor_": "Intel XDK",
+        "appAuthor_": "Luigi Matheus Afornalli Breda",
         "appVersion_": "0.0.0.1",
-        "appDescription_": "Universal init code for Intel XDK and Cordova device ready detection, as well as within browser."
+        "appDescription_": "Aplicativo para controle de vistorias Seyconel."
       },
       "WebApp": {
         "platform_": "webapp",

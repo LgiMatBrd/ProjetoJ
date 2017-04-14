@@ -1,0 +1,36 @@
+<section class="items">
+	
+	<header class="items-header">
+		<div class="row">
+			<div class="col-sm-9 col-xs-12">
+
+				<form class="form-inline" name="shopList">
+					<div class="form-actions">
+						<div class="input-group">
+							<input type="text" class="form-control" ng-model="itemInput" placeholder="Nome do cliente" required />
+							<div class="input-group-btn">
+								<button class="btn btn-info" type="submit" ng-click="addVistoria(itemInput); itemInput = null" ng-disabled="shopList.$invalid">
+									<i class="fa fa-plus"></i>&nbsp;
+								</button>
+							</div>
+						</div>
+					</div>
+				</form>
+
+			</div>
+ 
+		</div>
+	</header> 
+
+	<fieldset class="items-list">
+        <!--<a href="#/vistorias/mike2">haha</a>-->
+		<!--<label ng-click="verVistorias22(cliente.id);" class="items-list-item" ng-repeat="cliente in lerVistorias() | filter : filtroVistorias">-->
+		<label ng-click="verVistorias22(vistoria.id);" class="items-list-item" ng-repeat="vistoria in lerVistorias(id_dono)">
+			<span class="items-list-desc" ng-class="{strike:vistoria.STATUS==2}">{{vistoria.nome}} 
+                <span class="date">[{{vistoria.data_criacao | date:"d MMM"}}]</span>
+            </span> 
+            <a confirmed-click="deletarVistoria(vistoria.id);" ng-confirm-click="Você quer deletar este item?" class="pull-right red"><button  class="btn btn-default" aria-label="Right Align">D</button></a>
+		</label>
+	</fieldset>	
+
+</section>
