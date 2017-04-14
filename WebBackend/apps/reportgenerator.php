@@ -314,6 +314,59 @@ class PDF extends FPDF
         }
     }
     
+    function PrintGraph($ySteps, $h, $xTexts, $valores, $cores, $espacamento = 10)
+    {
+        $borda = 7;
+        $textoLinha = 1;
+        
+        if ($this->y+$h > $this->PageBreakTrigger)
+            $this->AddPage();
+        
+        $this->Rect($this->recuoEsquerda, $this->y, $this->w - $this->recuoDireita - $this->recuoEsquerda, $h);
+        $h -= $borda*2;
+        
+        $maxY = $ySteps * ceil(max($valores)/$ySteps);
+        $inter = $maxY/$ySteps;
+        $tmp = (string)$maxY;
+        $wc = $this->GetStringWidth($tmp);
+        //$cw = &$this->CurrentFont['cw'];
+        /*for ($i = 0; $tmp[$i]; $i++)
+        {
+            $wc += $cw[$tmp[$i]];
+        }*/
+        
+        $hSteps = $h/$inter;
+        $cy = $this->GetY()+$borda;
+        $cx = $this->recuoEsquerda+$borda;
+        $this->y += $h+$borda;
+        
+        for ($i = 0; $i <= $inter; $i++)
+        {
+            $this->x = $cx;
+            $this->Cell($wc, 0, $ySteps*$i, 0, 0, 'R');
+            $this->x += $textoLinha;
+            $this->Line($this->x, $this->y, $this->w - $this->recuoDireita - $borda, $this->y);
+            $this->y -= $hSteps;
+        }
+        
+        $cy = $cy + $h;
+        $cx = $cx + $wc + $textoLinha + $espacamento/2; // 1 (referente ao espaço entre texto e linha) + 5 (espaço a partir da linha)
+        $cols = count($valores);
+        //$mWidth = ($this->w - $cx - 5*$cols - $this->rMargin) / $cols;
+        $mWidth = ($this->w - $cx - $espacamento*$cols + $espacamento/2 - $this->recuoDireita - $borda) / $cols;
+        $hUnity = $hSteps / $ySteps;
+        
+        for ($i = 0; $i < $cols; $i++)
+        {
+            $ch = $valores[$i]*$hUnity;
+            $this->SetFillColor($cores[$i]['r'],$cores[$i]['g'],$cores[$i]['b']);
+            $this->Rect($cx, $cy - $ch, $mWidth, $ch, 'F');
+            $cx += $mWidth + $espacamento;
+        }
+        $this->x = $cx;
+        $this->y = $cy+$borda;
+    }
+    
     function AddPage($orientation = '', $size = '', $rotation = 0) {
         if ($this->page == count($this->pages))
             parent::AddPage($orientation, $size, $rotation);
@@ -444,7 +497,31 @@ $pdf->PrintTitulo('OBJETIVO');
 $pdf->MultiCell($wCell,$hCell,$txtObjetivo);
 $pdf->PrintTitulo('DESCRIÇÃO DA INSPEÇÃO');
 $pdf->MultiCell($wCell, $hCell, $txtDesc);
-$pdf->PrintTitulo('INPEÇÃO');
+$pdf->PrintTitulo('INSPEÇÃO');
+$xTexts = [];
+//$valores = [13, 10, 0, 1, 5];
+$valores = [13, 6, 20];
+$cores = [
+    [
+        'r' => 255,
+        'g' => 0,
+        'b' => 0
+    ],
+    [
+        'r' => 0,
+        'g' => 255,
+        'b' => 0
+    ],
+    [
+        'r' => 0,
+        'g' => 0,
+        'b' => 255
+    ]
+];
+$pdf->SetDrawColor(150);
+$pdf->PrintGraph(3, 70, $xTexts, $valores, $cores);
+$pdf->Ln();
+$pdf->SetDrawColor(0);
 $pdf->PrintTexto($hCell, 'Data da inspeção: ', 'B');
 $pdf->PrintTexto($hCell, 'XXX');
 $pdf->Ln();
