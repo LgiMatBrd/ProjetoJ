@@ -540,7 +540,11 @@
 	<label>APROVADO?</label>
 	</md-switch>
 
-	
+    <button camera ng-model='myPicture'>Tire fotos</button>
+    <br/>
+
+    <img ng-repeat="onepic in myPictures" style="width:25%;height:20%;" id="smallImage" src="{{ ('data:image/jpeg;base64,'+onepic)}}" />
+
 	
   </form>
 </div>
