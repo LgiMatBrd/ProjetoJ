@@ -18,13 +18,15 @@
 <md-list-item ng-repeat="person in lerClientes()" ng-click="verVistorias(person.id)" class="noright">
     <p>{{ person.nome }}</p>
     <!--<md-checkbox class="md-secondary" ng-model="person.selected"></md-checkbox>-->
-    <md-icon class="md-secondary" ng-click="verDadosCliente(person, $event)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>
+    <!--<md-icon class="md-secondary" ng-click="verDadosCliente(person, $event)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>-->
     <!--<md-icon confirmed-click="deletarVistoria(vistoria.id);" ng-confirm-click="Você quer deletar este item?" class="md-secondary" ng-click="deletarCliente(person.id)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>-->
-    <md-button ng-click="deletarCliente(person.id)">Deletar</md-button>
+    <!--<md-button ng-click="deletarCliente(person.id)">Deletar</md-button>-->
+    <md-button><i style="color: #555 !important;" ng-click="verDadosCliente(person, $event)" class="material-icons">more_horiz</i></md-button>
+    <md-button><i style="color: #555 !important;" ng-click="deletarCliente(person.id)" class="material-icons">delete</i></md-button>
 </md-list-item>
 
 <md-button class="md-fab md-fab-bottom-right" aria-label="Add" ng-click="showAdvanced($event)" style="background-color: #1364b4;">
-    <i class="fa fa-plus fa-lg" aria-hidden="true"></i>
+        <i class="material-icons">arrow_upward</i>
 </md-button>
 
 

@@ -1,36 +1,33 @@
 <html lang="en" >
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Angular Material style sheet -->
-  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <!-- Angular Material CSS -->
+  <link rel="stylesheet" href="./css/angular-material.min.css">
+  <link rel="stylesheet" href="./css/font-awesome.min.css">
   <link rel="stylesheet" href="./css/main.css">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!--<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">-->
+  <link href="./css/Icones-Material.css" rel="stylesheet">
 </head>
 <body ng-app="seyconelApp" ng-cloak>
 
-  <div ng-view></div>
+    <div ng-view></div>
 
-  <!-- Angular Material requires Angular.js Libraries -->
-  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
-  <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/t-114/svg-assets-cache.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/angular-material-icons/0.7.1/angular-material-icons.min.js"></script> 
-  
-<script src="cordova.js"></script>
-<script src="app/app.js"></script>     
-<script src="xdk/init-dev.js"></script>     
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.js"></script> 
-<script type="text/javascript" src="app/dbObj.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ngStorage/0.3.6/ngStorage.min.js"></script>
-
-
-
-  <!-- Angular Material Library -->
-  <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
-
-
+    <!-- Cordova -->  
+    <script src="cordova.js"></script>
+    <!-- AngularJS -->
+    <script src="./js/angular.min.js"></script>
+    <script src="./js/angular-animate.min.js"></script>
+    <script src="./js/angular-aria.min.js"></script>
+    <script src="./js/angular-messages.min.js"></script>
+    <script src="./js/angular-route.js"></script> 
+    <script src="./js/svg-assets-cache.js"></script>
+    <script src="./js/ngStorage.min.js"></script> 
+    <!-- Angular Material -->
+    <script src="./js/angular-material.min.js"></script>
+    <script src="./js/angular-material-icons.min.js"></script> 
+    <!-- JS Adicional -->
+    <script src="app/app.js"></script>     
+    <script src="app/dbObj.js"></script>
+    <script src="xdk/init-dev.js"></script>     
 </body>
 </html>
