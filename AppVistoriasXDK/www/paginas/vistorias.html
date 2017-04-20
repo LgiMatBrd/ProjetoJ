@@ -1,26 +1,25 @@
-<md-toolbar>
+<md-toolbar style="position: fixed !important;">
     <div class="md-toolbar-tools">
         <!--<a href back-button style="margin-right: 10px;">Voltar</a>-->
-        <a href back-button style="margin-right: 10px;"><i class="fa fa-chevron-left" aria-hidden="true"></i></a>
+        <md-button><i back-button class="material-icons">keyboard_arrow_left</i></md-button>
         <h2><span>SeyService</span></h2>
     </div>
 </md-toolbar>
 
 <md-subheader class="md-no-sticky">Todos as vistorias: <strong>{{nome}}</strong> ID: {{id}}</md-subheader>
 
-<md-list-item ng-repeat="person in vistorias" ng-click="verVistoria(id)" class="noright">
+<md-list-item ng-repeat="person in vistorias" ng-click="verVistoria(person.id)" class="noright">
     <p>{{ person.nome }}</p>
     <!--<md-checkbox class="md-secondary" ng-model="person.selected"></md-checkbox>-->
     <!--<md-icon class="md-secondary" ng-click="verDadosVistorias(person.id)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>-->
     <!--<md-icon confirmed-click="deletarVistoria(vistoria.id);" ng-confirm-click="Você quer deletar este item?" class="md-secondary" ng-click="deletarCliente(person.id)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>-->
     <!--<md-icon confirmed-click="deletarVistoria2(vistoria.id);" ng-confirm-click="Você quer deletar este item?" class="md-secondary" ng-click="deletarCliente(person.id)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>-->
     <!--<md-button ng-click="deletarVistoria(person.id)">Deletar</md-button>-->
-    <md-icon ng-click="verDadosVistorias(person.id)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>
-    <md-icon ng-click="deletarVistoria(person.id)">delete_forever</md-icon>
+    <md-button><i style="color: #555 !important;" ng-click="deletarVistoria(person.id)" class="material-icons">delete</i></md-button>
 </md-list-item> 
 
-<md-button class="md-fab md-fab-bottom-right" aria-label="Add" ng-click="showAdvanced($event)" style="background-color: #1364b4;">
-    <i class="fa fa-plus fa-lg" aria-hidden="true"></i>
+<md-button class="md-fab md-fab-bottom-right" aria-label="Add" ng-click="showAdvanced($event)" style="background-color: #1364b4; position: fixed !important;">
+        <i class="material-icons">arrow_upward</i>
 </md-button>
 
 

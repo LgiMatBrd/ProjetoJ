@@ -1,3 +1,10 @@
+function onAppReady() {
+    if( navigator.splashscreen && navigator.splashscreen.hide ) {   // Cordova API detected
+        navigator.splashscreen.hide() ;
+    }
+}
+document.addEventListener("app.Ready", onAppReady, false);
+
 //Define an angular module for our app 
 var app = angular.module('seyconelApp', ['ngRoute','ngStorage','ngMaterial','ngMessages', 'material.svgAssetsCache']);
 
@@ -72,8 +79,26 @@ app.run(function($localStorage) {
     }
 });
 
-
-
+app.directive('camera', function() {
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function(scope, elm, attrs, ctrl) {
+            elm.on('click', function() {
+                navigator.camera.getPicture(
+                    function(imageURI) {
+                        scope.$apply(function() {
+                            ctrl.$setViewValue(imageURI);
+                        });
+                    },
+                    function(err) {
+                        ctrl.$setValidity('error', false);
+                    }, {quality: 50, 
+                        destinationType: Camera.DestinationType.DATA_URL});
+            });
+        }
+    };
+})
 
 app.controller('homeController', function($scope, $http, $localStorage, $location, $mdDialog) {
     /*delete $localStorage.vistoria;
@@ -382,6 +407,13 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
 
     function DialogController($scope, $mdDialog, id_dono, tiposVistorias) {
         
+        $scope.myPictures = [];
+        $scope.$watch('myPicture', function(value) {
+            if (value) {
+                $scope.myPictures.push(value);
+            }
+        }, true);
+
         $scope.tiposVistorias = tiposVistorias;
         $scope.addItem = function(itemForm) {
             

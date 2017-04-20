@@ -29,12 +29,7 @@
 // You can add other code to it or add additional functions that are triggered
 // by the same event or other events.
 
-function onAppReady() {
-    if( navigator.splashscreen && navigator.splashscreen.hide ) {   // Cordova API detected
-        navigator.splashscreen.hide() ;
-    }
-}
-document.addEventListener("app.Ready", onAppReady, false);
+
 // document.addEventListener("deviceready", onAppReady, false) ;
 // document.addEventListener("onload", onAppReady, false) ;
 
