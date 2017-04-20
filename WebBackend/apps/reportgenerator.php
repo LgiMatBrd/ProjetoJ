@@ -300,12 +300,14 @@ class PDF extends FPDF
         return $ly;
     }
     // Simple table
-    function BasicTable($header, $data)
+    function BasicTable($data, $maxw, $header = NULL)
     {
-        $maxw = array(17,30,21,27,28,15,21,31);
-        // Header
-        
-        $this->PrintRow($maxw, $header, 1.0, 1, 'C');
+        //$maxw = array(17,30,21,27,28,15,21,31);
+        if ($header != NULL)
+        {
+            // Header
+            $this->PrintRow($maxw, $header, 1.0, 1, 'C');
+        }
         
         // Data
         foreach($data as $row)
@@ -467,16 +469,18 @@ $pdf->SetRecuoDireita(13);                  // Configura o recuo a partir da dir
 $entrelinhas = 1.5;                         // Entrelinhas de 1.5x
 
 
-$lorem = file_get_contents('lorem.txt');
 $txtObjetivo = <<< EOT
-Apresentar um relatório sobre a inspeção realizada em lingas de corrente e cintas de elevação para a empresa XXXXXXXXXXXXXXXXXXX.
+Apresentar um relatório sobre a inspeção realizada em lingas de corrente e cintas de elevação para a empresa {$cliente['nome']}.
 EOT;
 $txtDesc = <<< EOT
-A inspeção foi realizada no mês XXXXX de XXXXX, dentro das instalações fabris da empresa na unidade de XXXXXXX.
+A inspeção foi realizada no mês {$vistoria['data_criacao']} de {$vistoria['data_criacao']}, dentro das instalações fabris da empresa na unidade de {$vistoria['nome']}.
 
-Os critérios utilizados para a inspeção das lingas foram a inspeção visual e a checagem dimensional do desgaste da corrente, utilizando-se gabaritos de inspeção, onde, através de um sistema "passa/não-passa"  é possível determinar se a corrente está ou não em condições de uso. Os gabaritos possuem arestas de inspeção cujas dimensões possuem a medida do item analisado mais a tolerância permitida para desgaste em correntes, de acordo com a norma (NBR ISO 3076:2005).
+Os critérios utilizados para a inspeção das lingas foram a inspeção visual e a checagem dimensional do desgaste da corrente, utilizando-se gabaritos de inspeção, onde, através de um sistema “passa/não-passa” é possível determinar se a corrente está ou não em condições de uso. Os gabaritos possuem arestas de inspeção cujas dimensões possuem a medida do item analisado mais a tolerância permitida para desgaste em correntes, de acordo com a norma (NBR ISO 3076:2005).
 
 O gabarito foi utilizado seguindo o esquema descrito na Tabela 1 a seguir.
+EOT;
+$txtDesc2 = <<< EOT
+O critério utilizado para a inspeção das eslingas e cintas de elevação foi a inspeção visual, onde foi checado o desgaste do tecido, rastreamento e ruptura dos filamentos de acordo com a (NBR 15637). Para os dispositivos e pega chapas checamos todos os itens de cada dispositivos tirando medidas e a situação física de cada item seguindo as normas (DIN EM 287 -1 e EN 13155).
 EOT;
 $tabela = <<< EOT
 299;.XXX;.Linga;.20;.6800;.1;.NÃO;.Identificação de carga ilegível, corrente muito.
@@ -497,7 +501,79 @@ $pdf->PrintTitulo('OBJETIVO');
 $pdf->MultiCell($wCell,$hCell,$txtObjetivo);
 $pdf->PrintTitulo('DESCRIÇÃO DA INSPEÇÃO');
 $pdf->MultiCell($wCell, $hCell, $txtDesc);
+$data = [
+    ['abc', 'Inspeção do alongamento interno: Deve-se tentar inserir a lingüeta do gabarito no vão entre os elos da corrente. A corrente deve ser reprovada caso a lingüeta consiga entrar no vão.'],
+    ['def', 'Inspeção do diâmetro da corrente: Deve-se tentar inserir o canal menor do gabarito ao redor do elo da corrente (no lado oposto à solda). A corrente seve ser reprovada caso o canal se encaixe na corrente.'],
+    ['ghi', 'Inspeção do alongamento externo: deve-se tentar inserir o canal maior do gabarito por fora de um elo de corrente no sentido longitudinal. Caso o canal maior do gabarito não se encaixe, a corrente deve ser reprovada.']
+];
+$pdf->BasicTable($data, array(45, 82.5));
+
+
+
 $pdf->PrintTitulo('INSPEÇÃO');
+$pdf->PrintText($hCell, 'Data da Inspeção: ', 'B');
+$pdf->PrintTexto($hCell, $vistoria['data_criacao']);
+$pdf->Ln();
+$pdf->PrintText($hCell, 'Período: ', 'B');
+$pdf->PrintTexto($hCell, 'xxx');
+$pdf->Ln();
+$pdf->PrintText($hCell, 'Quantidade de itens inspecionados: ', 'B');
+$pdf->PrintTexto($hCell, count($itensVistoriados));
+$pdf->Ln();
+$pdf->PrintText($hCell, 'Setores: ', 'B');
+$pdf->PrintTexto($hCell, 'xxx');
+$pdf->Ln();
+
+$pdf->PrintTitulo('Lista dos Itens Inspecionados');
+$pdf->MultiCell($wCell,$hCell,'A Tabela 2 mostra a seguir os equipamentos inspecionados agrupados por setor.');
+$header = array('Nº','RASTREAMENTO/ SETOR','Material','CORRENTE [mm] CINTA [t]','COMPRIMENTO DA LINGA/CINTA','RAMAIS','APROVADA','MOTIVO');
+$data = array();
+foreach ($itensVistoriados as $item)
+{
+    $index = count($data);
+    $data[] = array();
+    $data[$index][] = (empty($item['placa_rastreabilidade_seyconel']))?  '-' : $item['placa_rastreabilidade_seyconel'];
+    $data[$index][] = (empty($item['setor']))?  '-' : $item['setor'];
+    switch($item['nome'])
+    {
+        case 'itemAces':
+            $material = 'Acessório';
+            break;
+        case 'itemDies':
+            $material = 'Dispositivo';
+            break;
+        case 'itemEctu':
+            $material = 'Eslinga';
+            break;
+        case 'itemGael':
+            $material = 'Gael';
+            break;
+        case 'itemLema':
+            $material = 'Lema';
+            break;
+        case 'itemLila':
+            $material = 'Lila';
+            break;
+        case 'itemLinc':
+            $material = 'Linga';
+            break;
+        default:
+            $material = '-';
+    }
+    $data[$index][] = $material;
+    $data[$index][] = (isset($item['elemento_inicial']))? $item['elemento_inicial'] : (isset($item['capacidade']))? $item['capacidade'] : '-';
+    $data[$index][] = (isset($item['comprimento']))? $item['comprimento'] : '-';
+    $data[$index][] = (isset($item['ramal']))? $item['ramal'] : '-';
+    $data[$index][] = ($item['item_aprovado'])? 'SIM' : 'NÃO';
+    $data[$index][] = (isset($item['observacao']))? $item['observacao'] : '-';
+}
+$pdf->BasicTable($data, array(), $header);
+$pdf->Ln();
+
+
+
+
+
 $xTexts = [];
 //$valores = [13, 10, 0, 1, 5];
 $valores = [13, 6, 20];
