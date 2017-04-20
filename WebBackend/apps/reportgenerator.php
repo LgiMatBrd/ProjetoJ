@@ -518,7 +518,7 @@ $pdf->PrintText($hCell, 'Período: ', 'B');
 $pdf->PrintTexto($hCell, 'xxx');
 $pdf->Ln();
 $pdf->PrintText($hCell, 'Quantidade de itens inspecionados: ', 'B');
-$pdf->PrintTexto($hCell, count($itensVistoriados));
+$pdf->PrintTexto($hCell, $itensTotal);
 $pdf->Ln();
 $pdf->PrintText($hCell, 'Setores: ', 'B');
 $pdf->PrintTexto($hCell, 'xxx');
@@ -570,6 +570,11 @@ foreach ($itensVistoriados as $item)
 $pdf->BasicTable($data, array(), $header);
 $pdf->Ln();
 
+$pdf->SetFont('Calibri','B',12);
+$pdf->MultiCell($wCell, $hCell, <<< EOT
+A partir dos {$itensTotal} itens inspecionados podemos afirmar que {$itensReprovados} itens apresentaram algum problema como alongamentos, desgastes, amassamento, fora dos padrões exigidos em normas, etc. em XX??? itens o material pode ser recuperado com a colocação de placas de identificação de carga e a substituição de um elo de sustentação conforme descrito nos itens abaixo, mas na sua grande maioria eles devem ser substituídos por itens que se enquadrem as normas vigentes e {$aprovados} item está apto a continuar a trabalhar por atender todos os requisitos exigidos em normas.
+EOT
+);
 
 
 
