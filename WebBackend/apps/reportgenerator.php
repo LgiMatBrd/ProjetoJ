@@ -6,9 +6,17 @@
 
 define('ROOT_DIR', dirname(dirname(__FILE__)));
 
+ob_start();
+
 require '../lib/pdfgenerator/fpdf.php';
 require '../config/psl-config.php';
 require '../config/db_connect.php';
+require '../config/global.php';
+//set_include_path(get_include_path() . PATH_SEPARATOR . ROOT_DIR . '/lib/phpmailer');
+//require 'class.phpmailer.php';
+require ROOT_DIR.'/lib/phpmailer/class.phpmailer.php';
+
+set_time_limit(60);
 
 class PDF extends FPDF
 {
@@ -19,10 +27,14 @@ class PDF extends FPDF
     protected $hHeader;             // Posição Y após o header
     //protected $acceptPageBreak;     // (Boolean) Controla a quebra automática de página
     public $fatorWord;              // (Boolean) Valor que é necessário somar à entrelinhas para se aproximar ao Word
+    public $customArea;             // Região salva para uso posterior array(tipo, page, y, x, w, h)
+    protected $marcador_numerico;   // Salva o marcador numérico do título (faz a contagem de títulos)
     
     public function __construct($orientation = 'P', $unit = 'mm', $size = 'A4') {
         $this->fatorWord = 0.215; // Valor a ser somado à entrelinhas para se aproximar ao Word
         $this->hHeader = 0;
+        $this->customArea = array();
+        $this->marcador_numerico = 1;
         parent::__construct($orientation, $unit, $size);
     }
 
@@ -54,6 +66,54 @@ class PDF extends FPDF
     function SetRecuoDireita($valor)
     {
         $this->recuoDireita = $valor + $this->GetRMargin();
+    }
+    // Cria uma área editável posteriormente
+    function AddCustomArea($tipo, $page = NULL, $y = NULL, $x = NULL, $w = 0, $h = 0)
+    {
+        if ($page === NULL) $page = $this->page;
+        if ($y === NULL) $y = $this->y;
+        if ($x === NULL) $x = $this->x;
+        $this->customArea[] = array($tipo, $page, $y, $x, $w, $h);
+    }
+    // Recua para uma área editável definida anteriormente
+    function GotoCustomArea($tipo, $shiftOut = true)
+    {
+        static $tipoAnterior, $countAnterior, $i, $customs, $keys;
+        if ($tipoAnterior != $tipo)
+        {
+            $i = -1;
+        }
+        $i++;
+        if ($tipoAnterior != $tipo || $countAnterior != count($this->customArea))
+        {
+            $customs = array();
+            $keys = array();
+            foreach ($this->customArea as $key => $custom)
+            {
+                if ($custom[0] == $tipo)
+                {
+                    $customs[] = $custom;
+                    $keys[] = $key;
+                }
+            }
+        }
+        $tipoAnterior = $tipo;
+        if ($i >= count($customs))
+            return false;
+        $this->page = $customs[$i][1];
+        $this->y = $customs[$i][2];
+        $this->x = $customs[$i][3];
+        
+        if ($shiftOut)
+            unset($this->customArea[$keys[$i]]);
+        $countAnterior = count($this->customArea);
+        
+        return [
+            'y' => $customs[$i][2],
+            'x' => $customs[$i][3],
+            'w' => $customs[$i][4],
+            'h' => $customs[$i][5]
+                ];
     }
     // Retorna o valor configurado de margem esquerda
     function GetLMargin()
@@ -88,10 +148,9 @@ class PDF extends FPDF
     // Imprime uma célula de título com marcador numérico automático
     function PrintTitulo($str)
     {
-        static $marcador_numerico = 1;
         $this->SetFont('','B');
         $this->SetX($this->recuoEsquerda);
-        $this->Cell($this->GetCellWidth(),$this->GetCellHeight(3.5),$marcador_numerico++.'. '.utf8_decode($str),0,1);
+        $this->Cell($this->GetCellWidth(),$this->GetCellHeight(3.5),$this->marcador_numerico++.'. '.utf8_decode($str),0,1);
         $this->SetFont('');
     }
     // Imprime uma célula com a largura exata do texto a ser mostrado
@@ -198,7 +257,7 @@ class PDF extends FPDF
     }
     
     // Imprime uma linha inteira da tabela, celula por celula
-    function PrintRow($wcols, $row, $entrelinhas, $border=0, $align='J', $fill=false)
+    function PrintRow($wcols, $row, $entrelinhas, $border=0, $align='J', $fill=false, $minh=0)
     {
         $lx = $this->x;
         $this->_row_decodeUTF8($row);
@@ -207,6 +266,11 @@ class PDF extends FPDF
         $rowh = $this->_countRowLinhas($row, $qtdmulticells, $wcols);
         
         $h = $this->GetCellHeight($rowh*($entrelinhas+$this->fatorWord));
+        if ($h < $minh)
+        {
+            $rowh = floor($minh / $this->GetCellHeight($entrelinhas, 1));
+            $h = $this->GetCellHeight($rowh*($entrelinhas+$this->fatorWord));
+        }
         $sp = $this->page;
         $ep = 1;
         $ly = 0;
@@ -244,10 +308,17 @@ class PDF extends FPDF
             $qtdlinhas = floor($resto/$lh);
             // 2. Calcula a posição vertical
             if ($qtdlinhas > $cellh)
-            
                 $ypos = $ay + (($resto - $cellh*$lh)/2);
             else
                 $ypos = $ay;
+            
+            if ($txt === '{{custom}}')
+            {
+                if ($resto < $h)
+                    $this->AddCustomArea('celula', $this->page, $this->y, $this->x, $w, $resto);
+                else
+                    $this->AddCustomArea('celula', $this->page, $this->y, $this->x, $w, $h);
+            }
             
             // Desenha um pedaço da borda na página atual
             $rrh = $rowh;
@@ -280,6 +351,10 @@ class PDF extends FPDF
         }
         else
         {
+            if ($txt === '{{custom}}')
+            {
+                $this->AddCustomArea('celula', $this->page, $this->y, $this->x, $w, $h);
+            }
             $this->Cell($w, $h, '', $border, 1, '', $fill);
             if ($cellh != $rowh)
                 // Calcula a posição vertical do texto
@@ -287,47 +362,71 @@ class PDF extends FPDF
             else
                 $ypos = $ay;
         }
+        
         $ly = $this->y;
          
         //$this->Cell($w, $h, '', $border, 0, '', $fill);
         
         
         $this->SetXY($ax, $ypos);
+        if ($txt !== '{{custom}}')
+            parent::MultiCell($w, $lh, $txt, '', $align);
         
-        parent::MultiCell($w, $lh, $txt, '', $align);
         
         $this->SetXY($ax + $w, $ay);
         return $ly;
     }
     // Simple table
-    function BasicTable($data, $maxw, $header = NULL)
+    function BasicTable($data, $maxw, $header = NULL, $minh = 0, $align = NULL)
     {
         //$maxw = array(17,30,21,27,28,15,21,31);
+        $this->x = ($this->w - array_sum($maxw))/2;
+        if ($align == NULL)
+            $align = array('C','J');
+        else
+        {
+            if (!is_array($align))
+            {
+                $align = [$align, $align];
+            }
+        }
         if ($header != NULL)
         {
             // Header
-            $this->PrintRow($maxw, $header, 1.0, 1, 'C');
+            $cStyle = $this->FontStyle;
+            $this->SetFont('', 'B');
+            $this->PrintRow($maxw, $header, 1.0, 1, $align[0], false, $minh);
+            $this->SetFont('', $cStyle);
         }
         
         // Data
         foreach($data as $row)
         {
-            $this->PrintRow($maxw, $row, 1.0, 1, 'J');
+            $this->PrintRow($maxw, $row, 1.0, 1, $align[1], false, $minh);
         }
     }
     
-    function PrintGraph($ySteps, $h, $xTexts, $valores, $cores, $espacamento = 10)
+    function PrintGraph($ySteps, $h, $xTexts, $valores, $cores, $espacamento = 10, $drawcolor = 150)
     {
         $borda = 7;
         $textoLinha = 1;
-        
+        $cDrawColor = $this->DrawColor;
+        $this->SetDrawColor($drawcolor);
+        if (!empty($xTexts))
+            $lh = $this->FontSize + 4;
+        else
+            $lh = 0;
         if ($this->y+$h > $this->PageBreakTrigger)
             $this->AddPage();
         
         $this->Rect($this->recuoEsquerda, $this->y, $this->w - $this->recuoDireita - $this->recuoEsquerda, $h);
-        $h -= $borda*2;
+        if ($lh && $lh > $borda)
+            $h = $h - $borda - $lh;
+        else
+            $h = $h - $borda*2;
         
         $maxY = $ySteps * ceil(max($valores)/$ySteps);
+        if (!$maxY) $maxY = 1;
         $inter = $maxY/$ySteps;
         $tmp = (string)$maxY;
         $wc = $this->GetStringWidth($tmp);
@@ -353,6 +452,7 @@ class PDF extends FPDF
         
         $cy = $cy + $h;
         $cx = $cx + $wc + $textoLinha + $espacamento/2; // 1 (referente ao espaço entre texto e linha) + 5 (espaço a partir da linha)
+        $cx2 = $cx;
         $cols = count($valores);
         //$mWidth = ($this->w - $cx - 5*$cols - $this->rMargin) / $cols;
         $mWidth = ($this->w - $cx - $espacamento*$cols + $espacamento/2 - $this->recuoDireita - $borda) / $cols;
@@ -363,10 +463,21 @@ class PDF extends FPDF
             $ch = $valores[$i]*$hUnity;
             $this->SetFillColor($cores[$i]['r'],$cores[$i]['g'],$cores[$i]['b']);
             $this->Rect($cx, $cy - $ch, $mWidth, $ch, 'F');
+            if (!empty($xTexts))
+            {
+                $xTextW = $this->GetStringWidth(utf8_decode($xTexts[$i]));
+                $this->x = $cx + ($mWidth - $xTextW)/2;
+                $this->y = $cy;
+                $this->Cell($xTextW, $lh, utf8_decode($xTexts[$i]));
+            }
             $cx += $mWidth + $espacamento;
         }
+        
         $this->x = $cx;
-        $this->y = $cy+$borda;
+        $this->y = $cy+$borda+$lh;
+        $this->DrawColor = $cDrawColor;
+        if($this->page>0)
+            $this->_out($this->DrawColor);
     }
     
     function AddPage($orientation = '', $size = '', $rotation = 0) {
@@ -420,7 +531,7 @@ class PDF extends FPDF
         
         /* Não configuráveis */
         $lCelulaPrincipal = $this->w - $lCelulaLogo - 2*$lCelulaSecundaria - $this->lMargin - $this->rMargin;
-        $this->Image('logo.jpg',12,12,$lCelulaLogo-4,$alturaCelulaLogo-4);
+        $this->Image('../assets/report_images/logo.jpg',12,12,$lCelulaLogo-4,$alturaCelulaLogo-4);
         $this->Cell($lCelulaLogo,$alturaCelulaLogo,'',1,0);
         $fimCelulaImagem = $this->GetX();
         $this->SetFont($font,'B',11);
@@ -455,131 +566,331 @@ class PDF extends FPDF
     }
 }
 
-/* Declara o objeto da classe PDF e realiza as configurações globais */
-$pdf = new PDF();
-$pdf->AddFont('Calibri');                   // Adiciona a fonte Calibri Regular
-$pdf->AddFont('Calibri', 'B');              // Adiciona a fonte Calibri Negrito
-$pdf->SetCompression(true);                 // Ativa a compressão do arquivo PDF
-$pdf->AliasNbPages();                       // Ativa o apelido '{nb}' para n. de páginas 
-$pdf->SetFooterTextPos(23);                 // Posiciona o rodapé a 2.3 cm da borda
-$pdf->SetPageBorderPos(8);                  // Posiciona a margem a 8 mm da borda
-$pdf->SetFont('Calibri','B',11);            // Ativa a fonte Calibri, negrito, 11pt
-$pdf->SetRecuoEsquerda(13);                 // Configura o recuo a partir da esquerda
-$pdf->SetRecuoDireita(13);                  // Configura o recuo a partir da direita
-$entrelinhas = 1.5;                         // Entrelinhas de 1.5x
-
-
-$txtObjetivo = <<< EOT
+function elaboraRelatorio($cliente, $vistoria, $itensVistoriados, $itensTotal, $itensAprovados, $itensReprovados)
+{
+    /* Declara o objeto da classe PDF e realiza as configurações globais */
+    $pdf = new PDF();
+    $pdf->AddFont('Calibri');                   // Adiciona a fonte Calibri Regular
+    $pdf->AddFont('Calibri', 'B');              // Adiciona a fonte Calibri Negrito
+    $pdf->SetCompression(true);                 // Ativa a compressão do arquivo PDF
+    $pdf->AliasNbPages();                       // Ativa o apelido '{nb}' para n. de páginas 
+    $pdf->SetFooterTextPos(23);                 // Posiciona o rodapé a 2.3 cm da borda
+    $pdf->SetPageBorderPos(8);                  // Posiciona a margem a 8 mm da borda
+    $pdf->SetFont('Calibri','B',11);            // Ativa a fonte Calibri, negrito, 11pt
+    $pdf->SetRecuoEsquerda(13);                 // Configura o recuo a partir da esquerda
+    $pdf->SetRecuoDireita(13);                  // Configura o recuo a partir da direita
+    $entrelinhas = 1.5;                         // Entrelinhas de 1.5x
+$xTexts = [];
+    $data_criacao = new DateTime($vistoria['data_criacao'], new DateTimeZone('UTC'));
+    $data_criacao = $data_criacao->getTimestamp();
+    
+    $txtObjetivo = 
+<<< EOT
 Apresentar um relatório sobre a inspeção realizada em lingas de corrente e cintas de elevação para a empresa {$cliente['nome']}.
 EOT;
-$txtDesc = <<< EOT
-A inspeção foi realizada no mês {$vistoria['data_criacao']} de {$vistoria['data_criacao']}, dentro das instalações fabris da empresa na unidade de {$vistoria['nome']}.
+    $dataStr = strftime('%B', $data_criacao);
+    $dataStr2 = strftime('%Y', $data_criacao);
+    $txtDesc = 
+<<< EOT
+A inspeção foi realizada no mês {$dataStr} de {$dataStr2}, dentro das instalações fabris da empresa na unidade de {$vistoria['nome']}.
 
-Os critérios utilizados para a inspeção das lingas foram a inspeção visual e a checagem dimensional do desgaste da corrente, utilizando-se gabaritos de inspeção, onde, através de um sistema “passa/não-passa” é possível determinar se a corrente está ou não em condições de uso. Os gabaritos possuem arestas de inspeção cujas dimensões possuem a medida do item analisado mais a tolerância permitida para desgaste em correntes, de acordo com a norma (NBR ISO 3076:2005).
+Os critérios utilizados para a inspeção das lingas foram a inspeção visual e a checagem dimensional do desgaste da corrente, utilizando-se gabaritos de inspeção, onde, através de um sistema "passa/não-passa" é possível determinar se a corrente está ou não em condições de uso. Os gabaritos possuem arestas de inspeção cujas dimensões possuem a medida do item analisado mais a tolerância permitida para desgaste em correntes, de acordo com a norma (NBR ISO 3076:2005).
 
 O gabarito foi utilizado seguindo o esquema descrito na Tabela 1 a seguir.
 EOT;
-$txtDesc2 = <<< EOT
-O critério utilizado para a inspeção das eslingas e cintas de elevação foi a inspeção visual, onde foi checado o desgaste do tecido, rastreamento e ruptura dos filamentos de acordo com a (NBR 15637). Para os dispositivos e pega chapas checamos todos os itens de cada dispositivos tirando medidas e a situação física de cada item seguindo as normas (DIN EM 287 -1 e EN 13155).
-EOT;
-$tabela = <<< EOT
-299;.XXX;.Linga;.20;.6800;.1;.NÃO;.Identificação de carga ilegível, corrente muito.
-300;.XXX;.Linga;.20;.4000;.2;.NÃO;.Alongamento no diâmetro nominal, sem identificação de.
-312;.XXX;.Linga;.16;.3000;.2;.NÃO;.Identificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-312;.XXX;.Linga;.16;.3000;.2;.Identificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaIdentificação de carga ilegível, alongamentaadjksldjakldjkladhawiojaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaokdhsajkdakjxjbsakjegiwqhdaskhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa;.NÃO
-300;.XXX;.Linga;.20;.4000;.2;.NÃO;.Alongamento no diâmetro nominal, sem identificação de.
-EOT;
+    
+   
+    /* Gera o conteúdo das páginas */
+    $wCell = $pdf->GetCellWidth(); // Calcula a largura máxima da célula
+    $pdf->AddPage();
+    $pdf->SetFont('Calibri','B',11);
+    $hCell = $pdf->GetCellHeight($entrelinhas, 1); // Calcula a altura da celula com o fator Word
 
+    $pdf->PrintTitulo('OBJETIVO');
+    $pdf->MultiCell($wCell,$hCell,$txtObjetivo);
+    $pdf->PrintTitulo('DESCRIÇÃO DA INSPEÇÃO');
+    $pdf->MultiCell($wCell, $hCell, $txtDesc);
+    $data = [
+        ['{{custom}}', 'Inspeção do alongamento interno: Deve-se tentar inserir a lingüeta do gabarito no vão entre os elos da corrente. A corrente deve ser reprovada caso a lingüeta consiga entrar no vão.'],
+        ['{{custom}}', 'Inspeção do diâmetro da corrente: Deve-se tentar inserir o canal menor do gabarito ao redor do elo da corrente (no lado oposto à solda). A corrente seve ser reprovada caso o canal se encaixe na corrente.'],
+        ['{{custom}}', 'Inspeção do alongamento externo: deve-se tentar inserir o canal maior do gabarito por fora de um elo de corrente no sentido longitudinal. Caso o canal maior do gabarito não se encaixe, a corrente deve ser reprovada.']
+    ];
+    $pdf->BasicTable($data, array(45, 82.5), NULL, 40);
+    $pdf->Ln();
+    
+    
+    $pdf->PrintTitulo('INSPEÇÃO');
+    $pdf->PrintTexto($hCell, 'Data da Inspeção: ', 'B');
+    $dataStr = strftime('%A',$data_criacao);
+    if ($dataStr === 'segunda' || $dataStr === 'terça' || $dataStr === 'quarta' || $dataStr === 'quinta' || $dataStr === 'sexta')
+        $dataStr .= '-feira';        
+    $pdf->PrintTexto($hCell, strftime('%d de %B de %Y, %Hh%M, ',$data_criacao).$dataStr.'.');
+    $pdf->Ln();
+    $pdf->PrintTexto($hCell, 'Período: ', 'B');
+    $pdf->PrintTexto($hCell, 'xxx');
+    $pdf->Ln();
+    $pdf->PrintTexto($hCell, 'Quantidade de itens inspecionados: ', 'B');
+    $pdf->PrintTexto($hCell, $itensTotal);
+    $pdf->Ln();
+    $pdf->PrintTexto($hCell, 'Setores: ', 'B');
+    $pdf->PrintTexto($hCell, 'xxx');
+    $pdf->Ln();
 
-/* Gera o conteúdo das páginas */
-$wCell = $pdf->GetCellWidth(); // Calcula a largura máxima da célula
-$pdf->AddPage();
-$pdf->SetFont('Calibri','B',11);
-$hCell = $pdf->GetCellHeight($entrelinhas, 1); // Calcula a altura da celula com o fator Word
-
-$pdf->PrintTitulo('OBJETIVO');
-$pdf->MultiCell($wCell,$hCell,$txtObjetivo);
-$pdf->PrintTitulo('DESCRIÇÃO DA INSPEÇÃO');
-$pdf->MultiCell($wCell, $hCell, $txtDesc);
-$data = [
-    ['abc', 'Inspeção do alongamento interno: Deve-se tentar inserir a lingüeta do gabarito no vão entre os elos da corrente. A corrente deve ser reprovada caso a lingüeta consiga entrar no vão.'],
-    ['def', 'Inspeção do diâmetro da corrente: Deve-se tentar inserir o canal menor do gabarito ao redor do elo da corrente (no lado oposto à solda). A corrente seve ser reprovada caso o canal se encaixe na corrente.'],
-    ['ghi', 'Inspeção do alongamento externo: deve-se tentar inserir o canal maior do gabarito por fora de um elo de corrente no sentido longitudinal. Caso o canal maior do gabarito não se encaixe, a corrente deve ser reprovada.']
-];
-$pdf->BasicTable($data, array(45, 82.5));
-
-
-
-$pdf->PrintTitulo('INSPEÇÃO');
-$pdf->PrintText($hCell, 'Data da Inspeção: ', 'B');
-$pdf->PrintTexto($hCell, $vistoria['data_criacao']);
-$pdf->Ln();
-$pdf->PrintText($hCell, 'Período: ', 'B');
-$pdf->PrintTexto($hCell, 'xxx');
-$pdf->Ln();
-$pdf->PrintText($hCell, 'Quantidade de itens inspecionados: ', 'B');
-$pdf->PrintTexto($hCell, $itensTotal);
-$pdf->Ln();
-$pdf->PrintText($hCell, 'Setores: ', 'B');
-$pdf->PrintTexto($hCell, 'xxx');
-$pdf->Ln();
-
-$pdf->PrintTitulo('Lista dos Itens Inspecionados');
-$pdf->MultiCell($wCell,$hCell,'A Tabela 2 mostra a seguir os equipamentos inspecionados agrupados por setor.');
-$header = array('Nº','RASTREAMENTO/ SETOR','Material','CORRENTE [mm] CINTA [t]','COMPRIMENTO DA LINGA/CINTA','RAMAIS','APROVADA','MOTIVO');
-$data = array();
-foreach ($itensVistoriados as $item)
-{
-    $index = count($data);
-    $data[] = array();
-    $data[$index][] = (empty($item['placa_rastreabilidade_seyconel']))?  '-' : $item['placa_rastreabilidade_seyconel'];
-    $data[$index][] = (empty($item['setor']))?  '-' : $item['setor'];
-    switch($item['nome'])
+    $pdf->PrintTitulo('Lista dos Itens Inspecionados');
+    $pdf->MultiCell($wCell,$hCell,'A Tabela 2 mostra a seguir os equipamentos inspecionados agrupados por setor.');
+    $header = array('Nº','RASTREAMENTO/ SETOR','Material','CORRENTE [mm] CINTA [t]','COMPRIMENTO DA LINGA/CINTA','RAMAIS','APROVADA','MOTIVO');
+    $data = array();
+    foreach ($itensVistoriados as $item)
     {
-        case 'itemAces':
-            $material = 'Acessório';
-            break;
-        case 'itemDies':
-            $material = 'Dispositivo';
-            break;
-        case 'itemEctu':
-            $material = 'Eslinga';
-            break;
-        case 'itemGael':
-            $material = 'Gael';
-            break;
-        case 'itemLema':
-            $material = 'Lema';
-            break;
-        case 'itemLila':
-            $material = 'Lila';
-            break;
-        case 'itemLinc':
-            $material = 'Linga';
-            break;
-        default:
-            $material = '-';
+        $index = count($data);
+        $data[] = array();
+        $data[$index][] = (empty($item['placa_rastreabilidade_seyconel']))?  '-' : $item['placa_rastreabilidade_seyconel'];
+        $data[$index][] = (empty($item['setor']))?  '-' : $item['setor'];
+        switch($item['nome'])
+        {
+            case 'itemAces':
+                $material = 'Acessório';
+                break;
+            case 'itemDies':
+                $material = 'Dispositivo';
+                break;
+            case 'itemEctu':
+                $material = 'Eslinga';
+                break;
+            case 'itemGael':
+                $material = 'Gael';
+                break;
+            case 'itemLema':
+                $material = 'Lema';
+                break;
+            case 'itemLila':
+                $material = 'Lila';
+                break;
+            case 'itemLinc':
+                $material = 'Linga';
+                break;
+            default:
+                $material = '-';
+        }
+        $data[$index][] = $material;
+        $data[$index][] = (isset($item['elemento_inicial']))? $item['elemento_inicial'] : (isset($item['capacidade']))? $item['capacidade'] : '-';
+        $data[$index][] = (isset($item['comprimento']))? $item['comprimento'] : '-';
+        $data[$index][] = (isset($item['ramal']))? $item['ramal'] : '-';
+        $data[$index][] = ($item['item_aprovado'])? 'SIM' : 'NÃO';
+        $data[$index][] = (isset($item['observacao']))? $item['observacao'] : '-';
     }
-    $data[$index][] = $material;
-    $data[$index][] = (isset($item['elemento_inicial']))? $item['elemento_inicial'] : (isset($item['capacidade']))? $item['capacidade'] : '-';
-    $data[$index][] = (isset($item['comprimento']))? $item['comprimento'] : '-';
-    $data[$index][] = (isset($item['ramal']))? $item['ramal'] : '-';
-    $data[$index][] = ($item['item_aprovado'])? 'SIM' : 'NÃO';
-    $data[$index][] = (isset($item['observacao']))? $item['observacao'] : '-';
-}
-$pdf->BasicTable($data, array(), $header);
-$pdf->Ln();
+    $pdf->SetFont('','',10);
+    $pdf->BasicTable($data, array(17,30,21,27,28,15,21,31), $header, 8, 'C');
+    $pdf->Ln();
 
-$pdf->SetFont('Calibri','B',12);
-$pdf->MultiCell($wCell, $hCell, <<< EOT
-A partir dos {$itensTotal} itens inspecionados podemos afirmar que {$itensReprovados} itens apresentaram algum problema como alongamentos, desgastes, amassamento, fora dos padrões exigidos em normas, etc. em XX??? itens o material pode ser recuperado com a colocação de placas de identificação de carga e a substituição de um elo de sustentação conforme descrito nos itens abaixo, mas na sua grande maioria eles devem ser substituídos por itens que se enquadrem as normas vigentes e {$aprovados} item está apto a continuar a trabalhar por atender todos os requisitos exigidos em normas.
+    $pdf->SetFont('Calibri','B',12);
+    $pdf->MultiCell($wCell, $hCell,
+<<< EOT
+A partir dos {$itensTotal} itens inspecionados podemos afirmar que {$itensReprovados} itens apresentaram algum problema como alongamentos, desgastes, amassamento, fora dos padrões exigidos em normas, etc. em XX??? itens o material pode ser recuperado com a colocação de placas de identificação de carga e a substituição de um elo de sustentação conforme descrito nos itens abaixo, mas na sua grande maioria eles devem ser substituídos por itens que se enquadrem as normas vigentes e {$itensAprovados} item está apto a continuar a trabalhar por atender todos os requisitos exigidos em normas.
 EOT
-);
+    );
+
+    foreach ($itensVistoriados as $item)
+    {
+        $pdf->AddPage();
+        $pdf->SetFont('Arial','B',12);
+        if (!empty($item['placa_rastreabilidade_seyconel']))
+            $pdf->PrintTexto($hCell, "{$item['placa_rastreabilidade_seyconel']} - {$item['descricao']}", 'B');
+        else
+            $pdf->PrintTexto ($hCell, $item['descricao'], 'B');
+        $pdf->Ln(2*$hCell);
+
+        $pdf->PrintTexto($hCell, 'Capacidade de carga: '.'xxx', 'B');
+        $pdf->Ln();
+        $pdf->PrintTexto($hCell, 'Setor: '.$item['setor'], 'B');
+        $pdf->Ln();
+        // Fotos
+        if ($item['item_aprovado'])
+            $pdf->MultiCell($wCell, $hCell, '( X ) APROVADO  (   ) REPROVADO', 1, 0, 'C');
+        else
+            $pdf->MultiCell($wCell, $hCell, '(   ) APROVADO  ( X ) REPROVADO', 1, 0, 'C');
+        $pdf->Ln();
+        $pdf->PrintTexto($hCell, 'Resultado: ', 'B');
+        $pdf->PrintTexto($hCell, $item['observacao']);
+        $pdf->Ln();
+    }
+
+    $pdf->AddPage();
+    $pdf->SetFont('Calibri', 'B', 12);
+    $pdf->PrintTitulo('RESULTADO DA INSPEÇÃO');
+
+    $header = array('INSPECIONADAS (PÇ)','APROVADAS (PÇ)','REPROVADAS (PÇ)');
+    $data = [
+        [$itensTotal, $itensAprovados, $itensReprovados]
+    ];
+    $pdf->BasicTable($data, array(57.8, 49.4, 49.1), $header, 10, 'C');
+    $pdf->Ln();
+
+    $valores = [$itensTotal, $itensAprovados, $itensReprovados];
+    $cores = [
+        [
+            'r' => 255,
+            'g' => 0,
+            'b' => 0
+        ],
+        [
+            'r' => 0,
+            'g' => 255,
+            'b' => 0
+        ],
+        [
+            'r' => 0,
+            'g' => 0,
+            'b' => 255
+        ]
+    ];
+    $step = (int)round(max($valores)/8);
+    if (!$step) $step = 1;
+    $pdf->PrintGraph($step, 75, array('INSPECIONADAS (PÇ)','APROVADAS (PÇ)','REPROVADAS (PÇ)'), $valores, $cores);
+    $pdf->Ln();
+    
+    $header = array('Podem ser recuperadas (PÇ)', 'Devem ser descartadas (PÇ)');
+    $data = [
+        ['x', 'x']
+    ];
+    $pdf->BasicTable($data, array(70.2, 85.1), $header, 10, 'C');
+    $pdf->Ln();
+
+    $valores = [7, 17];
+    $cores = [
+        [
+            'r' => 255,
+            'g' => 255,
+            'b' => 0
+        ],
+        [
+            'r' => 255,
+            'g' => 0,
+            'b' => 0
+        ]
+    ];
+    $step = (int)round(max($valores)/8);
+    if (!$step) $step = 1;
+    $pdf->PrintGraph($step, 75, array('Podem ser recuperadas (PÇ)', 'Devem ser descartadas (PÇ)'), $valores, $cores, 30);
+    $pdf->Ln();
+
+    $pdf->AddPage();
+    $pdf->SetFont('', 'B');
+    $pdf->MultiCell($wCell, $hCell, 'O setor de inspeções técnicas se coloca a disposição sobre dúvidas referentes a inspeção realizada.');
+    $pdf->Ln(50);
+    $pdf->Image('../assets/report_images/signature.png', 84.8, $pdf->GetY(), 95.1, 64.7);
+    
+    $pdf->AddCustomArea('back');
+    $myCustom = $pdf->GotoCustomArea('celula');
+    $myCx = $myCustom['x'] + ($myCustom['w'] - 26.7)/2;
+    $myCy = $myCustom['y'] + ($myCustom['h'] - 35.4)/2;
+    $pdf->Image('../assets/report_images/tabela1-1.jpg', $myCx, $myCy, 26.7, 35.4);
+    $myCustom = $pdf->GotoCustomArea('celula');
+    $myCx = $myCustom['x'] + ($myCustom['w'] - 32.2)/2;
+    $myCy = $myCustom['y'] + ($myCustom['h'] - 35.4)/2;
+    $pdf->Image('../assets/report_images/tabela1-2.jpg', $myCx, $myCy, 32.2, 35.4);
+    $myCustom = $pdf->GotoCustomArea('celula');
+    $myCx = $myCustom['x'] + ($myCustom['w'] - 40.1)/2;
+    $myCy = $myCustom['y'] + ($myCustom['h'] - 32.1)/2;
+    $pdf->Image('../assets/report_images/tabela1-3.jpg', $myCx, $myCy, 40.1, 32.1);
+    $pdf->GotoCustomArea('back');
+    
+    $meuPdf = $pdf->Output('S');
+    
+    $email = new PHPMailer();
+    $email->setLanguage('pt_br');
+    $email->CharSet = 'UTF-8';
+    //$email->From      = $fromEmail;
+    $email->From      = FROM_EMAIL;
+    $email->FromName  = FROM_NAME;
+    $email->Subject   = "$cliente[nome] - $vistoria[nome]";
+    $email->Body      = <<<EOT
+Segue em anexo o relatório gerado automaticamente pelo sistema App SeyService.
+            
+Relatório referente à empresa: {$cliente['nome']}
+Vistoria no setor: {$vistoria['nome']}
+
+(Email enviado automaticamente)
+
+EOT;
+    $email->AddAddress( SEND_EMAIL );
+    $email->addStringAttachment($meuPdf, "Relatorio $cliente[nome].pdf", 'base64', 'application/pdf');
+    $email->Send();
+    
+    unset($meuPdf);
+    $conn = new mysqli(HOST, USER, PASSWORD, DATABASE);
+    $conn->set_charset('utf8');
+    $conn->query('UPDATE `vistorias` SET `relatorio`=b\'0\' WHERE id='.$conn->escape_string($vistoria['id']));
+    $conn->close();
+}
+
+$dbsVist = [
+            'itemAces',
+            'itemDies',
+            'itemEctu',
+            'itemGael',
+            'itemLema',
+            'itemLila',
+            'itemLinc'
+        ];
+
+$resul1 = $mysqli->query('SELECT id, id_cliente, nome, data_criacao FROM `vistorias` WHERE relatorio = 0');
+$qtdRelatorios = 0;
+while ($row1 = $resul1->fetch_assoc())
+{
+    $resul2 = $mysqli->query('SELECT nome FROM `clientes` WHERE id = '.$mysqli->escape_string($row1['id_cliente']));
+    $cliente = $resul2->fetch_assoc();
+    $itensVistoriados = array();
+    $itensTotal = 0;
+    $itensAprovados = 0;
+    $itensReprovados = 0;
+    foreach ($dbsVist as $myDB)
+    {
+        $resul3 = $mysqli->query("SELECT * FROM `{$myDB}` WHERE id_vistoria = ".$mysqli->escape_string($row1['id']));
+        while ($item = $resul3->fetch_assoc())
+        {
+            $itensVistoriados[$itensTotal] = $item;
+            $itensVistoriados[$itensTotal]['nome'] = $myDB;
+            $itensTotal++;
+            if ($item['item_aprovado'])
+                $itensAprovados++;
+            else
+                $itensReprovados++;
+        }
+    }
+    $vistoria = $row1;
+    elaboraRelatorio($cliente, $vistoria, $itensVistoriados, $itensTotal, $itensAprovados, $itensReprovados);
+    $qtdRelatorios++;
+}
+
+$resposta = [
+        'status' => 'ok',
+        'h2' => 'Relatórios emitidos!',
+        'msg' => $qtdRelatorios.' relatório(s) enviado(s) com sucesso!'
+    ];
+
+
+$out1 = ob_get_contents();
+ob_end_clean();
+
+if (!empty($out1))
+{
+    $resposta = [
+        'status' => 'error',
+        'h2' => 'Erro na emissão!',
+        'msg' => $out1
+    ];
+}
+
+header('Content-Type: application/json; charset=utf-8');
+//echo $html_entity_decode(json_encode($arr));
+
+//echo json_encode('oi', JSON_FORCE_OBJECT);
+echo json_encode((object)$resposta);
 
 
 
-
-$xTexts = [];
+/*$xTexts = [];
 //$valores = [13, 10, 0, 1, 5];
 $valores = [13, 6, 20];
 $cores = [
@@ -621,3 +932,4 @@ $pdf->Cell(0,10,'Hello Worldddddddddd!');
 //for($i=1;$i<=40;$i++)
 //    $pdf->Cell(0,10,'Printing line number '.$i,0,1);
 $pdf->Output();
+*/

@@ -18,6 +18,8 @@
     <div class="padded" flex="100" layout="column">
         <span style="white-space:pre-wrap;">{{msg}}</span>
         <md-progress-linear ng-show="barraProgresso" md-mode="determinate" ng-value="porcentagem"></md-progress-linear>
+        <br />
+        <md-button ng-disabled="btnRelatorios" ng-click="emitirRelatorios()" class="md-raised md-primary">{{btn}}</md-button>
     </div>
 </div>
 

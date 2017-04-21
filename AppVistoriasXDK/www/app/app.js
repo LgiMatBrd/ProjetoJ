@@ -530,6 +530,7 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
 app.controller('sincronizarController', function($scope, $http, $localStorage, $timeout, $interval, httpSincrono) {
     
     var UrlSync = 'http://app.igoroliveira.eng.br/apps/dbsync.php'; // URL do arquivo PHP de sincronização
+    var UrlRel = 'http://app.igoroliveira.eng.br/apps/reportgenerator.php'; // URL do arquivo PHP de emissão de relatórios
     var token = 'asda';
     var httpBusy = 0;
     var dbs = [
@@ -541,6 +542,8 @@ app.controller('sincronizarController', function($scope, $http, $localStorage, $
     $scope.porcentagem = 0;
     $scope.h2 = '';
     $scope.msg = '';
+    $scope.btnRelatorios = true;
+    $scope.btn = 'Emitir relatórios';
     
     function checkConnection()
     {
@@ -778,6 +781,7 @@ app.controller('sincronizarController', function($scope, $http, $localStorage, $
                     $interval.cancel(task);
                     $scope.porcentagem = 100;
                     $scope.msg = "Recebendo registros (" + ($scope.porcentagem | 0) + "%)";
+                    $scope.btnRelatorios = false;
                 }
                 else
                 {
@@ -800,6 +804,40 @@ app.controller('sincronizarController', function($scope, $http, $localStorage, $
             httpSincrono.close();
             task = undefined;
         });
+    }
+    
+    $scope.emitirRelatorios = function()
+    {
+        $scope.btnRelatorios = true;
+        $scope.btn = 'Emitindo...';
+        try
+        {
+            $http({
+                method: 'GET',
+                url: UrlRel,
+            })
+            .then(function (response) {
+                if (response.data.status == "ok" && response.data.msg != undefined)
+                {
+                    $scope.h2 = response.data.h2;
+                    $scope.msg = response.data.msg;
+                    $scope.btn = 'Concluído!';
+                }
+                else
+                {
+                    if (response.data.msg != undefined)
+                        throw new Error(response.data.msg);
+                    else
+                        throw new Error('O servidor não retornou informação legível!');
+                }
+            });
+        }
+        catch (err)
+        {
+            $interval.cancel(task);
+            $scope.h2 = 'Erro!';
+            $scope.msg = err.message;
+        }
     }
     
     // botão de voltar

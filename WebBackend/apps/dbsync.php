@@ -94,12 +94,16 @@ function receive()
         } else {
             $value4[$key3] = $value3;
         }
+        $idExt = 0;
         foreach ($value4 as $key => $value)
         {
             if (is_array($value))
                 continue;
             if ($key == 'idext')
+            {
+                $idExt = $value;
                 continue;
+            }
             else if ($key == 'id')
                 continue;
             if (is_string($value))
@@ -125,9 +129,35 @@ function receive()
             ];
     }
     
-    $valores = implode(',',$valores);
-    $keys = implode(',',$keys);
-    $query = "INSERT INTO $dbstr ($keys) VALUES ($valores)";
+    $resul = $mysqli->query("SELECT modificado FROM `$dbstr` WHERE id = ".$mysqli->escape_string($idExt).' LIMIT 1');
+    if ($row = $resul->num_rows)
+    {
+        $row = $resul->fetch_assoc();
+        if (strtotime($row['modificado']) < strtotime($valores['modificado']))
+        {
+            foreach ($keys as $ekey)
+            {
+                $valores[$ekey] = "`$ekey`=$valores[$ekey]";
+            }
+            $valores = implode(',', $valores);
+            $query = "UPDATE `$dbstr` SET ($valores) WHERE id=".$mysqli->escape_string($idExt);
+        }
+        else
+        {
+            $resposta = [
+                'status' => 'ok',
+                'idext' => $idExt
+            ];
+            return;
+        }
+    }
+    else
+    {
+        $valores = implode(',',$valores);
+        $keys = implode(',',$keys);
+
+        $query = "INSERT INTO $dbstr ($keys) VALUES ($valores)";
+    }
     try
     {
         if ($mysqli->query($query))
