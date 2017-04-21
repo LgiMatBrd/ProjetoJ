@@ -6,6 +6,9 @@
     </div>
 </md-toolbar>
 
+<br />
+<br />
+<br />
 <md-subheader class="md-no-sticky">Todos as vistorias: <strong>{{nome}}</strong> ID: {{id}}</md-subheader>
 
 <md-list-item ng-repeat="person in vistorias" ng-click="verVistoria(person.id)" class="noright">
@@ -27,9 +30,7 @@
 <md-dialog class="fullscreen-dialog" aria-label="Form">
 <md-toolbar>
 <div class="md-toolbar-tools">
-  <md-button aria-label="fechaDialog" class="md-icon-button" ng-click="cancel()">
-    <md-icon md-font-set="fa" class="fa-times fa-2x"></md-icon>
-  </md-button>
+    <md-button><i ng-click="cancel()" class="material-icons">keyboard_arrow_left</i></md-button>
   <h2 flex="flex">Adicionar vistoria</h2>
 </div>
 </md-toolbar>

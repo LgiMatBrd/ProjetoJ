@@ -1,0 +1,26 @@
+<md-toolbar style="position: fixed !important;">
+    <div class="md-toolbar-tools">
+        <!--<a href back-button style="margin-right: 10px;"><i class="fa fa-chevron-left" aria-hidden="true"></i></a>-->
+        <md-button><i back-button class="material-icons">keyboard_arrow_left</i></md-button>
+        <h2><span>SeyService</span></h2>
+    </div>
+</md-toolbar> 
+
+<md-subheader class="md-no-sticky">Sincronizar com o servidor</md-subheader>
+
+<div layout="row" layout-padding layout-wrap layout-margin layout-align="space-around">
+  <div class="padded" md-whiteframe="2" flex="100" layout="column" layout-align="center center">
+    <md-icon md-svg-icon="synced" flex="45" style="height:80%;width:80%;"></md-icon>
+    <h2 class"md-title">{{h2}}</h2>
+  </div>
+</div>
+
+<div layout="row" layout-padding layout-wrap layout-margin layout-align="space-around" layout-align="space-around">
+    <div class="padded" flex="100" layout="column">
+        <span style="white-space:pre-wrap;">{{msg}}</span>
+        <md-progress-linear ng-show="barraProgresso" md-mode="determinate" ng-value="porcentagem"></md-progress-linear>
+        <br />
+        <md-button ng-disabled="btnRelatorios" ng-click="emitirRelatorios()" class="md-raised md-primary">{{btn}}</md-button>
+    </div>
+</div>
+
