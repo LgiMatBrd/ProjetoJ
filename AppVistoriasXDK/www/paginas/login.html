@@ -1,0 +1,34 @@
+<div class="md-inline-form"layout="column" layout-sm="row" layout-align="center center" layout-align-sm="start start" layout-fill>
+
+    <md-content id="SignupContent" class="md-whiteframe-10dp _md flex-sm" flex-sm style="width: 100%; height: 100%; padding-top: 30%;">
+		<div layout-padding="">
+			<div layout="column" layout-align="center center">
+                <img src="../images/36x36.png" />
+            </div>
+			<form name="userForm" method="POST" action="" >
+				<input type="hidden" name="action" value="login" />
+				<div layout="row" layout-sm="column">
+					<md-input-container style="width: 100%;" flex-gt-sm="">
+						<label>Email</label>
+						<input required type="email" name="email" ng-model="user.email" ng-pattern="/^[_a-z0-9-+]+(\.[_a-z0-9-+]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/" placeholder="nome@seyconel.com.br" />
+						<div ng-if="userForm.email.$dirty" ng-messages="userForm.email.$error" role="alert">
+							<div ng-message="required" class="my-message">Você não pode entrar sem digitar seu email.</div>
+							<div ng-message-exp="['email', 'pattern']">Você digitou um email que não é válido.</div>
+						</div>
+					</md-input-container>
+				</div>
+				<div layout="row" layout-sm="column">
+					<md-input-container style="width: 100%;" flex-gt-sm="">
+						<label>Senha</label>
+						<input name="password" ng-model="user.password" type="password" minlength="8" maxlength="100" ng-pattern="/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/" required placeholder="********">
+						<div ng-if="userForm.password.$dirty" ng-messages="userForm.password.$error" role="alert" multiple>
+							<div ng-message="required">You can't Login without Password.</div>
+							<div ng-message-exp="['minlength', 'maxlength', 'pattern']">Não foi encontrado em nosso banco de dados nenhuma senha compatível com a que você digitou.</div>
+						</div>
+					</md-input-container>
+				</div>
+				<md-button class="md-raised md-primary" style="width:100%; margin: 0px 0px;" ng-click="user.submit(user)" ng-disabled="userForm.$invalid">Entrar</md-button>
+			</form>
+		</div>
+	</md-content>
+</div>

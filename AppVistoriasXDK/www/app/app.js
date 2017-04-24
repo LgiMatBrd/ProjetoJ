@@ -11,7 +11,11 @@ var app = angular.module('seyconelApp', ['ngRoute','ngStorage','ngMaterial','ngM
 
 app.config(function($routeProvider,$mdIconProvider) {
     $routeProvider
-    .when("/", { 
+    .when("/", {
+        templateUrl : "paginas/login.html",
+		controller  : 'loginController'
+    })
+    .when("/clientes", {
         templateUrl : "paginas/clientes.html",
 		controller  : 'homeController'
     })
@@ -100,6 +104,19 @@ app.directive('camera', function() {
     };
 })
 
+app.controller('loginController', function($scope, $http, $localStorage, $location, $mdDialog) {
+    $scope.user = {
+        email: '',
+    };
+    
+     $scope.user.submit = function(user) {
+        console.log('chamou');
+        console.log(user.email);
+        console.log(user.password);
+
+        $location.path('/clientes/');
+    }
+});
 app.controller('homeController', function($scope, $http, $localStorage, $location, $mdDialog) {
     /*delete $localStorage.vistoria;
     delete $localStorage.vistorias;
