@@ -101,7 +101,7 @@ app.directive('camera', function() {
                         destinationType: Camera.DestinationType.DATA_URL});
             });
         }
-    };
+    }; 
 })
 
 app.controller('loginController', function($scope, $http, $localStorage, $location, $mdDialog) {
@@ -435,7 +435,8 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
     function DialogController($scope, $mdDialog, id_dono, tiposVistorias, id_click) {
         
         // Verifica se o usuário quer editar o item.
-        if (id_click) {
+        if (id_click || id_click === 0) {
+            console.log(id_click);
             $scope.item = {};
             $scope.item = $localStorage.itensVistoriados.db[id_click].dados;
             $scope.item.EdicaoID = id_click;
