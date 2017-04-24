@@ -48,7 +48,7 @@
     <md-icon md-svg-src="img/icons/menu.svg"></md-icon>
 </md-button>-->
 <md-button class="md-fab md-fab-bottom-right" aria-label="Add" ng-click="showAdvanced($event)" style="background-color: #1364b4; position: fixed !important;">
-        <i class="material-icons">arrow_upward</i>
+        <i class="material-icons">add</i>
 </md-button> 
 
 <script type="text/ng-template" id="formulario-vistoria.tmpl.html">
@@ -548,7 +548,8 @@
 	<label>APROVADO?</label>
 	</md-switch>
 
-    <button camera ng-model='myPicture'>Tire fotos</button>
+    <!--<button camera ng-model='myPicture'>Tire fotos</button>-->
+    <md-button camera ng-model="myPicture" class="md-raised md-primary">Adicionar Fotos</md-button>
     <br/>
 
     <img ng-repeat="onepic in myPictures" style="width:25%;height:20%;" id="smallImage" src="{{ ('data:image/jpeg;base64,'+onepic)}}" />
@@ -560,8 +561,8 @@
 
    <md-dialog-actions layout="row">
       <span flex></span> 
-      <md-button ng-click="cancel()"> Cancel </md-button>
-      <md-button ng-click="addItem(itemForm)" class="md-primary"> Save </md-button>
+      <md-button ng-click="cancel()"> Cancelar </md-button>
+      <md-button ng-click="addItem(itemForm)" class="md-primary"> Adicionar </md-button>
    </md-dialog-actions>
 </md-dialog>
 </script>
