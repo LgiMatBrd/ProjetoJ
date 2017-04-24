@@ -36,7 +36,11 @@ else
     }
     else
     {
-        
+        $sqlContent = 'SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";SET time_zone = "+00:00";';
+        $sqlContent .= "CREATE DATABASE IF NOT EXISTS `{$dbname}` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `{$dbname}`;";
+        $sqlContent .= file_get_contents(ROOT_DIR.'/install/mysql-create.sql');
+        $mysqli_install->multi_query($sqlContent);
     }
     
     if (file_exists(ROOT_DIR.'/config/psl-config.php'))

@@ -6,22 +6,22 @@
             <url>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/apps/reportgenerator.php</url>
             <bookmark id="4">
                 <name/>
-                <line>357</line>
+                <line>373</line>
                 <key/>
             </bookmark>
             <bookmark id="3">
                 <name/>
-                <line>455</line>
+                <line>470</line>
                 <key/>
             </bookmark>
             <bookmark id="5">
                 <name/>
-                <line>604</line>
+                <line>619</line>
                 <key/>
             </bookmark>
             <bookmark id="2">
                 <name/>
-                <line>710</line>
+                <line>725</line>
                 <key/>
             </bookmark>
         </file>
@@ -30,6 +30,7 @@
         <group>
             <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/controllers/login.php</file>
             <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/controllers/home.php</file>
+            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/config/db_connect.php</file>
             <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/lib/pdfgenerator/fpdf.php</file>
             <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/index.php</file>
             <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/lib/login/register.php</file>
@@ -38,6 +39,7 @@
             <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/config/global.php</file>
             <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/lib/login/functions.php</file>
             <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/apps/dbsync.php</file>
+            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/install/db.php</file>
         </group>
     </open-files>
 </project-private>

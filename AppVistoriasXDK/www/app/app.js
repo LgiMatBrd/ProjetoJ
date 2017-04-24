@@ -87,14 +87,19 @@ app.directive('camera', function() {
             elm.on('click', function() {
                 navigator.camera.getPicture(
                     function(imageURI) {
+                        console.log(imageURI);
+                        console.log(moveFile(imageURI));
+                        //var imgView = dsad;
                         scope.$apply(function() {
-                            ctrl.$setViewValue(imageURI);
+                            //ctrl.$setViewValue(imgView);
                         });
                     },
                     function(err) {
                         ctrl.$setValidity('error', false);
-                    }, {quality: 50, 
-                        destinationType: Camera.DestinationType.DATA_URL});
+                    }, {
+                        quality: 50, 
+                        destinationType: Camera.DestinationType.FILE_URI
+                    });
             });
         }
     };
@@ -413,7 +418,7 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
                 $scope.myPictures.push(value);
             }
         }, true);
-
+        
         $scope.tiposVistorias = tiposVistorias;
         $scope.addItem = function(itemForm) {
             
@@ -431,16 +436,26 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
             item.data_criacao = timestampUTC(); 
             item.modificado = item.data_criacao;
             
+            item.fotos64 = $scope.myPictures;
             item.dados = $scope.item;
             
             $localStorage.itensVistoriados.db[id] = item;
 
-            id = id + 1; 
+            id = id + 1;
             $localStorage.itensVistoriados.nextID = id;
             
             $mdDialog.hide();
 
         };
+        
+        $scope.capturePhotoWithFile = function ()
+        {
+            navigator.camera.getPicture(function (imageData) {
+                imgView = imageData;
+            }, function (msg) {
+                console.log(msg);
+            }, { quality: 50, destinationType: Camera.DestinationType.DATA_URL });
+        }
         
         $scope.cancel = function() {
             $mdDialog.cancel();

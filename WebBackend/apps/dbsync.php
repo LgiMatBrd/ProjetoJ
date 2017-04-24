@@ -83,6 +83,15 @@ function receive()
     foreach ($request['row'] as $key3 => $value3)
     {
         $value4 = array();
+        if ($key3 == 'fotos64')
+        {
+            $value4[$key] = array();
+            foreach ($value3 as $key2 => $value2)
+            {
+                $value4[$key][] = $value2;
+            }
+            $value4[$key] = implode(',', $value4[$key]);
+        }
         if ($key3 == 'dados')
         {
             foreach ($value3 as $key2 => $value2)
@@ -140,7 +149,7 @@ function receive()
                 $valores[$ekey] = "`$ekey`=$valores[$ekey]";
             }
             $valores = implode(',', $valores);
-            $query = "UPDATE `$dbstr` SET ($valores) WHERE id=".$mysqli->escape_string($idExt);
+            $query = "UPDATE `$dbstr` SET $valores WHERE id=".$mysqli->escape_string($idExt);
         }
         else
         {
