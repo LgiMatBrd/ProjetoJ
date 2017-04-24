@@ -385,7 +385,7 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
 	$scope.nomeVistoria = $localStorage.vistorias.db[$scope.id].nome;
 	$scope.idVistoria = $localStorage.vistorias.db[$scope.id].id;
 	$scope.idDonoVistoria = $localStorage.vistorias.db[$scope.id].id_cliente;
-    console.log('ID Dono: '+$scope.idDonoVistoria);
+    
 	//$scope.idDono = $localStorage.vistorias.db[$scope.id].id_dono;
 	//$scope.nomeCliente = $localStorage.clientes.db[$scope.idDono].nome;
 
@@ -396,12 +396,13 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
 	$scope.itensVistoriados = {};
     populaVistorias($scope.id_dono);
     
-    $scope.showAdvanced = function(ev) {
+    $scope.showAdvanced = function(ev,id_click) {
         $mdDialog
             .show({
             controller: DialogController,
             templateUrl: 'formulario-vistoria.tmpl.html',
             id_dono: $scope.id_dono,
+            id_click: id_click,
             locals: {
                 tiposVistorias: $scope.tiposVistorias
             },
@@ -414,7 +415,25 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
             });
     };
 
-    function DialogController($scope, $mdDialog, id_dono, tiposVistorias) {
+    function DialogController($scope, $mdDialog, id_dono, tiposVistorias, id_click) {
+        
+        // Verifica se o usuário quer editar o item.
+        if (id_click) {
+            $scope.item = {};
+            $scope.item = $localStorage.itensVistoriados.db[id_click].dados;
+            $scope.item.EdicaoID = id_click;
+            
+            // Pega os valores booleanos que estão em string e coverte novamente.
+            angular.forEach($scope.item, function(value, key) {
+                //console.log(key + ': ' + value);
+                if (value == "true") {
+                    $scope.item[key] = true;
+                }
+            });
+            
+        } else {
+            console.log('Nenhum item para ser editado, abrindo tela de adiconar novo item...');
+        }
         
         $scope.myPictures = [];
         $scope.$watch('myPicture', function(value) {
@@ -426,28 +445,54 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
         $scope.tiposVistorias = tiposVistorias;
         $scope.addItem = function(itemForm) {
             
-            id = $localStorage.itensVistoriados.nextID;
+            // Verifica se os Form é de edição ou de adição de novo Item
+            if ($scope.item.EdicaoID) {
+                id = $localStorage.itensVistoriados.nextID;
 
-            /* OBJETO
-            this.id = 0;
-            this.id_dono = '';
-            this.data_criacao = '';
-            this.dados = '';
-            */
-            item = new itemVitoriado(); 
-            item.id = id;
-            item.id_vistoria = id_dono;
-            item.data_criacao = timestampUTC(); 
-            item.modificado = item.data_criacao;
-            
-            item.dados = $scope.item;
-            
-            $localStorage.itensVistoriados.db[id] = item;
+                /* OBJETO
+                this.id = 0;
+                this.id_dono = '';
+                this.data_criacao = '';
+                this.dados = '';
+                */
+                item = new itemVitoriado(); 
+                item.id = id;
+                item.id_vistoria = id_dono;
+                item.data_criacao = timestampUTC(); 
+                item.modificado = item.data_criacao;
 
-            id = id + 1; 
-            $localStorage.itensVistoriados.nextID = id;
-            
-            $mdDialog.hide();
+                item.dados = $scope.item;
+
+                $localStorage.itensVistoriados.db[id] = item;
+
+                id = id + 1; 
+                $localStorage.itensVistoriados.nextID = id;
+
+                $mdDialog.hide();
+            } else {
+                id = $localStorage.itensVistoriados.nextID;
+
+                /* OBJETO
+                this.id = 0;
+                this.id_dono = '';
+                this.data_criacao = '';
+                this.dados = '';
+                */
+                item = new itemVitoriado(); 
+                item.id = id;
+                item.id_vistoria = id_dono;
+                item.data_criacao = timestampUTC(); 
+                item.modificado = item.data_criacao;
+
+                item.dados = $scope.item;
+
+                $localStorage.itensVistoriados.db[id] = item;
+
+                id = id + 1; 
+                $localStorage.itensVistoriados.nextID = id;
+
+                $mdDialog.hide();
+            }
 
         };
         

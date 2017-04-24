@@ -5,7 +5,7 @@
       "projectTypeName": "com.intel.xdk.projecttype.jsapp",
       "src": "jsapp/template-blank-cordova-project-lite/sample.zip",
       "projectGuid": "82606458-0726-45b5-b3d1-bea1407cd611",
-      "lastModifiedDate": 1491001556275,
+      "lastModifiedDate": 1492808538717,
       "creationDate": 1488809141554
     },
     "XDK-app-designer": "false",
@@ -118,8 +118,56 @@
         "permissions": {},
         "description": "Cordova Compatibility Plugin",
         "data": {},
-        "dependedBy": [],
+        "dependedBy": [
+          "cordova-plugin-file"
+        ],
         "custom": "true"
+      },
+      {
+        "id": "cordova-plugin-network-information",
+        "name": "Network Information",
+        "version": "1.2.1",
+        "originType": "cordova.io",
+        "origin": "cordova-plugin-network-information",
+        "gitref": "",
+        "paramvals": {},
+        "sourceLocation": "plugins/cordova-plugin-network-information",
+        "selectedState": "Included",
+        "checksum": "9d8331a4",
+        "dependsOn": [],
+        "topLevel": true,
+        "permissions": {
+          "android:name": [
+            "android.permission.ACCESS_NETWORK_STATE"
+          ]
+        },
+        "description": "Cordova Network Information Plugin",
+        "data": {},
+        "dependedBy": []
+      },
+      {
+        "id": "cordova-plugin-file",
+        "name": "File",
+        "version": "4.2.0",
+        "originType": "cordova.io",
+        "origin": "cordova-plugin-file",
+        "gitref": "",
+        "paramvals": {},
+        "sourceLocation": "plugins/cordova-plugin-file",
+        "selectedState": "Included",
+        "checksum": "1fdd7f27",
+        "dependsOn": [
+          "cordova-plugin-compat"
+        ],
+        "topLevel": true,
+        "permissions": {
+          "android:name": [
+            "android.permission.WRITE_EXTERNAL_STORAGE"
+          ]
+        },
+        "description": "Cordova File Plugin",
+        "data": {},
+        "dependedBy": []
       }
     ],
     "buildConfigurations": {
@@ -130,11 +178,11 @@
         "preferences_": {
           "android-minSdkVersion": "14",
           "android-targetSdkVersion": "21",
-          "android-installLocation": "auto",
+          "android-installLocation": "internalOnly",
           "android-signed": true
         },
         "isActive_": true,
-        "certificateId_": "",
+        "certificateId_": "WN954LLJv0Oo3AABAriLWA2",
         "appName_": "AppSeyconel",
         "appID_": "seyconel.vistorias.app",
         "appAccess_": {
@@ -244,7 +292,7 @@
         "appVersion_": "0.0.1",
         "appDescription_": "Aplicativo para controle de vistorias Seyconel.",
         "appAuthor_": "Luigi Matheus Afornalli Breda",
-        "appVersionCode_": "1",
+        "appVersionCode_": "2",
         "signed_": true
       },
       "iOS": {
