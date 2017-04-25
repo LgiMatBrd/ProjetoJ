@@ -5,7 +5,7 @@
       "projectTypeName": "com.intel.xdk.projecttype.jsapp",
       "src": "jsapp/template-blank-cordova-project-lite/sample.zip",
       "projectGuid": "82606458-0726-45b5-b3d1-bea1407cd611",
-      "lastModifiedDate": 1492289207270,
+      "lastModifiedDate": 1493080923229,
       "creationDate": 1488809141554
     },
     "XDK-app-designer": "false",
@@ -152,11 +152,11 @@
         "preferences_": {
           "android-minSdkVersion": "14",
           "android-targetSdkVersion": "21",
-          "android-installLocation": "auto",
+          "android-installLocation": "internalOnly",
           "android-signed": true
         },
         "isActive_": true,
-        "certificateId_": "",
+        "certificateId_": "SQXkLHNztUO9MlfLiTZy9A2",
         "appName_": "AppSeyconel",
         "appID_": "seyconel.vistorias.app",
         "appAccess_": {
@@ -171,9 +171,13 @@
             "sms:*",
             "mailto:*",
             "geo:*",
-            "market:*"
+            "market:*",
+            "filesystem:*",
+            "file:*",
+            "blob:*"
           ],
-          "navigation": []
+          "navigation": [],
+          "properties": {}
         },
         "icons_": [
           {
@@ -266,7 +270,7 @@
         "appVersion_": "0.0.1",
         "appDescription_": "Aplicativo para controle de vistorias Seyconel.",
         "appAuthor_": "Luigi Matheus Afornalli Breda",
-        "appVersionCode_": "1",
+        "appVersionCode_": "2",
         "signed_": true
       },
       "iOS": {

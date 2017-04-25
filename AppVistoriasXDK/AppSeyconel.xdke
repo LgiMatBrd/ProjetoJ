@@ -5,36 +5,33 @@
     "projectFiles": {},
     "projectDirectories": {}
   },
-  "build-tab": {
-    "selectedTargets": []
-  },
   "editorTab": {
     "currentEditorMode": 0
+  },
+  "build-tab": {
+    "selectedTargets": [],
+    "emailListForShareBuild": [
+      "igor@igoroliveira.eng.br"
+    ]
   },
   "simulator": {
     "cordova-simulate": {
       "tinyhippos-geosettings": {
         "id": "tinyhippos-geosettings",
         "key": "geosettings",
-        "value": "{\"position\":{\"latitude\":43.4614491683405,\"longitude\":-80.52992510058584,\"altitude\":100,\"accuracy\":150,\"altitudeAccuracy\":80,\"heading\":0,\"speed\":0,\"timeStamp\":\"new Date(1493063027455)\"},\"delay\":\"0\",\"timeout\":false}",
+        "value": "{\"position\":{\"latitude\":43.41165168063978,\"longitude\":-80.5741279051524,\"altitude\":100,\"accuracy\":150,\"altitudeAccuracy\":80,\"heading\":0,\"speed\":0,\"timeStamp\":\"new Date(1493087556397)\"},\"delay\":\"0\",\"timeout\":false}",
         "prefix": "tinyhippos-"
       },
-      "tinyhippos-statusbar-visible": {
-        "id": "tinyhippos-statusbar-visible",
-        "key": "statusbar-visible",
-        "value": true,
-        "prefix": "tinyhippos-"
-      },
-      "tinyhippos-network-type": {
-        "id": "tinyhippos-network-type",
-        "key": "network-type",
-        "value": "4g",
+      "tinyhippos-saved-sims": {
+        "id": "tinyhippos-saved-sims",
+        "key": "saved-sims",
+        "value": "[]",
         "prefix": "tinyhippos-"
       },
       "tinyhippos-geo-map-zoom-key": {
         "id": "tinyhippos-geo-map-zoom-key",
         "key": "geo-map-zoom-key",
-        "value": 13,
+        "value": 11,
         "prefix": "tinyhippos-"
       }
     }

@@ -29,7 +29,8 @@ function itemVitoriado()
     this.id_vistoria = 0;
     this.data_criacao = 0;
     this.modificado = 0;
-    this.fotos64 = '',
+
+    this.fotos64 = [];
     this.dados = {};
 }
 
@@ -67,7 +68,7 @@ function dbClone(obj)
         copy.nome = obj.nome;
         copy.id_cliente = obj.id_cliente;
         copy.data_criacao = obj.data_criacao;
-        copy.modificado = obj.modificado;
+        copy.modificado = obj.modificado;    
         return copy;
     }
 

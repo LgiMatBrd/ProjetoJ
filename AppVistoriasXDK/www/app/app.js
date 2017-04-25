@@ -6,16 +6,20 @@ function onAppReady() {
 document.addEventListener("app.Ready", onAppReady, false);
 
 //Define an angular module for our app 
-var app = angular.module('seyconelApp', ['ngRoute','ngStorage','ngMaterial','ngMessages', 'material.svgAssetsCache']);
+var app = angular.module('seyconelApp', ['ngRoute','ngStorage','ngMaterial','ngMessages', 'material.svgAssetsCache', 'ngCordova']);
 
 
 app.config(function($routeProvider,$mdIconProvider) {
     $routeProvider
-    .when("/", { 
+    .when("/login", {
+        templateUrl : "paginas/login.html",
+		controller  : 'loginController'
+    })
+    .when("/", {
         templateUrl : "paginas/clientes.html",
 		controller  : 'homeController'
     })
-    .when("/vistorias/:id?", {
+    .when("/vistorias/:id?", { 
         templateUrl : "paginas/vistorias.html",
 		controller  : 'vistoriasController'
     })
@@ -79,7 +83,7 @@ app.run(function($localStorage) {
     }
 });
 
-app.directive('camera', function() {
+ /*app.directive('camera', function() {
     return {
         restrict: 'A',
         require: 'ngModel',
@@ -102,9 +106,22 @@ app.directive('camera', function() {
                     });
             });
         }
-    };
-})
+    }; 
+})*/
 
+app.controller('loginController', function($scope, $http, $localStorage, $location, $mdDialog) {
+    $scope.user = {
+        email: '',
+    };
+    
+     $scope.user.submit = function(user) {
+        console.log('chamou');
+        console.log(user.email);
+        console.log(user.password);
+
+        $location.path('/clientes/');
+    }
+});
 app.controller('homeController', function($scope, $http, $localStorage, $location, $mdDialog) {
     /*delete $localStorage.vistoria;
     delete $localStorage.vistorias;
@@ -233,7 +250,6 @@ app.controller('homeController', function($scope, $http, $localStorage, $locatio
 
 app.controller('vistoriasController', function($scope, $routeParams, $http, $localStorage, $location, $mdDialog) {
 
-   
 	$scope.vistorias = {};
     
     // id do cliente
@@ -383,21 +399,32 @@ app.controller('vistoriasController', function($scope, $routeParams, $http, $loc
 
 
 app.controller('vistoriaController', function($scope, $routeParams, $http, $localStorage, $filter, $mdDialog) {
-	
+
+    console.dir($localStorage);
+    
     $scope.id_dono = $routeParams.id;
 	$scope.id = $routeParams.id;
-	$scope.nome = $localStorage.vistorias.db[$scope.id].nome;
+	$scope.nomeVistoria = $localStorage.vistorias.db[$scope.id].nome;
+	$scope.idVistoria = $localStorage.vistorias.db[$scope.id].id;
+	$scope.idDonoVistoria = $localStorage.vistorias.db[$scope.id].id_cliente;
+    
+	//$scope.idDono = $localStorage.vistorias.db[$scope.id].id_dono;
+	//$scope.nomeCliente = $localStorage.clientes.db[$scope.idDono].nome;
+
+	$scope.nomeClienteDono = $localStorage.clientes.db[$scope.idDonoVistoria].nome;
+	$scope.NextID = $localStorage.itensVistoriados.nextID;
     
     // chama a função para preencher a variável que armazena as vistorias desse cliente
 	$scope.itensVistoriados = {};
     populaVistorias($scope.id_dono);
     
-    $scope.showAdvanced = function(ev) {
+    $scope.showAdvanced = function(ev,id_click) {
         $mdDialog
             .show({
             controller: DialogController,
             templateUrl: 'formulario-vistoria.tmpl.html',
             id_dono: $scope.id_dono,
+            id_click: id_click,
             locals: {
                 tiposVistorias: $scope.tiposVistorias
             },
@@ -410,7 +437,26 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
             });
     };
 
-    function DialogController($scope, $mdDialog, id_dono, tiposVistorias) {
+    function DialogController($scope, $mdDialog, id_dono, tiposVistorias, id_click, $cordovaCamera) {
+        
+        // Verifica se o usuário quer editar o item.
+        if (id_click || id_click === 0) {
+            console.log(id_click);
+            $scope.item = {};
+            $scope.item = $localStorage.itensVistoriados.db[id_click].dados;
+            $scope.item.EdicaoID = id_click;
+            
+            // Pega os valores booleanos que estão em string e coverte novamente.
+            angular.forEach($scope.item, function(value, key) {
+                //console.log(key + ': ' + value);
+                if (value == "true") {
+                    $scope.item[key] = true;
+                }
+            });
+            
+        } else {
+            console.log('Nenhum item para ser editado, abrindo tela de adiconar novo item...');
+        }
         
         $scope.myPictures = [];
         $scope.$watch('myPicture', function(value) {
@@ -419,32 +465,84 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
             }
         }, true);
         
+        $scope.takePicture = function()
+        {
+            
+            var options = {
+              quality: 50,
+              destinationType: Camera.DestinationType.DATA_URL,
+              sourceType: Camera.PictureSourceType.CAMERA,
+              allowEdit: false,
+              encodingType: Camera.EncodingType.JPEG,
+              mediaType: Camera.MediaType.PICTURE,
+              targetWidth: 1024,
+              targetHeight: 768,
+              popoverOptions: CameraPopoverOptions,
+              saveToPhotoAlbum: false,
+              correctOrientation: true
+            };
+            $cordovaCamera.getPicture(options).then(function(data) {
+                 $scope.myPicture = data;
+
+            }, function(err) {
+                 console.log(err);
+            });
+        
+        }
+
         $scope.tiposVistorias = tiposVistorias;
         $scope.addItem = function(itemForm) {
             
-            id = $localStorage.itensVistoriados.nextID;
+            // Verifica se os Form é de edição ou de adição de novo Item
+            if ($scope.item.EdicaoID) {
+                id = $localStorage.itensVistoriados.nextID;
 
-            /* OBJETO
-            this.id = 0;
-            this.id_dono = '';
-            this.data_criacao = '';
-            this.dados = '';
-            */
-            item = new itemVitoriado(); 
-            item.id = id;
-            item.id_vistoria = id_dono;
-            item.data_criacao = timestampUTC(); 
-            item.modificado = item.data_criacao;
-            
-            item.fotos64 = $scope.myPictures;
-            item.dados = $scope.item;
-            
-            $localStorage.itensVistoriados.db[id] = item;
+                /* OBJETO
+                this.id = 0;
+                this.id_dono = '';
+                this.data_criacao = '';
+                this.dados = '';
+                */
+                item = new itemVitoriado(); 
+                item.id = id;
+                item.id_vistoria = id_dono;
+                item.data_criacao = timestampUTC(); 
+                item.modificado = item.data_criacao;
+                
+                item.fotos64 = $scope.myPictures;
+                item.dados = $scope.item;
 
-            id = id + 1;
-            $localStorage.itensVistoriados.nextID = id;
-            
-            $mdDialog.hide();
+                $localStorage.itensVistoriados.db[id] = item;
+
+                id = id + 1; 
+                $localStorage.itensVistoriados.nextID = id;
+                
+                $mdDialog.hide();
+            } else {
+                id = $localStorage.itensVistoriados.nextID;
+
+                /* OBJETO
+                this.id = 0;
+                this.id_dono = '';
+                this.data_criacao = '';
+                this.dados = '';
+                */
+                item = new itemVitoriado(); 
+                item.id = id;
+                item.id_vistoria = id_dono;
+                item.data_criacao = timestampUTC(); 
+                item.modificado = item.data_criacao;
+                
+                item.fotos64 = $scope.myPictures;
+                item.dados = $scope.item;
+
+                $localStorage.itensVistoriados.db[id] = item;
+
+                id = id + 1; 
+                $localStorage.itensVistoriados.nextID = id;
+                
+                $mdDialog.hide();
+            }
 
         };
         
@@ -478,8 +576,7 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
             }
         }
     }
-    
-    
+        
     // botão de voltar
     $scope.goBack = function() {
         window.history.back();
@@ -881,8 +978,27 @@ app.directive('backButton', function(){
     };
 });
 
-
-
+/*
+app.directive('ngConfirmClick', [function() {
+	return {
+		restrict: 'A',
+		link: function(scope, element, attrs) {
+			element.bind('click', function() {
+				var condition = scope.$eval(attrs.ngConfirmCondition);
+				if(condition){
+					var message = attrs.ngConfirmMessage;
+					if (message && confirm(message)) {
+						scope.$apply(attrs.ngConfirmClick);
+					}
+				}
+				else{
+					scope.$apply(attrs.ngConfirmClick);
+				}
+			});
+		}
+	}
+}]);
+*/
 
 app.directive('ngConfirmClick', [
     function(){
@@ -900,7 +1016,6 @@ app.directive('ngConfirmClick', [
             }
         };
 }]);
-
 
 
 

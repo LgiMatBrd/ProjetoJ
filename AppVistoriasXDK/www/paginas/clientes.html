@@ -1,5 +1,6 @@
 <md-toolbar style="position: fixed !important;">
     <div class="md-toolbar-tools">
+        <md-button><i style="color: #fff !important;" ng-click="" class="material-icons">perm_identity</i></md-button>
         <h2 md-truncate flex><span>SeyService</span></h2>
         <md-button href="#/sincronizar">Sincronizar</md-button>
     </div>
@@ -13,6 +14,9 @@
     </div>
 </md-toolbar>
 -->
+<br />
+<br />
+<br /> 
 <md-subheader class="md-no-sticky">Todos os clientes</md-subheader>
 
 <md-list-item ng-repeat="person in lerClientes()" ng-click="verVistorias(person.id)" class="noright">
@@ -21,12 +25,16 @@
     <!--<md-icon class="md-secondary" ng-click="verDadosCliente(person, $event)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>-->
     <!--<md-icon confirmed-click="deletarVistoria(vistoria.id);" ng-confirm-click="Você quer deletar este item?" class="md-secondary" ng-click="deletarCliente(person.id)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>-->
     <!--<md-button ng-click="deletarCliente(person.id)">Deletar</md-button>-->
-    <md-button><i style="color: #555 !important;" ng-click="verDadosCliente(person, $event)" class="material-icons">more_horiz</i></md-button>
+    <!--<md-button><i style="color: #555 !important;" ng-click="verDadosCliente(person, $event)" class="material-icons">more_horiz</i></md-button>-->
+    <!--<md-button>
+        <i style="color: #555 !important;" confirmed-click="deletarCliente(person.id);" class="allow-modals material-icons">delete</i>
+    </md-button> -->
+     
     <md-button><i style="color: #555 !important;" ng-click="deletarCliente(person.id)" class="material-icons">delete</i></md-button>
 </md-list-item>
 
 <md-button class="md-fab md-fab-bottom-right" aria-label="Add" ng-click="showAdvanced($event)" style="background-color: #1364b4; position: fixed !important;">
-        <i class="material-icons">arrow_upward</i>
+        <i class="material-icons">add</i>
 </md-button>
 
 
@@ -34,9 +42,8 @@
 <md-dialog class="fullscreen-dialog" aria-label="Form">
 <md-toolbar>
 <div class="md-toolbar-tools">
-  <md-button aria-label="fechaDialog" class="md-icon-button" ng-click="cancel()">
-    <md-icon md-font-set="fa" class="fa-times fa-2x"></md-icon>
-  </md-button>
+
+        <md-button><i ng-click="cancel()" class="material-icons">keyboard_arrow_left</i></md-button>
   <h2 flex="flex">Adicionar cliente</h2>
 </div>
 </md-toolbar>
