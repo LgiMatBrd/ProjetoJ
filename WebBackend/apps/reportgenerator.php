@@ -16,7 +16,7 @@ require '../config/global.php';
 //require 'class.phpmailer.php';
 require ROOT_DIR.'/lib/phpmailer/class.phpmailer.php';
 
-set_time_limit(60);
+set_time_limit(180);
 
 class PDF extends FPDF
 {
@@ -479,7 +479,53 @@ class PDF extends FPDF
         if($this->page>0)
             $this->_out($this->DrawColor);
     }
-    
+    // Insere imagens no relatório
+    function InserirImagens($imagens, $w, $h)
+    {
+        $borda = 5;
+        $wCell = $this->GetCellWidth();
+        $qtd = count($imagens);
+        if ($this->y+($h+$borda*2) > $this->PageBreakTrigger)
+            $this->AddPage();
+        $restImgs = $qtd;
+        while ($restImgs > 0)
+        {
+            $this->x = $this->recuoEsquerda;
+            $this->AddCustomArea('insImagem');
+            $resto = $this->PageBreakTrigger - $this->y - 2*$borda;
+            $qtdimgs = floor($resto/$h);
+            $hCell = ($qtdimgs > $restImgs)? $restImgs : $qtdimgs;
+            $this->Cell($wCell, $hCell*$h+2*$borda, '', 1, 1);
+            $restImgs -= $qtdimgs;
+            if ($restImgs > 0)
+                $this->AddPage();
+        }
+        $this->AddCustomArea('finsImagem');
+        
+        $this->GotoCustomArea('insImagem');
+        $this->y += $borda;
+        $centX = ($wCell-$w)/2 + $this->recuoEsquerda;
+        if (!empty($imagens))
+        {
+            foreach ($imagens as $img)
+            {
+                if ($this->y+($h+$borda) > $this->PageBreakTrigger)
+                {
+                    $this->GotoCustomArea('insImagem');
+                    $this->y += $borda;
+                }
+                $this->x = $centX;
+                if (file_exists($img))
+                {
+                    $this->Image($img, null, null, $w, $h);
+                }
+                else
+                    $this->y += $h;
+            }
+        }
+        $this->GotoCustomArea('finsImagem');
+    }
+      
     function AddPage($orientation = '', $size = '', $rotation = 0) {
         if ($this->page == count($this->pages))
             parent::AddPage($orientation, $size, $rotation);
@@ -705,6 +751,7 @@ EOT
         $pdf->PrintTexto($hCell, 'Setor: '.$item['setor'], 'B');
         $pdf->Ln();
         // Fotos
+        $pdf->InserirImagens($item['fotos64'], 100, 50);
         if ($item['item_aprovado'])
             $pdf->MultiCell($wCell, $hCell, '( X ) APROVADO  (   ) REPROVADO', 1, 0, 'C');
         else
@@ -834,7 +881,7 @@ $dbsVist = [
             'itemLinc'
         ];
 
-$resul1 = $mysqli->query('SELECT id, id_cliente, nome, data_criacao FROM `vistorias` WHERE relatorio = 0');
+$resul1 = $mysqli->query('SELECT id, id_cliente, id_user, nome, data_criacao FROM `vistorias` WHERE relatorio = 0');
 $qtdRelatorios = 0;
 while ($row1 = $resul1->fetch_assoc())
 {
@@ -850,6 +897,22 @@ while ($row1 = $resul1->fetch_assoc())
         while ($item = $resul3->fetch_assoc())
         {
             $itensVistoriados[$itensTotal] = $item;
+            if (!empty($itensVistoriados[$itensTotal]['fotos64'])) $itensVistoriados[$itensTotal]['fotos64'] = json_decode($itensVistoriados[$itensTotal]['fotos64']);
+            if (!empty($itensVistoriados[$itensTotal]['fotos64']) && is_array($itensVistoriados[$itensTotal]['fotos64']))
+            {
+                foreach ($itensVistoriados[$itensTotal]['fotos64'] as $key => $base64)
+                {
+                    $imageData = base64_decode($base64);
+                    $source = imagecreatefromstring($imageData);
+                    $myFilename = "{$row1['id_user']}-".generateRandomString(10).'.jpg';
+                    $imageSave = imagejpeg($source,ROOT_DIR."/uploads/imagens/{$myFilename}",100);
+                    if (!$imageSave) die('Problemas com as imagens!');
+                    //$fo = fopen(ROOT_DIR."/uploads/imagens/{$myFilename}", w);
+                    //fwrite($fo, $imageSave);
+                    //fclose($fo);
+                    $itensVistoriados[$itensTotal]['fotos64'][$key] = ROOT_DIR."/uploads/imagens/{$myFilename}";
+                }
+            }
             $itensVistoriados[$itensTotal]['nome'] = $myDB;
             $itensTotal++;
             if ($item['item_aprovado'])
@@ -860,7 +923,24 @@ while ($row1 = $resul1->fetch_assoc())
     }
     $vistoria = $row1;
     elaboraRelatorio($cliente, $vistoria, $itensVistoriados, $itensTotal, $itensAprovados, $itensReprovados);
+    foreach ($itensVistoriados as $item)
+    {
+        if (empty($item['fotos64']))
+            continue;
+        foreach ($item['fotos64'] as $arq)
+        {
+            if (file_exists($arq))
+            {
+                unlink($arq);
+            }
+        }
+    }
     $qtdRelatorios++;
+}
+
+function generateRandomString($length = 10)
+{
+    return substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil($length/strlen($x)) )),1,$length);
 }
 
 $resposta = [

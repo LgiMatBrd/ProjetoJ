@@ -85,14 +85,16 @@ function receive()
         $value4 = array();
         if ($key3 == 'fotos64')
         {
-            $value4[$key] = array();
-            foreach ($value3 as $key2 => $value2)
+            $value4[$key3] = array();
+            foreach ($value3 as $value2)
             {
-                $value4[$key][] = $value2;
+                $value4[$key3][] = $value2;
             }
-            $value4[$key] = implode(',', $value4[$key]);
+            //$value4[$key] = implode(',', $value4[$key]);
+            $value4[$key3] = $mysqli->escape_string(json_encode($value4[$key3]));
+            //base64_encode($file);
         }
-        if ($key3 == 'dados')
+        else if ($key3 == 'dados')
         {
             foreach ($value3 as $key2 => $value2)
             {
@@ -376,6 +378,8 @@ if (!empty($out1))
         'msg' => $out1
     ];
 }
+
+file_put_contents('test.txt', file_get_contents('test.txt').file_get_contents('php://input')."\n");
 
 header('Content-Type: application/json; charset=utf-8');
 //echo $html_entity_decode(json_encode($arr));

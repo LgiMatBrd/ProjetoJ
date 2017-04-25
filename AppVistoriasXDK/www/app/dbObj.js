@@ -80,6 +80,7 @@ function dbClone(obj)
         copy.id_vistoria = obj.id_vistoria;
         copy.data_criacao = obj.data_criacao;
         copy.modificado = obj.modificado;
+        copy.fotos64 = obj.fotos64;
         copy.dados = obj.dados;
         return copy;
     }

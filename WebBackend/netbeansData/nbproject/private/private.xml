@@ -16,12 +16,12 @@
             </bookmark>
             <bookmark id="5">
                 <name/>
-                <line>619</line>
+                <line>665</line>
                 <key/>
             </bookmark>
             <bookmark id="2">
                 <name/>
-                <line>725</line>
+                <line>772</line>
                 <key/>
             </bookmark>
         </file>
@@ -36,7 +36,6 @@
             <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/lib/login/register.php</file>
             <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/apps/uploadimages.php</file>
             <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/apps/reportgenerator.php</file>
-            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/config/global.php</file>
             <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/lib/login/functions.php</file>
             <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/apps/dbsync.php</file>
             <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/install/db.php</file>
