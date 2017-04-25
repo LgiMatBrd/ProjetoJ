@@ -6,10 +6,14 @@
         <group>
             <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/controllers/login.php</file>
             <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/controllers/home.php</file>
+            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/config/db_connect.php</file>
             <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/lib/pdfgenerator/fpdf.php</file>
+            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/index.php</file>
+            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/lib/login/register.php</file>
             <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/apps/uploadimages.php</file>
             <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/apps/reportgenerator.php</file>
             <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/lib/login/functions.php</file>
+            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/install/db.php</file>
         </group>
     </open-files>
 </project-private>

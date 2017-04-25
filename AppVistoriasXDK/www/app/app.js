@@ -6,16 +6,16 @@ function onAppReady() {
 document.addEventListener("app.Ready", onAppReady, false);
 
 //Define an angular module for our app 
-var app = angular.module('seyconelApp', ['ngRoute','ngStorage','ngMaterial','ngMessages', 'material.svgAssetsCache']);
+var app = angular.module('seyconelApp', ['ngRoute','ngStorage','ngMaterial','ngMessages', 'material.svgAssetsCache', 'ngCordova']);
 
 
 app.config(function($routeProvider,$mdIconProvider) {
     $routeProvider
-    .when("/", {
+    .when("/login", {
         templateUrl : "paginas/login.html",
 		controller  : 'loginController'
     })
-    .when("/clientes", {
+    .when("/", {
         templateUrl : "paginas/clientes.html",
 		controller  : 'homeController'
     })
@@ -83,7 +83,7 @@ app.run(function($localStorage) {
     }
 });
 
-app.directive('camera', function() {
+ /*app.directive('camera', function() {
     return {
         restrict: 'A',
         require: 'ngModel',
@@ -102,7 +102,7 @@ app.directive('camera', function() {
             });
         }
     }; 
-})
+})*/
 
 app.controller('loginController', function($scope, $http, $localStorage, $location, $mdDialog) {
     $scope.user = {
@@ -432,7 +432,7 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
             });
     };
 
-    function DialogController($scope, $mdDialog, id_dono, tiposVistorias, id_click) {
+    function DialogController($scope, $mdDialog, id_dono, tiposVistorias, id_click, $cordovaCamera) {
         
         // Verifica se o usuário quer editar o item.
         if (id_click || id_click === 0) {
@@ -459,6 +459,33 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
                 $scope.myPictures.push(value);
             }
         }, true);
+        
+        $scope.takePicture = function()
+        {
+            
+            var options = {
+              quality: 50,
+              destinationType: Camera.DestinationType.DATA_URL,
+              sourceType: Camera.PictureSourceType.CAMERA,
+              allowEdit: false,
+              encodingType: Camera.EncodingType.JPEG,
+              mediaType: Camera.MediaType.PICTURE,
+              targetWidth: 1024,
+              targetHeight: 768,
+              popoverOptions: CameraPopoverOptions,
+              saveToPhotoAlbum: false,
+              correctOrientation: true
+            };
+            
+
+            $cordovaCamera.getPicture(options).then(function(data) {
+                 $scope.myPicture = data;
+
+            }, function(err) {
+                 console.log(err);
+            });
+        
+        }
 
         $scope.tiposVistorias = tiposVistorias;
         $scope.addItem = function(itemForm) {
@@ -478,14 +505,15 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
                 item.id_vistoria = id_dono;
                 item.data_criacao = timestampUTC(); 
                 item.modificado = item.data_criacao;
-
+                
+                item.fotos64 = $scope.myPictures;
                 item.dados = $scope.item;
 
                 $localStorage.itensVistoriados.db[id] = item;
 
                 id = id + 1; 
                 $localStorage.itensVistoriados.nextID = id;
-
+                
                 $mdDialog.hide();
             } else {
                 id = $localStorage.itensVistoriados.nextID;
@@ -501,14 +529,15 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
                 item.id_vistoria = id_dono;
                 item.data_criacao = timestampUTC(); 
                 item.modificado = item.data_criacao;
-
+                
+                item.fotos64 = $scope.myPictures;
                 item.dados = $scope.item;
 
                 $localStorage.itensVistoriados.db[id] = item;
 
                 id = id + 1; 
                 $localStorage.itensVistoriados.nextID = id;
-
+                
                 $mdDialog.hide();
             }
 
@@ -535,8 +564,7 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
             }
         }
     }
-    
-    
+        
     // botão de voltar
     $scope.goBack = function() {
         window.history.back();

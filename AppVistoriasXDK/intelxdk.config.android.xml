@@ -16,6 +16,9 @@
 <allow-intent href="mailto:*"/>
 <allow-intent href="geo:*"/>
 <allow-intent href="market:*"/>
+<allow-intent href="filesystem:*"/>
+<allow-intent href="file:*"/>
+<allow-intent href="blob:*"/>
 <icon platform="android" src="package-assets/36x36.png" density="ldpi" width="36" height="36"/>
 <icon platform="android" src="package-assets/48x48.png" density="mdpi" width="48" height="48"/>
 <icon platform="android" src="package-assets/72x72.png" density="hdpi" width="72" height="72"/>
@@ -65,6 +68,8 @@
     <!-- below requires the splash screen plugin -->
     <!-- docs: https://github.com/apache/cordova-plugin-splashscreen -->
     <preference name="SplashMaintainAspectRatio" value="false"/>
+    <preference name="AndroidPersistentFileLocation" value="Internal"/>
+    <preference name="AndroidExtraFilesystems" value="files,cache, sdcard, cache-external, files-external"/>
 </platform>
 <intelxdk:crosswalk xmlns:intelxdk="http://xdk.intel.com/ns/v1" xwalk-command-line="--disable-pull-to-refresh-effect"/>
 <intelxdk:crosswalk xmlns:intelxdk="http://xdk.intel.com/ns/v1" xwalk-command-line="--ignore-gpu-blacklist"/></widget>

@@ -549,7 +549,8 @@
 	</md-switch>
 
     <!--<button camera ng-model='myPicture'>Tire fotos</button>-->
-    <md-button camera ng-model="myPicture" class="md-raised md-primary">Adicionar Fotos</md-button>
+    <!--<md-button camera ng-model="myPicture" class="md-raised md-primary">Adicionar Fotos</md-button>-->
+    <md-button ng-click="takePicture()" ng-model="myPicture" class="md-raised md-primary">Adicionar Fotos</md-button>
     <br/>
 
     <img ng-repeat="onepic in myPictures" style="width:25%;height:20%;" id="smallImage" src="{{ ('data:image/jpeg;base64,'+onepic)}}" />

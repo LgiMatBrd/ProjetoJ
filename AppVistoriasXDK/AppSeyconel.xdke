@@ -11,6 +11,9 @@
   "build-tab": {
     "selectedTargets": [
       "CORDOVA_ANDROID"
+    ],
+    "emailListForShareBuild": [
+      "igor@igoroliveira.eng.br"
     ]
   },
   "simulator": {
@@ -18,19 +21,19 @@
       "tinyhippos-geosettings": {
         "id": "tinyhippos-geosettings",
         "key": "geosettings",
-        "value": "{\"position\":{\"latitude\":43.46063927435358,\"longitude\":-80.50357507922475,\"altitude\":100,\"accuracy\":150,\"altitudeAccuracy\":80,\"heading\":0,\"speed\":0,\"timeStamp\":\"new Date(1493037331042)\"},\"delay\":\"0\",\"timeout\":false}",
+        "value": "{\"position\":{\"latitude\":43.41165168063978,\"longitude\":-80.5741279051524,\"altitude\":100,\"accuracy\":150,\"altitudeAccuracy\":80,\"heading\":0,\"speed\":0,\"timeStamp\":\"new Date(1493081338226)\"},\"delay\":\"0\",\"timeout\":false}",
         "prefix": "tinyhippos-"
       },
       "tinyhippos-saved-sims": {
         "id": "tinyhippos-saved-sims",
         "key": "saved-sims",
-        "value": "[{\"service\":\"SQLitePlugin\",\"action\":\"open\",\"args\":[{\"name\":\"example\",\"dblocation\":\"nosync\"}],\"value\":0,\"success\":true}]",
+        "value": "[]",
         "prefix": "tinyhippos-"
       },
       "tinyhippos-geo-map-zoom-key": {
         "id": "tinyhippos-geo-map-zoom-key",
         "key": "geo-map-zoom-key",
-        "value": 13,
+        "value": 11,
         "prefix": "tinyhippos-"
       }
     }
