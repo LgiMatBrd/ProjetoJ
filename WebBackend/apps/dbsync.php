@@ -315,6 +315,7 @@ function send()
                         $local['idext'] = $row['id'];
                         $local['data_criacao'] = strtotime($row['data_criacao']);
                         $local['modificado'] = $modificado;
+                        $local['fotos64'] = json_decode($row['fotos64']);
                         for ($i = 0; $i < count($db['vistorias']); $i++)
                         {
                             if ($row['id_vistoria'] != $db['vistorias'][$i]['idext'])
@@ -322,7 +323,7 @@ function send()
                             $local['id_vistoria'] = $db['vistorias'][$i]['id'];
                             break;
                         }
-                        unset($row['id'],$row['idext'],$row['data_criacao'],$row['modificado'],$row['id_vistoria']);
+                        unset($row['id'],$row['idext'],$row['data_criacao'],$row['modificado'],$row['fotos64'],$row['id_vistoria']);
                         $local['dados'] = array();
                         $local['dados'] = $row;
                         $finfo = $resul->fetch_fields();

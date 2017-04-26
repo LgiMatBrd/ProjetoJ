@@ -471,13 +471,13 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
     };
 
     function DialogController($scope, $mdDialog, id_dono, tiposVistorias, id_click, $cordovaCamera) {
-        
+        $scope.myPictures = [];
         // Verifica se o usuário quer editar o item.
-        if (id_click || id_click === 0) {
-            console.log(id_click);
+        if (id_click > -1)
+        {
             $scope.item = {};
             $scope.item = $localStorage.itensVistoriados.db[id_click].dados;
-            $scope.item.EdicaoID = id_click;
+            $scope.myPictures = $localStorage.itensVistoriados.db[id_click].fotos64;
             
             // Pega os valores booleanos que estão em string e coverte novamente.
             angular.forEach($scope.item, function(value, key) {
@@ -491,7 +491,7 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
             console.log('Nenhum item para ser editado, abrindo tela de adiconar novo item...');
         }
         
-        $scope.myPictures = [];
+        
         $scope.$watch('myPicture', function(value) {
             if (value) {
                 $scope.myPictures.push(value);
@@ -527,28 +527,12 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
         $scope.addItem = function(itemForm) {
             
             // Verifica se os Form é de edição ou de adição de novo Item
-            if ($scope.item.EdicaoID) {
-                id = $localStorage.itensVistoriados.nextID;
-
-                /* OBJETO
-                this.id = 0;
-                this.id_dono = '';
-                this.data_criacao = '';
-                this.dados = '';
-                */
-                item = new itemVitoriado(); 
-                item.id = id;
-                item.id_vistoria = id_dono;
-                item.data_criacao = timestampUTC(); 
-                item.modificado = item.data_criacao;
-                
-                item.fotos64 = $scope.myPictures;
-                item.dados = $scope.item;
-
-                $localStorage.itensVistoriados.db[id] = item;
-
-                id = id + 1; 
-                $localStorage.itensVistoriados.nextID = id;
+            if (id_click > -1) {
+                // Edita o item
+                id = id_click;
+                $localStorage.itensVistoriados.db[id].dados = $scope.item;
+                $localStorage.itensVistoriados.db[id].fotos = $scope.myPictures;
+                $localStorage.itensVistoriados.db[id].modificado = timestampUTC();
                 
                 $mdDialog.hide();
             } else {
@@ -563,7 +547,7 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
                 item = new itemVitoriado(); 
                 item.id = id;
                 item.id_vistoria = id_dono;
-                item.data_criacao = timestampUTC(); 
+                item.data_criacao = timestampUTC();
                 item.modificado = item.data_criacao;
                 
                 item.fotos64 = $scope.myPictures;
