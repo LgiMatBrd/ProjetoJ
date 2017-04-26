@@ -5,18 +5,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
+header('Content-Type: text/html; charset=utf-8');
 if (!defined('ROOT_DIR'))
     die('Diretório raiz não foi previamente definido!');
 
 // Verifica se a instalação está atualizada (conforme arquivo version.php)
 $installerVersion = '0.1';
-include_once ROOT_DIR.'/config/version.php';
+$version = '-1';
+if (file_exists(ROOT_DIR.'/config/version.php'))
+    include_once ROOT_DIR.'/config/version.php';
 
 if ($version !== $installerVersion)
 {
 
-$time = date(Ymd);
+$time = date('Ymd');
 $concreteBackgroundWallPaper = 'http://backgroundimages.concrete5.org/wallpaper/'.$time.'.jpg';
 $concreteBackgroundDesc = 'http://backgroundimages.concrete5.org/get_image_data.php?image='.$time.'.jpg';
 

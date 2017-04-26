@@ -69,6 +69,8 @@ define('HOST', '$host');     // Para o host com o qual você quer se conectar.
 define('USER', '$user');    // O nome de usuário para o banco de dados. 
 define('PASSWORD', '$pass');    // A senha do banco de dados. 
 define('DATABASE', '$dbname');    // O nome do banco de dados. 
+                    
+define('SECURE', FALSE);    // ESTRITAMENTE PARA DESENVOLVIMENTO!!!!
 EOF;
             fwrite($myfile, $strconf);
             fclose($myfile);

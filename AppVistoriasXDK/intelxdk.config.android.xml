@@ -16,6 +16,9 @@
 <allow-intent href="mailto:*"/>
 <allow-intent href="geo:*"/>
 <allow-intent href="market:*"/>
+<allow-intent href="filesystem:*"/>
+<allow-intent href="file:*"/>
+<allow-intent href="blob:*"/>
 <icon platform="android" src="package-assets/36x36.png" density="ldpi" width="36" height="36"/>
 <icon platform="android" src="package-assets/48x48.png" density="mdpi" width="48" height="48"/>
 <icon platform="android" src="package-assets/72x72.png" density="hdpi" width="72" height="72"/>
@@ -36,7 +39,6 @@
 <intelxdk:param intelxdk:name="PHOTOLIBRARY_USAGE_DESCRIPTION" intelxdk:value=" "/></intelxdk:plugin>
 <intelxdk:plugin intelxdk:name="Compat" intelxdk:value="cordova-plugin-compat" intelxdk:version="1.0.0" intelxdk:checksum="61c62eb" intelxdk:type="file"/>
 <intelxdk:plugin intelxdk:name="Network Information" intelxdk:value="cordova-plugin-network-information" intelxdk:version="1.2.1" intelxdk:checksum="9d8331a4" intelxdk:type="file"/>
-<intelxdk:plugin intelxdk:name="File" intelxdk:value="cordova-plugin-file" intelxdk:version="4.2.0" intelxdk:checksum="1fdd7f27" intelxdk:type="file"/>
 <intelxdk:plugin intelxdk:name="Cordova Network Whitelist Plugin (added by Intel XDK)" intelxdk:value="cordova-plugin-whitelist" intelxdk:version="1.2.2"/>
 <preference name="android-minSdkVersion" value="14"/>
 <preference name="android-targetSdkVersion" value="21"/>

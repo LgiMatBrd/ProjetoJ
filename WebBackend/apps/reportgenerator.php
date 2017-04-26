@@ -6,11 +6,30 @@
 
 define('ROOT_DIR', dirname(dirname(__FILE__)));
 
+// Importa a conexão à DB e as funções da biblioteca de login
+require_once ROOT_DIR.'/config/db_connect.php';
+require_once ROOT_DIR.'/lib/login/functions.php';
+
+// Nossa segurança personalizada para iniciar uma sessão php.
+sec_session_start();
+
 ob_start();
 
+if (login_check($mysqli) != true)
+{
+    $resposta = [
+        'status' => 'error',
+        'logged' => 'out',
+        'h2' => 'Necessário logar!',
+        'msg' => 'Você está desconectado!'
+    ];
+    
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode((object)$resposta);
+    die;
+}
+
 require '../lib/pdfgenerator/fpdf.php';
-require '../config/psl-config.php';
-require '../config/db_connect.php';
 require '../config/global.php';
 //set_include_path(get_include_path() . PATH_SEPARATOR . ROOT_DIR . '/lib/phpmailer');
 //require 'class.phpmailer.php';

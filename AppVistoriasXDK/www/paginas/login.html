@@ -17,6 +17,12 @@
 						</div>
 					</md-input-container>
 				</div>
+                <div layout="row" layout-sm="column">
+					<md-input-container style="width: 100%;" flex-gt-sm="">
+						<label>Usuário</label>
+						<input required type="text" name="username" ng-model="user.username" placeholder="seyconel123" />
+					</md-input-container>
+				</div>
 				<div layout="row" layout-sm="column">
 					<md-input-container style="width: 100%;" flex-gt-sm="">
 						<label>Senha</label>
@@ -25,6 +31,11 @@
 							<div ng-message="required">Você não pode logar sem senha.</div>
 							<div ng-message-exp="['minlength', 'maxlength', 'pattern']">Não foi encontrado em nosso banco de dados nenhuma senha compatível com a que você digitou.</div>
 						</div>
+					</md-input-container>
+				</div>
+                <div layout="row" layout-sm="column">
+					<md-input-container style="width: 100%;" flex-gt-sm="">
+						<span>{{msg}}</span>
 					</md-input-container>
 				</div>
 				<md-button class="md-raised md-primary" style="width:100%; margin: 0px 0px;" ng-click="user.submit(user)" ng-disabled="userForm.$invalid">Entrar</md-button>

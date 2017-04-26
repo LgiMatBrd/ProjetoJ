@@ -114,14 +114,46 @@ app.controller('loginController', function($scope, $http, $localStorage, $locati
         email: '',
     };
     
-     $scope.user.submit = function(user) {
+    $scope.user.submit = function(user)
+    {
         console.log('chamou');
         console.log(user.email);
+        console.log(user.username);
         console.log(user.password);
-
-        $location.path('/clientes/');
+        console.log(hex_sha512(user.password));
+        
+        var p = hex_sha512(user.password);
+        $http({
+            method: 'POST',
+            url: 'http://app.igoroliveira.eng.br/apps/makelogin.php',
+            data: {
+                makelogin: 'true',
+                username: user.username,
+                password: '',
+                p: p
+            }
+        })
+        .then(function successCallback(response)
+        {
+            console.log(response);
+            if (response.data.status == "ok")
+            {
+                if (response.data.logged === 'in')
+                    $location.path('/sincronizar').replace();
+                else
+                    $scope.msg = response.data.msg;
+            }
+            else if (response.data.status == "error")
+            {
+                $scope.msg = "Não foi possível logar! "+response.data.msg;
+            }
+            
+        }, function errorCallback(response){
+            $scope.msg = "Ocorreu um problema ao efetuar login: "+response.statusText;
+        });
     }
 });
+
 app.controller('homeController', function($scope, $http, $localStorage, $location, $mdDialog) {
     /*delete $localStorage.vistoria;
     delete $localStorage.vistorias;
@@ -639,7 +671,7 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
 
 
 
-app.controller('sincronizarController', function($scope, $http, $localStorage, $timeout, $interval, httpSincrono) {
+app.controller('sincronizarController', function($scope, $http, $localStorage, $timeout, $interval, $location, httpSincrono) {
     
     var UrlSync = 'http://app.igoroliveira.eng.br/apps/dbsync.php'; // URL do arquivo PHP de sincronização
     var UrlRel = 'http://app.igoroliveira.eng.br/apps/reportgenerator.php'; // URL do arquivo PHP de emissão de relatórios
@@ -685,15 +717,20 @@ app.controller('sincronizarController', function($scope, $http, $localStorage, $
             }
         })
         .then(function successCallback(response){
-            httpBusy = 0;
             if (response.data.status == "ok")
             {
-                $scope.barraProgresso = true;
-                $scope.h2 = "Aguarde!";
-                sendData();
+                if (response.data.logged != "in")
+                    $location.path('/login').replace();
+                else
+                {
+                    $scope.barraProgresso = true;
+                    $scope.h2 = "Aguarde!";
+                    sendData();
+                }
             }
-            else if (response.data.status != "error")
+            else if (response.data.status == "error")
             {
+                console.log(response);
                 $scope.h2 = "Falha no script do servidor!";
                 $scope.msg = "";
             }
@@ -701,7 +738,7 @@ app.controller('sincronizarController', function($scope, $http, $localStorage, $
         }, function errorCallback(response){
             $scope.h2 = "Não foi possível contactar o servidor!";
             $scope.msg = "Verifique se você possui uma conexão estável com a internet e tente novamente.\nErro: "+response.statusText;
-        });        
+        });
     }
 
     function sendData()

@@ -14,8 +14,7 @@ ob_start();
 require '../config/global.php';
 date_default_timezone_set('UTC');
 
-
-$json_string = print_r(file_get_contents("php://input"), true);
+//$json_string = print_r(file_get_contents("php://input"), true);
 
 $postdata = file_get_contents("php://input");
 $request = json_decode($postdata, true);
@@ -32,11 +31,21 @@ try
     include_once ROOT_DIR.'/lib/login/functions.php';
 
     // Inicia uma sessão segura
-    /*sec_session_start();
-    if (login_check($mysqli) == true)
+    sec_session_start();
+    $logged = 'out';
+    if (login_check($mysqli) != true)
     {
-        
-    }*/
+        $resposta = [
+            'status' => 'ok',
+            'logged' => 'out',
+            'h2' => 'Necessário logar!',
+            'msg' => 'Você está desconectado!'
+        ];
+
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode((object)$resposta);
+        die;
+    } else $logged = 'in';
     
     switch ($request['func'])
     {
@@ -63,8 +72,9 @@ try
 
 function serverOk()
 {
-    global $resposta;
+    global $resposta, $logged;
     $resposta['status'] = 'ok';
+    $resposta['logged'] = $logged;
 }
 
 function receive()

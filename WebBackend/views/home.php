@@ -1,110 +1,96 @@
-<!DOCTYPE html>
-<html dir="ltr">
+<?php
 
+// Esta view possui um controller, por este motivo, este arquivo não deve ser 
+// acessado de forma direta ou através de outro arquivo não previsto.
+// 
+// Testa se este arquivo foi incluído pelo seu controller
+if (!defined('HOME_CONTROLLER'))
+    die;
+
+$time = date('Ymd');
+$concreteBackgroundWallPaper = 'http://backgroundimages.concrete5.org/wallpaper/'.$time.'.jpg';
+$concreteBackgroundDesc = 'http://backgroundimages.concrete5.org/get_image_data.php?image='.$time.'.jpg';
+
+?>
+
+<!DOCTYPE html>
+<html>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Frontpage layout example - UIkit documentation</title>
+        <title>Cadastro de usuários</title>
         <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
         <link rel="apple-touch-icon-precomposed" href="images/apple-touch-icon.png">
-        <link rel="stylesheet" href="css/uikit.gradient.min.css">
+        <link rel="stylesheet" href="css/uikit.gradient.min.css" />
+        <link rel="stylesheet" href="css/components/form-password.min.css" />
         <script src="js/jquery.min.js"></script>
         <script src="js/uikit.min.js"></script>
-        <script src="js/angular.min.js"></script>
+        <script src="js/components/form-password.min.js"></script>
+        <script type="text/JavaScript" src="js/sha512.js"></script> 
+        <script type="text/JavaScript" src="js/forms.js"></script> 
+        <script type="text/javascript" src="js/angular.min.js"></script>
+        
     </head>
-
     <body ng-app="app">
-
-        <div ng-controller="ctrl" class="uk-container uk-container-center uk-margin-top uk-margin-large-bottom">
-
-            <nav class="uk-navbar uk-margin-large-bottom">
-                <a class="uk-navbar-brand uk-hidden-small" href="layouts_frontpage.html">Brand</a>
-                <ul class="uk-navbar-nav uk-hidden-small">
-                    <li class="uk-active">
-                        <a href="layouts_frontpage.html">Frontpage</a>
-                    </li>
-                    <li>
-                        <a href="layouts_portfolio.html">Portfolio</a>
-                    </li>
-                    <li>
-                        <a href="layouts_blog.html">Blog</a>
-                    </li>
-                    <li>
-                        <a href="layouts_documentation.html">Documentation</a>
-                    </li>
-                    <li>
-                        <a href="layouts_contact.html">Contact</a>
-                    </li>
-                    <li>
-                        <a href="layouts_login.html">Login</a>
-                    </li>
-                </ul>
-                <a href="#offcanvas" class="uk-navbar-toggle uk-visible-small" data-uk-offcanvas></a>
-                <div class="uk-navbar-brand uk-navbar-center uk-visible-small">Brand</div>
-            </nav>
-
-            <div class="uk-grid" data-uk-grid-margin>
-                <div class="uk-width-medium-1-1">
-
-                    <form ng-model="form1" class="uk-form uk-form-stacked uk-text-left" ng-submit="sendForm()">                      
-                        <input type="hidden" name="oi" value="eita" />
-                        
-                        <input type="submit" value="Enviar" name="submit" />
+        <div class="uk-width-1-1">
+            <div class="uk-width-9-10 uk-container-center uk-margin-large uk-margin-large-top">
+                <div class="uk-panel uk-panel-space uk-panel-box uk-panel-header">
+                    <h2 class="uk-text-center">Cadastrar novo usuário:</h2>
+                    <div class="uk-panel-title"></div>
+                    <form id="form1" class="uk-form uk-form-horizontal" action="/home" method="post" name="form">                      
+                        <fieldset>
+                            <div class="uk-form-row">
+                                <label class="uk-form-label">Usuário:</label>
+                                <div class="uk-form-controls">
+                                    <input class="uk-width-1-1" type="text" ng-model="u" name="username" required />
+                                    <div ng-if="u.$touched && u.$invalid" class="uk-alert uk-alert-danger">...</div>
+                                </div>
+                            </div>
+                            <div class="uk-form-row">
+                                <label class="uk-form-label">Senha:</label>
+                                <div class="uk-form-controls">
+                                    <input class="uk-width-1-1" type="password" id="user-pass1" />
+                                </div>
+                            </div>
+                            <div class="uk-form-row">
+                                <label class="uk-form-label">Confirmação da senha:</label>
+                                <div class="uk-form-controls">
+                                    <input class="uk-width-1-1" type="password" id="user-pass2" name="password" />
+                                </div>
+                            </div>
+                            <div class="uk-form-row">
+                                <label class="uk-form-label">Email:</label>
+                                <div class="uk-form-controls">
+                                    <input class="uk-width-1-1" type="email" id="user-email1" />
+                                </div>
+                            </div>
+                            <div class="uk-form-row">
+                                <label class="uk-form-label">Confirmação de email:</label>
+                                <div class="uk-form-controls">
+                                    <input class="uk-width-1-1" type="email" id="user-email2" name="email" />
+                                </div>
+                            </div>
+                            <div class="uk-form-row uk-margin-large-bottom">
+                                <label class="uk-form-label">Primeiro nome:</label>
+                                <div class="uk-form-controls">
+                                    <input class="uk-width-1-1" type="text" name="pnome" />
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="uk-form-row">
+                            <a class="uk-width-1-1 uk-button uk-button-primary uk-button-large" type="button" 
+                               onclick="formhash(form1, form1.password);">Cadastrar</a>
+                        </div>
                     </form>
-
                 </div>
             </div>
-
         </div>
-
-        <div id="offcanvas" class="uk-offcanvas">
-            <div class="uk-offcanvas-bar">
-                <ul class="uk-nav uk-nav-offcanvas">
-                    <li class="uk-active">
-                        <a href="layouts_frontpage.html">Frontpage</a>
-                    </li>
-                    <li>
-                        <a href="layouts_portfolio.html">Portfolio</a>
-                    </li>
-                    <li>
-                        <a href="layouts_blog.html">Blog</a>
-                    </li>
-                    <li>
-                        <a href="layouts_documentation.html">Documentation</a>
-                    </li>
-                    <li>
-                        <a href="layouts_contact.html">Contact</a>
-                    </li>
-                    <li>
-                        <a href="layouts_login.html">Login</a>
-                    </li>
-                </ul>
-            </div>
+        
+        <div class="backstretch" style="left: 0px; top: 0px; overflow: hidden; margin: 0px; padding: 0px; height: 100%; width: 100%; z-index: -999999; position: fixed;">
+            <img style="position: absolute; margin: 0px; padding: 0px; border: medium none; width: 100%; height: 100%; max-height: none; max-width: none; z-index: -999999; left: 0px; top: 0px;" src="<? echo $concreteBackgroundWallPaper; ?>">
         </div>
         <script>
-            var app = angular.module("app", []);
-            
-            app.controller("ctrl", function($scope, $http) {
-                $scope.sendForm = function ()
-                {
-                    alert('oi');
-                    var meuForm = new FormData();
-                    meuForm.append('files[]', 'file:///C:/Users/igoro_000/Pictures/banner_whatsapp.jpg.png');
-                    alert('eeeeiii');
-                    $http({
-                        method: 'POST',
-                        url: '/home',
-                        data: meuForm,
-                        withCredentials: true,
-                        headers: {'Content-Type': undefined },
-                        transformRequest: angular.identity
-                    }).success(function() {
-                        console.log("Uploaded");
-                    }).error(function() {
-                        console.log("Error");
-                    });
-                };
-            });
+            angular.module('app', ['ngMessages']);
         </script>
     </body>
 </html>

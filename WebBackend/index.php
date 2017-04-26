@@ -7,6 +7,7 @@
  */
 
 define('ROOT_DIR', dirname(__FILE__));
+require_once ROOT_DIR.'/config/global.php';
 
 // Verifica se o arquivo de instalação existe e faz sua inclusão.
 if (file_exists(ROOT_DIR.'/install/index.php'))
