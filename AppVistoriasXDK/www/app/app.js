@@ -48,7 +48,8 @@ app.config(function($routeProvider,$mdIconProvider) {
 
 
 app.run(function($localStorage) {
-    if (typeof $localStorage.clientes === 'undefined' || typeof $localStorage.clientes.db === 'undefined' || $localStorage.clientes.version !== 'v0.2')
+    
+    if (typeof $localStorage.clientes === 'undefined' || typeof $localStorage.clientes.db === 'undefined' || $localStorage.clientes.version !== 'v0.4')
     {
         $localStorage.clientes = {
             nextID: 0,
@@ -59,7 +60,7 @@ app.run(function($localStorage) {
             db: {}
         }; 
     }
-    if (typeof $localStorage.vistorias === 'undefined' || typeof $localStorage.vistorias.db === 'undefined' || $localStorage.vistorias.version !== 'v0.2')
+    if (typeof $localStorage.vistorias === 'undefined' || typeof $localStorage.vistorias.db === 'undefined' || $localStorage.vistorias.version !== 'v0.4')
     {
         $localStorage.vistorias = {
             nextID: 0,
@@ -70,7 +71,7 @@ app.run(function($localStorage) {
             db: {}
         }; 
     } 
-    if (typeof $localStorage.itensVistoriados === 'undefined' || typeof $localStorage.itensVistoriados.db === 'undefined' || $localStorage.itensVistoriados.version !== 'v0.1')
+    if (typeof $localStorage.itensVistoriados === 'undefined' || typeof $localStorage.itensVistoriados.db === 'undefined' || $localStorage.itensVistoriados.version !== 'v0.3')
     {
         $localStorage.itensVistoriados = {
             nextID: 0,
