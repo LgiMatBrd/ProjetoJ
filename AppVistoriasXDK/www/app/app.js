@@ -70,7 +70,7 @@ app.run(function($localStorage) {
             remoteDelete: [],
             db: {}
         }; 
-    } 
+    }
     if (typeof $localStorage.itensVistoriados === 'undefined' || typeof $localStorage.itensVistoriados.db === 'undefined' || $localStorage.itensVistoriados.version !== 'v0.3')
     {
         $localStorage.itensVistoriados = {
@@ -117,12 +117,6 @@ app.controller('loginController', function($scope, $http, $localStorage, $locati
     
     $scope.user.submit = function(user)
     {
-        console.log('chamou');
-        console.log(user.email);
-        console.log(user.username);
-        console.log(user.password);
-        console.log(hex_sha512(user.password));
-        
         var p = hex_sha512(user.password);
         $http({
             method: 'POST',
@@ -532,7 +526,7 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
                 // Edita o item
                 id = id_click;
                 $localStorage.itensVistoriados.db[id].dados = $scope.item;
-                $localStorage.itensVistoriados.db[id].fotos = $scope.myPictures;
+                $localStorage.itensVistoriados.db[id].fotos64 = $scope.myPictures;
                 $localStorage.itensVistoriados.db[id].modificado = timestampUTC();
                 
                 $mdDialog.hide();
@@ -788,6 +782,9 @@ app.controller('sincronizarController', function($scope, $http, $localStorage, $
                 {
                     $scope.promise = $scope.promise.then(function () {
                         return httpSincrono.enviar(UrlSync, token, $scope, $scope.sendTimestamp, $scope.incrementoProg, $scope.sortable);
+                    }, function (response) {
+                        httpSincrono.close();
+                        $scope.h2 = response.data;
                     });
                 }
             }

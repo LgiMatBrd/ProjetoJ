@@ -109,8 +109,7 @@ function HttpSincrono($http, $q, $localStorage) {
                             
                 
             }, function (response){
-                
-                deferred.reject();
+                deferred.reject(response);
                 return deferred.promise;
             });
         }

@@ -7,7 +7,7 @@
 
 define('ROOT_DIR', dirname(dirname(__FILE__)));
 
-header('Content-Type: application/json; charset=utf-8');
+
 $token = 'dasda'; 
 ob_start();
 
@@ -81,7 +81,6 @@ function receive()
     global $request, $resposta, $mysqli;
     $keys = array();
     $valores = array();
-    $idExt = 0;
     if ($request['dbName'] === 'itensVistoriados')
     {
         $dbstr = $request['row']['dados']['nome'];
@@ -115,14 +114,14 @@ function receive()
         } else {
             $value4[$key3] = $value3;
         }
-        
+        $idExt = 0;
         foreach ($value4 as $key => $value)
         {
             if (is_array($value))
                 continue;
             if ($key == 'idext')
             {
-                $idExt = (int)$value;
+                $idExt = $value;
                 continue;
             }
             else if ($key == 'id')
@@ -149,11 +148,12 @@ function receive()
                 'msg' => $e->getMessage()
             ];
     }
+    
     $resul = $mysqli->query("SELECT modificado FROM `$dbstr` WHERE id = ".$mysqli->escape_string($idExt).' LIMIT 1');
-    if ($resul->num_rows > 0)
+    if ($row = $resul->num_rows)
     {
         $row = $resul->fetch_assoc();
-        if (strtotime($row['modificado']) < strtotime(substr($valores['modificado'], 1, -1)))
+        if (strtotime($row['modificado']) < strtotime($valores['modificado']))
         {
             foreach ($keys as $ekey)
             {
@@ -170,7 +170,6 @@ function receive()
             ];
             return;
         }
-        
     }
     else
     {
@@ -186,9 +185,10 @@ function receive()
     {
         if ($mysqli->query($query))
         {
-            $resposta['status'] = 'ok';
-            $resposta['idext'] = ($mysqli->insert_id)? $mysqli->insert_id : $idExt;
-            
+            $resposta = [
+                'status' => 'ok',
+                'idext' => $mysqli->insert_id
+            ];
         }
         else
             throw new Exception ('Não foi possível executar o comando do SQL. '.$mysqli->error);
@@ -293,8 +293,6 @@ function send()
                         $local['idext'] = $row['id'];
                         $local['id'] = $id;
                     }*/
-                    if (isset($row['id_user']))
-                        unset($row['id_user']);
                     if ($dbName !== 'itensVistoriados')
                     {
                         $local = $row;
@@ -396,5 +394,10 @@ if (!empty($out1))
     ];
 }
 
+file_put_contents('test.txt', file_get_contents('test.txt').file_get_contents('php://input')."\n");
 
+header('Content-Type: application/json; charset=utf-8');
+//echo $html_entity_decode(json_encode($arr));
+
+//echo json_encode('oi', JSON_FORCE_OBJECT);
 echo json_encode((object)$resposta);

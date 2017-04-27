@@ -62,7 +62,7 @@ $concreteBackgroundDesc = 'http://backgroundimages.concrete5.org/get_image_data.
                             <div class="uk-form-row">
                                 <label class="uk-form-label">Senha:</label>
                                 <div class="uk-form-controls">
-                                    <input class="uk-width-1-1" type="password" minlength="8" id="user-pass1" name="password1" required />
+                                    <input class="uk-width-1-1" type="password" minlength="8" pwcheck="true" id="user-pass1" name="password1" required />
                                 </div>
                             </div>
                             <div class="uk-form-row">
@@ -149,6 +149,9 @@ $concreteBackgroundDesc = 'http://backgroundimages.concrete5.org/get_image_data.
                 email: 'Email inválido!',
                 minlength: $.validator.format("São necessários pelo menos {0} caracteres.")
             });
+            $.validator.addMethod("pwcheck", function(value) {
+                return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/.test(value);
+            }, "A senha precisa ser composta de números, letras maiúsculas e letras minúsculas.");
             
         </script>
     </body>
