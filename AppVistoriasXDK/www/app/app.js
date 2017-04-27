@@ -431,10 +431,7 @@ app.controller('vistoriasController', function($scope, $routeParams, $http, $loc
 
 
 
-app.controller('vistoriaController', function($scope, $routeParams, $http, $localStorage, $filter, $mdDialog) {
-
-    console.dir($localStorage);
-    
+app.controller('vistoriaController', function($scope, $routeParams, $http, $localStorage, $filter, $mdDialog) {    
     $scope.id_dono = $routeParams.id;
 	$scope.id = $routeParams.id;
 	$scope.nomeVistoria = $localStorage.vistorias.db[$scope.id].nome;
@@ -450,6 +447,11 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
     // chama a função para preencher a variável que armazena as vistorias desse cliente
 	$scope.itensVistoriados = {};
     populaVistorias($scope.id_dono);
+
+    // Foto principal vistoria
+    console.dir($localStorage);
+    //$scope.fotoPrincipal = $localStorage.itensVistoriados.db;
+    
     
     $scope.showAdvanced = function(ev,id_click) {
         $mdDialog
@@ -490,7 +492,6 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
         } else {
             console.log('Nenhum item para ser editado, abrindo tela de adiconar novo item...');
         }
-        
         
         $scope.$watch('myPicture', function(value) {
             if (value) {
