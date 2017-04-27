@@ -9,6 +9,7 @@
 <br />
 <br />
 <br />
+<br />
 <md-subheader class="md-no-sticky">Todos as vistorias: <strong>{{nome}}</strong> ID: {{id}}</md-subheader>
 
 <md-list-item ng-repeat="person in vistorias" ng-click="verVistoria(person.id)" class="noright">
@@ -44,12 +45,17 @@
 	  </md-input-container>
   </form>
 </div>
+<md-dialog-actions layout="row">
+    <span flex></span> 
+    <md-button style="width: 50% !important;" ng-click="cancel()"> Cancelar </md-button>
+    <md-button style="width: 50% !important;" ng-click="addVistoria(nomeVistoria)" class="md-primary"> Adicionar </md-button>
+</md-dialog-actions>
 </md-content>
 
-   <md-dialog-actions layout="row">
-      <span flex></span> 
-      <md-button ng-click="cancel()"> Cancelar </md-button>
-      <md-button ng-click="addVistoria(nomeVistoria)" class="md-primary"> Adicionar </md-button>
-   </md-dialog-actions>
+<!--<md-dialog-actions layout="row">
+  <span flex></span> 
+  <md-button style="width: 50% !important;" ng-click="cancel()"> Cancelar </md-button>
+  <md-button style="width: 50% !important;" ng-click="addVistoria(nomeVistoria)" class="md-primary"> Adicionar </md-button>
+</md-dialog-actions>-->
 </md-dialog>
 </script>

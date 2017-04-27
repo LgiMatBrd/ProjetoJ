@@ -1,6 +1,6 @@
 <md-toolbar style="position: fixed !important;">
     <div class="md-toolbar-tools">
-        <md-button><i style="color: #fff !important;" ng-click="" class="material-icons">perm_identity</i></md-button>
+        <!--<md-button><i style="color: #fff !important;" ng-click="" class="material-icons">perm_identity</i></md-button>-->
         <h2 md-truncate flex><span>SeyService</span></h2>
         <md-button href="#/sincronizar">Sincronizar</md-button>
     </div>
@@ -14,6 +14,7 @@
     </div>
 </md-toolbar>
 -->
+<br />
 <br />
 <br />
 <br /> 
@@ -57,12 +58,17 @@
 	  </md-input-container>
   </form>
 </div>
+<md-dialog-actions layout="row">
+  <span flex></span> 
+  <md-button style="width: 50% !important;" ng-click="cancel()"> Cancelar </md-button>
+  <md-button style="width: 50% !important;" ng-click="addCliente(theMax)" class="md-primary"> Adicionar </md-button>
+</md-dialog-actions>
 </md-content>
 
-   <md-dialog-actions layout="row">
-      <span flex></span> 
-      <md-button ng-click="cancel()"> Cancelar </md-button>
-      <md-button ng-click="addCliente(theMax)" class="md-primary"> Adicionar </md-button>
-   </md-dialog-actions>
+<!--<md-dialog-actions layout="row">
+  <span flex></span> 
+  <md-button style="width: 50% !important;" ng-click="cancel()"> Cancelar </md-button>
+  <md-button style="width: 50% !important;" ng-click="addCliente(theMax)" class="md-primary"> Adicionar </md-button>
+</md-dialog-actions>-->
 </md-dialog>
 </script>

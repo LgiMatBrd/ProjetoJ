@@ -1,3 +1,35 @@
+md-card-title#fundo_card_destaque {
+    /* 
+    background: #3f51b5; 
+    background: -moz-radial-gradient(center, ellipse cover, #3f51b5 0%, #4759b2 50%, #3f51b5 100%); 
+    background: -webkit-radial-gradient(center, ellipse cover, #3f51b5 0%,#4759b2 50%,#3f51b5 100%); 
+    background: radial-gradient(ellipse at center, #3f51b5 0%,#4759b2 50%,#3f51b5 100%); 
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3f51b5', endColorstr='#3f51b5',GradientType=1 ); 
+    */
+    background-color: #3f51b5 !important;
+}
+
+#smallImage {
+    width: 100% !important;
+    height: 70% !important;
+    background-color: #3f51b5;
+    padding: 5px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+ 
+#smallImage img {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+button.md-fab.md-fab-bottom-right.md-button.ng-scope.md-ink-ripple {
+    background-color: #3f51b5 !important;
+}
+
+md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolbar) {
+    background-color: #3f51b5 !important;
+}
 
 .listdemoListControls md-divider {
   margin-top: 0;

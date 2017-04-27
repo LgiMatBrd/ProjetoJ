@@ -1,10 +1,10 @@
-function onAppReady() {
+/*function onAppReady() {
     if( navigator.splashscreen && navigator.splashscreen.hide ) {   // Cordova API detected
         navigator.splashscreen.hide() ;
     }
 }
 document.addEventListener("app.Ready", onAppReady, false);
-
+*/
 //Define an angular module for our app 
 var app = angular.module('seyconelApp', ['ngRoute','ngStorage','ngMaterial','ngMessages', 'material.svgAssetsCache', 'ngCordova']);
 
@@ -624,7 +624,7 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
     };
    
     // deletar vistoria
-    $scope.deletarVistoria = function ()
+    $scope.deletarVistoria = function ($id)
     {
         // Verifica se a row local já foi sincronizada alguma vez
         if ($localStorage.itensVistoriados.db[$id].idext)
@@ -638,7 +638,7 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
             $localStorage.itensVistoriados.remoteDelete.push(deleteSync);
         }
         
-        delete $localStorage.itensVistoriados.db[$scope.id]; 
+        delete $localStorage.itensVistoriados.db[$id]; 
         populaVistorias($scope.id);
     };
     
