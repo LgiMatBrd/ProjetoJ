@@ -7,7 +7,6 @@
  */
 
 define('ROOT_DIR', dirname(__FILE__));
-require_once ROOT_DIR.'/config/global.php';
 
 // Verifica se o arquivo de instalação existe e faz sua inclusão.
 if (file_exists(ROOT_DIR.'/install/index.php'))
@@ -15,6 +14,8 @@ if (file_exists(ROOT_DIR.'/install/index.php'))
     include ROOT_DIR.'/install/index.php';
     
 }
+
+require_once ROOT_DIR.'/config/global.php';
 
 // Obtém o recurso solicitado ao servidor   
 $recurso = filter_var($_SERVER['REQUEST_URI'], FILTER_SANITIZE_URL);
