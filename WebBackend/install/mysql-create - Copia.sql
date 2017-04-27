@@ -5,7 +5,7 @@
 
 CREATE TABLE IF NOT EXISTS `appToken` (
   `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `userid` int(10) UNSIGNED NOT NULL COMMENT 'ID do respectivo usuario na tabela users',
+  `userid` int(10) UNSIGNED ZEROFILL NOT NULL COMMENT 'ID do respectivo usuario na tabela users',
   `token` varchar(40) NOT NULL COMMENT 'Token de acesso enviado para o App',
   `dataLogin` datetime NOT NULL COMMENT 'Data do login que gerou este token',
   `ultimoAcesso` datetime NOT NULL COMMENT 'Data em que este token foi utilizado pela utlima vez',
@@ -25,7 +25,9 @@ CREATE TABLE IF NOT EXISTS `clientes` (
   `nome` varchar(150) NOT NULL COMMENT 'Nome do cliente',
   `data_criacao` datetime NOT NULL COMMENT 'Data e hora UTC em que a row foi criada',
   `modificado` datetime NOT NULL COMMENT 'Data e hora UTC em que a row foi modificada',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -258,7 +260,7 @@ CREATE TABLE IF NOT EXISTS `itemLinc` (
 --
 
 CREATE TABLE IF NOT EXISTS `login_attempts` (
-  `userid` int(10) UNSIGNED NOT NULL COMMENT 'ID de usuario que tentou logar',
+  `userid` int(10) UNSIGNED ZEROFILL NOT NULL COMMENT 'ID de usuario que tentou logar',
   `datetime` datetime NOT NULL COMMENT 'Data e hora da tentativa'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Registros de tentativas fracassadas de login';
 
@@ -269,7 +271,7 @@ CREATE TABLE IF NOT EXISTS `login_attempts` (
 --
 
 CREATE TABLE IF NOT EXISTS `users` (
-  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` int(10) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT,
   `username` varchar(50) NOT NULL COMMENT 'Usuario utilizado para efetuar o login',
   `pass` varchar(128) NOT NULL COMMENT 'Senha do usuario',
   `salt` varchar(128) NOT NULL COMMENT 'Dados aleatorios usados para aumentar a seguranca e personaizar a senha',
@@ -277,9 +279,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `create_time` datetime NOT NULL COMMENT 'Data e hora UTC que a conta foi criada',
   `atributos` smallint(5) UNSIGNED DEFAULT '0' COMMENT 'Tipos de permissoes (atributos) que o usuario possui',
   `pNome` varchar(25) NOT NULL COMMENT 'Primeiro nome',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `username` (`username`),
-  UNIQUE KEY `email` (`email`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Relaciona todos os usuarios autorizados a logar no sistema';
 
 -- --------------------------------------------------------
@@ -317,54 +317,6 @@ END
 $$
 DELIMITER ;
 
---
--- Constraints for dumped tables
---
-
---
--- Limitadores para a tabela `itemAces`
---
-ALTER TABLE `itemAces`
-  ADD CONSTRAINT `itemAces_ibfk_1` FOREIGN KEY (`id_vistoria`) REFERENCES `vistorias` (`id`) ON DELETE CASCADE;
-
---
--- Limitadores para a tabela `itemDies`
---
-ALTER TABLE `itemDies`
-  ADD CONSTRAINT `itemDies_ibfk_1` FOREIGN KEY (`id_vistoria`) REFERENCES `vistorias` (`id`) ON DELETE CASCADE;
-
---
--- Limitadores para a tabela `itemEctu`
---
-ALTER TABLE `itemEctu`
-  ADD CONSTRAINT `itemEctu_ibfk_1` FOREIGN KEY (`id_vistoria`) REFERENCES `vistorias` (`id`) ON DELETE CASCADE;
-
---
--- Limitadores para a tabela `itemGael`
---
-ALTER TABLE `itemGael`
-  ADD CONSTRAINT `itemGael_ibfk_1` FOREIGN KEY (`id_vistoria`) REFERENCES `vistorias` (`id`) ON DELETE CASCADE;
-
---
--- Limitadores para a tabela `itemLema`
---
-ALTER TABLE `itemLema`
-  ADD CONSTRAINT `itemLema_ibfk_1` FOREIGN KEY (`id_vistoria`) REFERENCES `vistorias` (`id`) ON DELETE CASCADE;
-
---
--- Limitadores para a tabela `itemLila`
---
-ALTER TABLE `itemLila`
-  ADD CONSTRAINT `itemLila_ibfk_1` FOREIGN KEY (`id_vistoria`) REFERENCES `vistorias` (`id`) ON DELETE CASCADE;
-
---
--- Limitadores para a tabela `itemLinc`
---
-ALTER TABLE `itemLinc`
-  ADD CONSTRAINT `itemLinc_ibfk_1` FOREIGN KEY (`id_vistoria`) REFERENCES `vistorias` (`id`) ON DELETE CASCADE;
-
---
--- Limitadores para a tabela `vistorias`
---
-ALTER TABLE `vistorias`
-  ADD CONSTRAINT `vistorias_ibfk_1` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id`) ON DELETE CASCADE;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

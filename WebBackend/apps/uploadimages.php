@@ -1,7 +1,7 @@
 <?php
 
 /*
- * 
+ * Interface com o app para receber as imagens no servidor.
  */
 
 define('ROOT_DIR', dirname(dirname(__FILE__)));

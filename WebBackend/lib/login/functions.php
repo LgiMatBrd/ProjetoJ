@@ -1,9 +1,8 @@
 <?php
 
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Este arquivo possui as funções principais do sistema de login e controle de
+ * sessão.
  */
 
 if (!defined('ROOT_DIR'))
@@ -40,7 +39,7 @@ function sec_session_start() {
 
 function login($loginTxt, $password, $mysqli) {
     // Usando definições pré-estabelecidas significa que a injeção de SQL (um tipo de ataque) não é possível. 
-    if ($stmt = $mysqli->prepare('SELECT id, username, pass, salt 
+    if ($stmt = $mysqli->prepare('SELECT id, email, pNome, username, pass, salt 
         FROM users
        WHERE username = ?
         LIMIT 1')) {
@@ -49,7 +48,7 @@ function login($loginTxt, $password, $mysqli) {
         $stmt->store_result();
  
         // obtém variáveis a partir dos resultados. 
-        $stmt->bind_result($user_id, $username, $db_password, $salt);
+        $stmt->bind_result($user_id, $email, $pNome, $username, $db_password, $salt);
         $stmt->fetch();
  
         // faz o hash da senha com um salt excusivo.
@@ -72,6 +71,8 @@ function login($loginTxt, $password, $mysqli) {
                     // proteção XSS conforme imprimimos este valor
                     $user_id = preg_replace("/[^0-9]+/", "", $user_id);
                     $_SESSION['user_id'] = $user_id;
+                    $_SESSION['email'] = $email;
+                    $_SESSION['pNome'] = $pNome;
                     // proteção XSS conforme imprimimos este valor 
                     $username = preg_replace("/[^a-zA-Z0-9_\-]+/", 
                                                                 "", 

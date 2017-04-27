@@ -8,13 +8,13 @@ if (!defined('ROOT_DIR'))
 if (file_exists(ROOT_DIR.'/config/version.php'))
 {
     if (!unlink(ROOT_DIR.'/config/version.php'))
-            $error_msg = 'Já existe um arquivo version.php e o instalador não conseguiu apagá-lo.';
+        AddMsg(VER, ERROR, 'Já existe um arquivo version.php e o instalador não conseguiu apagá-lo.');
 }
 if (!file_exists(ROOT_DIR.'/config/version.php'))
 {
     if (!$myfile = fopen(ROOT_DIR.'/config/version.php', 'w'))
     {
-        $error_msg = 'Não foi possível criar o arquivo version.php.';
+        AddMsg(VER, ERROR, 'Não foi possível criar o arquivo version.php.');
     }
     else
     {
@@ -32,7 +32,8 @@ if (!file_exists(ROOT_DIR.'/config/version.php'))
 
 \$version = '$installerVersion';
 EOF;
-        fwrite($myfile, $strconf);
+        if (fwrite($myfile, $strconf))
+                AddMsg(VER, OK, 'Arquivo version.php criado com sucesso!');
         fclose($myfile);
     }
 

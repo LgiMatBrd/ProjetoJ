@@ -18,7 +18,6 @@ if (file_exists(ROOT_DIR.'/install/index.php'))
 
 // Obtém o recurso solicitado ao servidor   
 $recurso = filter_var($_SERVER['REQUEST_URI'], FILTER_SANITIZE_URL);
-$url_base = 'http://app.igoroliveira.eng.br';
 
 // Verifica se o arquivo solicitado é de acesso liberado e se existe e corrige a URL
 if ($recurso[0] === '/') {

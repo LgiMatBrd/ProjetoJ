@@ -1,13 +1,13 @@
 <?php
 
 /* 
- * 
+ * Interface com o app para sincronização completa do banco de dados local e 
+ * em servidor.
  */
 
 define('ROOT_DIR', dirname(dirname(__FILE__)));
 
 
-$userID = -1; // Temporário (poderá ser usado para diferenciar os usuários no futuro)
 $token = 'dasda'; 
 ob_start();
 
@@ -72,9 +72,8 @@ try
 
 function serverOk()
 {
-    global $resposta, $logged;
+    global $resposta;
     $resposta['status'] = 'ok';
-    $resposta['logged'] = $logged;
 }
 
 function receive()
@@ -174,6 +173,9 @@ function receive()
     }
     else
     {
+        $valores[] = $_SESSION['user_id'];
+        $keys[] = 'id_user';
+        
         $valores = implode(',',$valores);
         $keys = implode(',',$keys);
 
@@ -273,8 +275,8 @@ function send()
             $sendTimestamp = 0;
             foreach ($dbstr as $table)
             {
+                $query = "SELECT * FROM `$table` WHERE id_user = ".$mysqli->escape_string($_SESSION['user_id']);
                 
-                $query = "SELECT * FROM `$table`";
                 if (!$resul = $mysqli->query($query))
                         throw new Exception ('Houve um erro no select. '.$mysqli->error);
                 
@@ -378,6 +380,8 @@ function send()
         ];
     }
 }
+
+$resposta['logged'] = $logged;
 
 $out1 = ob_get_contents();
 ob_end_clean();

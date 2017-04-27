@@ -1,9 +1,7 @@
 <?php
 
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Interface com o app para a realização do login do usuário no sistema Web.
  */
 
 define('ROOT_DIR', dirname(dirname(__FILE__)));

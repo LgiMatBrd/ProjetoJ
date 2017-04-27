@@ -1,7 +1,7 @@
 <?php
 
 /*
- * 
+ * Interface com o App para geração de relatórios automatizados em PDF
  */
 
 define('ROOT_DIR', dirname(dirname(__FILE__)));
@@ -879,14 +879,14 @@ Vistoria no setor: {$vistoria['nome']}
 (Email enviado automaticamente)
 
 EOT;
-    $email->AddAddress( SEND_EMAIL );
+    $email->AddAddress($_SESSION['email'], $_SESSION['pNome']);
     $email->addStringAttachment($meuPdf, "Relatorio $cliente[nome].pdf", 'base64', 'application/pdf');
     $email->Send();
     
     unset($meuPdf);
     $conn = new mysqli(HOST, USER, PASSWORD, DATABASE);
     $conn->set_charset('utf8');
-    $conn->query('UPDATE `vistorias` SET `relatorio`=b\'0\' WHERE id='.$conn->escape_string($vistoria['id']));
+    $conn->query('UPDATE `vistorias` SET `relatorio`=b\'1\' WHERE id='.$conn->escape_string($vistoria['id']));
     $conn->close();
 }
 
@@ -899,12 +899,12 @@ $dbsVist = [
             'itemLila',
             'itemLinc'
         ];
-
-$resul1 = $mysqli->query('SELECT id, id_cliente, id_user, nome, data_criacao FROM `vistorias` WHERE relatorio = 0');
+$userID = $mysqli->escape_string($_SESSION['user_id']);
+$resul1 = $mysqli->query('SELECT id, id_cliente, id_user, nome, data_criacao FROM `vistorias` WHERE relatorio = 0 AND id_user = '.$userID);
 $qtdRelatorios = 0;
 while ($row1 = $resul1->fetch_assoc())
 {
-    $resul2 = $mysqli->query('SELECT nome FROM `clientes` WHERE id = '.$mysqli->escape_string($row1['id_cliente']));
+    $resul2 = $mysqli->query('SELECT nome FROM `clientes` WHERE id = '.$mysqli->escape_string($row1['id_cliente']).' AND id_user = '.$userID);
     $cliente = $resul2->fetch_assoc();
     $itensVistoriados = array();
     $itensTotal = 0;
@@ -912,7 +912,7 @@ while ($row1 = $resul1->fetch_assoc())
     $itensReprovados = 0;
     foreach ($dbsVist as $myDB)
     {
-        $resul3 = $mysqli->query("SELECT * FROM `{$myDB}` WHERE id_vistoria = ".$mysqli->escape_string($row1['id']));
+        $resul3 = $mysqli->query("SELECT * FROM `{$myDB}` WHERE id_vistoria = ".$mysqli->escape_string($row1['id']).' AND id_user = '.$userID);
         while ($item = $resul3->fetch_assoc())
         {
             $itensVistoriados[$itensTotal] = $item;

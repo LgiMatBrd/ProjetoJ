@@ -16,19 +16,32 @@ $concreteBackgroundDesc = 'http://backgroundimages.concrete5.org/get_image_data.
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Secure Login: Log In</title>
-        <title>Login layout example - UIkit documentation</title>
-        <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
-        <link rel="apple-touch-icon-precomposed" href="images/apple-touch-icon.png">
+        <title>Login na área de cadastro</title>
+        <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" href="css/uikit.min.css" />
         <link rel="stylesheet" href="css/uikit.gradient.min.css" />
         <link rel="stylesheet" href="css/components/form-password.min.css" />
         <script src="js/jquery.min.js"></script>
         <script src="js/uikit.min.js"></script>
         <script src="js/components/form-password.min.js"></script>
-        <script type="text/JavaScript" src="js/sha512.js"></script> 
-        <script type="text/JavaScript" src="js/forms.js"></script> 
+        <script type="text/JavaScript" src="js/sha512.js"></script>
+        <script type="text/JavaScript" src="js/forms.js"></script>
+        <style>
+            .uk-panel-box {
+                background: #fafafaee;
+                border-radius: 8px;
+            }
+            .backstretch {
+                background: #2cb5e8cc; /* For browsers that do not support gradients */
+                background: -webkit-linear-gradient(#0fb8ad, #2cb5e8); /* For Safari 5.1 to 6.0 */
+                background: -o-linear-gradient(#0fb8ad, #2cb5e8); /* For Opera 11.1 to 12.0 */
+                background: -moz-linear-gradient(#0fb8ad, #2cb5e8); /* For Firefox 3.6 to 15 */
+                background: linear-gradient(0deg, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%);
+            }
+        </style>
     </head>
     <body class="uk-height-1-1">
+        
         <?php
         if (isset($_GET['error'])) {
             echo '<p class="error">Erro ao fazer o login!</p>';
@@ -60,13 +73,11 @@ $concreteBackgroundDesc = 'http://backgroundimages.concrete5.org/get_image_data.
                             </div>
                         </div>
                         <div class="uk-form-row">
-                            <a class="uk-width-1-1 uk-button uk-button-primary uk-button-large" type="button" 
-                               onclick="formhash(form1, form1.password);">Entrar</a>
+                            <button class="uk-width-1-1 uk-button uk-button-primary uk-button-large" type="submit" 
+                               onclick="formhash(form1, form1.password);">Entrar</button>
                         </div>
                     </form>
-                    <p>If you don't have a login, please <a href="register.php">register</a></p>
-                    <p>If you are done, please <a href="includes/logout.php">log out</a>.</p>
-                    <p>You are currently logged <?php echo $logged ?>.</p>
+                    <p>No momento você está <?php echo ($logged == 'in')? 'conectado' : 'deconectado'; ?>.</p>
                 </div>
             </div>
         </div>

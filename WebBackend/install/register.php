@@ -1,60 +1,14 @@
 <?php
-/*
- * Arquivo controller da view 'home'
+
+/* 
+ * Este arquivo é responsável por criar o primeiro usuário do sistema.
  */
 
-if (!defined('ROOT_DIR')) // Impossibilita o acesso direto ao arquivo
+if (!defined('ROOT_DIR'))
     die;
 
-/*
- * Verifica se o usuário está logado.
- * O acesso a este controller é restrito a usuários logados!
- */
-if ($logged !== 'in')
-{
-    header('Location: /home');
-    die;
-}
-    
-// Se não houve sessão segura iniciada, deve-se iniciar
-if (!defined('SESSION_START'))
-    // Nossa segurança personalizada para iniciar uma sessão php.
-    sec_session_start();
-
-define('HOME_CONTROLLER', true);
-
-    const OK = 1;
-    const WARNING = 2;
-    const ERROR = 3;
-
-$msgs = array();
-function AddMsg($s, $txt)
-{
-    global $msgs;
-    $msgs[] = [
-        $s,
-        $txt
-    ];
-}
-
-function GetMsg()
-{
-    global $msgs;
-    if (isset($msgs[0]))
-    {
-        $mymsg = array_shift($msgs[0]);
-        $mymsg[0] = ($mymsg[0] === ERROR)? 'danger' : ($mymsg[0] === WARNING)? 'warning' : 'info';
-        
-        return [
-            'status' => $mymsg[0],
-            'msg' => $mymsg[1]
-        ];
-    }
-    return false;
-}
-
-
-
+include_once ROOT_DIR.'/config/db_connect.php';
+include_once ROOT_DIR.'/config/psl-config.php';
 
 if (isset($_POST['username'], $_POST['email'], $_POST['p'], $_POST['pnome']))
 {
@@ -63,23 +17,18 @@ if (isset($_POST['username'], $_POST['email'], $_POST['p'], $_POST['pnome']))
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         // Email inválido
-        AddMsg(ERROR, 'O endereço de email digitado não é válido');
+        AddMsg(REG, ERROR, 'O endereço de email digitado não é válido');
     }
  
     $password = filter_input(INPUT_POST, 'p', FILTER_SANITIZE_STRING);
     if (strlen($password) != 128) {
         // A senha com hash deve ter 128 caracteres.
         // Caso contrário, algo muito estranho está acontecendo
-        AddMsg(ERROR, 'A senha enviada é inválida.');
+        AddMsg(REG, ERROR, 'A senha enviada é inválida.');
     }
     
     $pNome = filter_input(INPUT_POST, 'pnome', FILTER_SANITIZE_STRING);
      
-    // O nome de usuário e a validade da senha foram conferidas no lado cliente.
-    // Não deve haver problemas nesse passo já que ninguém ganha 
-    // violando essas regras.
-    //
- 
     $prep_stmt = 'SELECT id FROM users WHERE email = ? LIMIT 1';
     $stmt = $mysqli->prepare($prep_stmt);
  
@@ -90,10 +39,10 @@ if (isset($_POST['username'], $_POST['email'], $_POST['p'], $_POST['pnome']))
  
         if ($stmt->num_rows == 1) {
             // Um usuário com esse email já esixte
-            AddMsg(WARNING, 'Já existe um usuário cadastrado com este email.');
+            AddMsg(REG, ERROR, 'Já existe um usuário cadastrado com este email.');
         }
     } else {
-        AddMsg(ERROR, 'Erro no banco de dados');
+        AddMsg(REG, ERROR, 'Erro no banco de dados');
     }
     
     $prep_stmt = 'SELECT id FROM users WHERE username = ? LIMIT 1';
@@ -106,16 +55,16 @@ if (isset($_POST['username'], $_POST['email'], $_POST['p'], $_POST['pnome']))
  
         if ($stmt->num_rows == 1) {
             // Um usuário com esse email já esixte
-            AddMsg(WARNING, 'Este nome de usuário já se encontra cadastrado.');
+            AddMsg(REG, ERROR, 'Este nome de usuário já se encontra cadastrado.');
         }
     } else {
-        AddMsg(ERROR, 'Erro no banco de dados');
+        AddMsg(REG, ERROR, 'Erro no banco de dados');
     }
  
-    if (empty($msgs)) {
+    if (empty($msgs[REG])) {
         // Crie um salt aleatório
         $random_salt = hash('sha512', uniqid(openssl_random_pseudo_bytes(16), TRUE));
-        $atributos = 0;
+        $atributos = 1;
         // Crie uma senha com salt
         $password = hash('sha512', $password . $random_salt);
         
@@ -126,15 +75,16 @@ if (isset($_POST['username'], $_POST['email'], $_POST['p'], $_POST['pnome']))
             $insert_stmt->bind_param('sssssis', $username, $password, $random_salt, $email, $create_time, $atributos, $pNome);
             // Executar a tarefa pré-estabelecida.
             if (! $insert_stmt->execute()) {
-                AddMsg(ERROR, 'Falha ao registrar usuário');
+                AddMsg(REG, ERROR, 'Falha ao registrar usuário');
             }
             else
             {
-                AddMsg(OK, 'Usuário cadastrado!');
+                AddMsg(REG, OK, 'Usuário cadastrado!');
             }
         }
     }
+    else
+        AddMsg(REG, ERROR, 'Não foi possível criar o usuário devido a erros anteriores!');
 }
-
-// Provê a view do controller
-include ROOT_DIR.'/views/home.php';
+else
+    AddMsg(REG, ERROR, 'Dados enviados insuficientes!');

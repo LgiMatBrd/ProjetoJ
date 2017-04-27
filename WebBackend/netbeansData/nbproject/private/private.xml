@@ -27,25 +27,6 @@
         </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/controllers/login.php</file>
-            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/apps/makelogin.php</file>
-            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/views/home.php</file>
-            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/controllers/home.php</file>
-            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/lib/pdfgenerator/fpdf.php</file>
-            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/index.php</file>
-            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/lib/login/register.php</file>
-            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/install/index.php</file>
-            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/apps/reportgenerator.php</file>
-            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/lib/login/functions.php</file>
-            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/install/db.php</file>
-            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/config/psl-config.php</file>
-            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/config/db_connect.php</file>
-            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/apps/uploadimages.php</file>
-            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/install/install.php</file>
-            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/install/version.php</file>
-            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/apps/dbsync.php</file>
-            <file>file:/E:/Igor/Documentos/GitHub/ProjetoVistoria/WebBackend/views/login.php</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>
