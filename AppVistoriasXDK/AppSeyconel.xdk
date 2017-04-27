@@ -5,7 +5,7 @@
       "projectTypeName": "com.intel.xdk.projecttype.jsapp",
       "src": "jsapp/template-blank-cordova-project-lite/sample.zip",
       "projectGuid": "82606458-0726-45b5-b3d1-bea1407cd611",
-      "lastModifiedDate": 1493318701093,
+      "lastModifiedDate": 1493329072996,
       "creationDate": 1488809141554
     },
     "XDK-app-designer": "false",
@@ -118,9 +118,7 @@
         "permissions": {},
         "description": "Cordova Compatibility Plugin",
         "data": {},
-        "dependedBy": [
-          "cordova-plugin-file"
-        ],
+        "dependedBy": [],
         "custom": "true"
       },
       {
@@ -142,30 +140,6 @@
           ]
         },
         "description": "Cordova Network Information Plugin",
-        "data": {},
-        "dependedBy": []
-      },
-      {
-        "id": "cordova-plugin-file",
-        "name": "File",
-        "version": "4.2.0",
-        "originType": "cordova.io",
-        "origin": "cordova-plugin-file",
-        "gitref": "",
-        "paramvals": {},
-        "sourceLocation": "plugins/cordova-plugin-file",
-        "selectedState": "Included",
-        "checksum": "1fdd7f27",
-        "dependsOn": [
-          "cordova-plugin-compat"
-        ],
-        "topLevel": true,
-        "permissions": {
-          "android:name": [
-            "android.permission.WRITE_EXTERNAL_STORAGE"
-          ]
-        },
-        "description": "Cordova File Plugin",
         "data": {},
         "dependedBy": []
       }

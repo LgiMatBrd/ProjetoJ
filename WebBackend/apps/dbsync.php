@@ -82,6 +82,7 @@ function receive()
     $keys = array();
     $valores = array();
     $idExt = 0;
+    $vistoriaUpdateID = 0;
     if ($request['dbName'] === 'itensVistoriados')
     {
         $dbstr = $request['row']['dados']['nome'];
@@ -155,6 +156,8 @@ function receive()
         $row = $resul->fetch_assoc();
         if (strtotime($row['modificado']) < strtotime(substr($valores['modificado'], 1, -1)))
         {
+            if (isset($valores['id_vistoria']))
+                    $vistoriaUpdateID = $valores['id_vistoria'];
             foreach ($keys as $ekey)
             {
                 $valores[$ekey] = "`$ekey`=$valores[$ekey]";
@@ -188,6 +191,8 @@ function receive()
         {
             $resposta['status'] = 'ok';
             $resposta['idext'] = ($mysqli->insert_id)? $mysqli->insert_id : $idExt;
+            if ($vistoriaUpdateID)
+                $mysqli->query('UPDATE `vistorias` SET `relatorio`=b\'0\' WHERE id = '.$vistoriaUpdateID);
             
         }
         else
