@@ -551,11 +551,11 @@
 	<label>Placa de rastreabilidade Seyconel:</label>
 	<input ng-model="item.placa_rastreabilidade_seyconel" />
 	</md-input-container>
-	  
+	   
 	<md-switch ng-show="item.nome=='lila'" md-invert="" ng-model="item.item_aprovado" aria-label="Switch 1">
 	<label>APROVADO?</label>
 	</md-switch>
-
+ 
     <!--<button camera ng-model='myPicture'>Tire fotos</button>-->
     <!--<md-button camera ng-model="myPicture" class="md-raised md-primary">Adicionar Fotos</md-button>-->
     <md-button style="width: 95% !important;" ng-click="takePicture()" ng-model="myPicture" class="md-raised md-primary">Adicionar Fotos</md-button>
@@ -564,7 +564,7 @@
     <!--<img ng-repeat="onepic in myPictures" ng-cloak style="width:25%;height:20%;" id="smallImage" src="{{ ('data:image/jpeg;base64,'+onepic) }}" /> -->
     <br />
     <br />
-    <br />
+    <br /> 
     <div ng-cloak id="smallImage" ng-repeat="onepic in myPictures">
         <img src="{{ ('data:image/jpeg;base64,'+onepic) }}"/>
         <!--<md-button style="width: 100% !important;" ng-click="" class="md-primary"> Deletar </md-button>-->
