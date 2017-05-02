@@ -31,8 +31,6 @@ if (login_check($mysqli) != true)
 
 require '../lib/pdfgenerator/fpdf.php';
 require '../config/global.php';
-//set_include_path(get_include_path() . PATH_SEPARATOR . ROOT_DIR . '/lib/phpmailer');
-//require 'class.phpmailer.php';
 require ROOT_DIR.'/lib/phpmailer/class.phpmailer.php';
 
 set_time_limit(180);
@@ -815,31 +813,6 @@ EOT
     $pdf->PrintGraph($step, 75, array('INSPECIONADAS (PÇ)','APROVADAS (PÇ)','REPROVADAS (PÇ)'), $valores, $cores);
     $pdf->Ln();
     
-    $header = array('Podem ser recuperadas (PÇ)', 'Devem ser descartadas (PÇ)');
-    $data = [
-        ['x', 'x']
-    ];
-    $pdf->BasicTable($data, array(70.2, 85.1), $header, 10, 'C');
-    $pdf->Ln();
-
-    $valores = [7, 17];
-    $cores = [
-        [
-            'r' => 255,
-            'g' => 255,
-            'b' => 0
-        ],
-        [
-            'r' => 255,
-            'g' => 0,
-            'b' => 0
-        ]
-    ];
-    $step = (int)round(max($valores)/8);
-    if (!$step) $step = 1;
-    $pdf->PrintGraph($step, 75, array('Podem ser recuperadas (PÇ)', 'Devem ser descartadas (PÇ)'), $valores, $cores, 30);
-    $pdf->Ln();
-
     $pdf->AddPage();
     $pdf->SetFont('', 'B');
     $pdf->MultiCell($wCell, $hCell, 'O setor de inspeções técnicas se coloca a disposição sobre dúvidas referentes a inspeção realizada.');
@@ -866,7 +839,6 @@ EOT
     $email = new PHPMailer();
     $email->setLanguage('pt_br');
     $email->CharSet = 'UTF-8';
-    //$email->From      = $fromEmail;
     $email->From      = FROM_EMAIL;
     $email->FromName  = FROM_NAME;
     $email->Subject   = "$cliente[nome] - $vistoria[nome]";
@@ -889,6 +861,9 @@ EOT;
     $conn->query('UPDATE `vistorias` SET `relatorio`=b\'1\' WHERE id='.$conn->escape_string($vistoria['id']));
     $conn->close();
 }
+
+
+
 
 $dbsVist = [
             'itemAces',
@@ -926,9 +901,6 @@ while ($row1 = $resul1->fetch_assoc())
                     $myFilename = "{$row1['id_user']}-".generateRandomString(10).'.jpg';
                     $imageSave = imagejpeg($source,ROOT_DIR."/uploads/imagens/{$myFilename}",100);
                     if (!$imageSave) die('Problemas com as imagens!');
-                    //$fo = fopen(ROOT_DIR."/uploads/imagens/{$myFilename}", w);
-                    //fwrite($fo, $imageSave);
-                    //fclose($fo);
                     $itensVistoriados[$itensTotal]['fotos64'][$key] = ROOT_DIR."/uploads/imagens/{$myFilename}";
                 }
             }
@@ -982,53 +954,5 @@ if (!empty($out1))
 }
 
 header('Content-Type: application/json; charset=utf-8');
-//echo $html_entity_decode(json_encode($arr));
 
-//echo json_encode('oi', JSON_FORCE_OBJECT);
 echo json_encode((object)$resposta);
-
-
-
-/*$xTexts = [];
-//$valores = [13, 10, 0, 1, 5];
-$valores = [13, 6, 20];
-$cores = [
-    [
-        'r' => 255,
-        'g' => 0,
-        'b' => 0
-    ],
-    [
-        'r' => 0,
-        'g' => 255,
-        'b' => 0
-    ],
-    [
-        'r' => 0,
-        'g' => 0,
-        'b' => 255
-    ]
-];
-$pdf->SetDrawColor(150);
-$pdf->PrintGraph(3, 70, $xTexts, $valores, $cores);
-$pdf->Ln();
-$pdf->SetDrawColor(0);
-$pdf->PrintTexto($hCell, 'Data da inspeção: ', 'B');
-$pdf->PrintTexto($hCell, 'XXX');
-$pdf->Ln();
-
-// Column headings
-$header = array('Nº','RASTREAMENTO/ SETOR','Material','CORRENTE [mm] CINTA [t]','COMPRIMENTO DA LINGA/CINTA','RAMAIS','APROVADA','MOTIVO');
-// Data loading
-$data = $pdf->LoadData($tabela);
-$pdf->BasicTable($header, $data);
-
-$pdf->PrintTitulo('TEXTO DE EXEMPLO: LOREM IPSUM');
-$pdf->MultiCell($wCell,$hCell,$lorem);
-$pdf->Cell(10,10,'Hello Worldddddddddd!');
-$pdf->Ln();
-$pdf->Cell(0,10,'Hello Worldddddddddd!');
-//for($i=1;$i<=40;$i++)
-//    $pdf->Cell(0,10,'Printing line number '.$i,0,1);
-$pdf->Output();
-*/
