@@ -130,7 +130,6 @@ app.controller('loginController', function($scope, $http, $localStorage, $locati
         })
         .then(function successCallback(response)
         {
-            console.log(response);
             if (response.data.status == "ok")
             {
                 if (response.data.logged === 'in')
@@ -443,9 +442,8 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
     populaVistorias($scope.id_dono);
 
     // Foto principal vistoria
-    console.dir($localStorage);
     //$scope.fotoPrincipal = $localStorage.itensVistoriados.db;
-    
+    console.log($localStorage);
     
     $scope.showAdvanced = function(ev,id_click) {
         $mdDialog
@@ -507,7 +505,7 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
               targetHeight: 768,
               popoverOptions: CameraPopoverOptions,
               saveToPhotoAlbum: false,
-              correctOrientation: true
+              correctOrientation: false
             };
             $cordovaCamera.getPicture(options).then(function(data) {
                  $scope.myPicture = data;
@@ -784,7 +782,7 @@ app.controller('sincronizarController', function($scope, $http, $localStorage, $
                         return httpSincrono.enviar(UrlSync, token, $scope, $scope.sendTimestamp, $scope.incrementoProg, $scope.sortable);
                     }, function (response) {
                         httpSincrono.close();
-                        $scope.h2 = response.data;
+                        $scope.h2 = response.data.msg;
                     });
                 }
             }
@@ -976,6 +974,10 @@ app.controller('sincronizarController', function($scope, $http, $localStorage, $
     $scope.goBack = function() {
         window.history.back();
     };
+    
+    $scope.$on('$destroy', function() {
+            httpSincrono.close();
+        });
     
     checkConnection();
 });
