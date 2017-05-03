@@ -603,7 +603,7 @@ class PDF extends FPDF
         $this->Cell($lCelulaSecundaria,$metadeAltura, utf8_decode('RI-0101'),1,1,'C');
         $this->SetX($fimCelulaImagem);
         $this->SetFont($font,'',11);
-        $this->Cell($lCelulaPrincipal,$metadeAltura, utf8_decode('Acessórios para movimentação de cargas ( Below the Hook)'),1,0,'C');
+        $this->Cell($lCelulaPrincipal,$metadeAltura, utf8_decode('Acessórios para movimentação de cargas (Below the Hook)'),1,0,'C');
         $this->SetFont($font,'B',11);
         $this->Cell($lCelulaSecundaria,$metadeAltura, utf8_decode('DATA:'),1,0,'L');
         $this->Cell($lCelulaSecundaria,$metadeAltura, date('d/m/y'),1,0,'C');
@@ -629,7 +629,7 @@ class PDF extends FPDF
     }
 }
 
-function elaboraRelatorio($cliente, $vistoria, $itensVistoriados, $itensTotal, $itensAprovados, $itensReprovados)
+function elaboraRelatorio($cliente, $vistoria, $itensVistoriados, $itensTotal, $itensAprovados, $itensReprovados, $itensRecuperaveis)
 {
     /* Declara o objeto da classe PDF e realiza as configurações globais */
     $pdf = new PDF();
@@ -655,7 +655,7 @@ EOT;
     $dataStr2 = strftime('%Y', $data_criacao);
     $txtDesc = 
 <<< EOT
-A inspeção foi realizada no mês {$dataStr} de {$dataStr2}, dentro das instalações fabris da empresa na unidade de {$vistoria['nome']}.
+A inspeção foi realizada no mês {$dataStr} de {$dataStr2}, dentro das instalações fabris da empresa.
 
 Os critérios utilizados para a inspeção das lingas foram a inspeção visual e a checagem dimensional do desgaste da corrente, utilizando-se gabaritos de inspeção, onde, através de um sistema "passa/não-passa" é possível determinar se a corrente está ou não em condições de uso. Os gabaritos possuem arestas de inspeção cujas dimensões possuem a medida do item analisado mais a tolerância permitida para desgaste em correntes, de acordo com a norma (NBR ISO 3076:2005).
 
@@ -673,15 +673,21 @@ EOT;
     $pdf->MultiCell($wCell,$hCell,$txtObjetivo);
     $pdf->PrintTitulo('DESCRIÇÃO DA INSPEÇÃO');
     $pdf->MultiCell($wCell, $hCell, $txtDesc);
+    $pdf->Ln();
+    $pdf->SetFont('', 'B', 9);
+    $pdf->SetTextColor(78, 128, 188);
+    $pdf->MultiCell($wCell, $pdf->GetCellHeight(1.0,1), 'Tabela 1 - Inspeção com gabarito', 1, 0, 'C');
+    $pdf->SetTextColor(0);
+    $pdf->SetFont('', '', 11);
     $data = [
         ['{{custom}}', 'Inspeção do alongamento interno: Deve-se tentar inserir a lingüeta do gabarito no vão entre os elos da corrente. A corrente deve ser reprovada caso a lingüeta consiga entrar no vão.'],
         ['{{custom}}', 'Inspeção do diâmetro da corrente: Deve-se tentar inserir o canal menor do gabarito ao redor do elo da corrente (no lado oposto à solda). A corrente seve ser reprovada caso o canal se encaixe na corrente.'],
-        ['{{custom}}', 'Inspeção do alongamento externo: deve-se tentar inserir o canal maior do gabarito por fora de um elo de corrente no sentido longitudinal. Caso o canal maior do gabarito não se encaixe, a corrente deve ser reprovada.']
+        ['{{custom}}', 'Inspeção do alongamento externo: Deve-se tentar inserir o canal maior do gabarito por fora de um elo de corrente no sentido longitudinal. Caso o canal maior do gabarito não se encaixe, a corrente deve ser reprovada.']
     ];
     $pdf->BasicTable($data, array(45, 82.5), NULL, 40);
     $pdf->Ln();
     
-    
+    $pdf->AddPage();
     $pdf->PrintTitulo('INSPEÇÃO');
     $pdf->PrintTexto($hCell, 'Data da Inspeção: ', 'B');
     $dataStr = strftime('%A',$data_criacao);
@@ -690,18 +696,39 @@ EOT;
     $pdf->PrintTexto($hCell, strftime('%d de %B de %Y, %Hh%M, ',$data_criacao).$dataStr.'.');
     $pdf->Ln();
     $pdf->PrintTexto($hCell, 'Período: ', 'B');
-    $pdf->PrintTexto($hCell, 'xxx');
+    $ultimo_item = 0;
+    $setores = array();
+    foreach ($itensVistoriados as $item)
+    {
+        $tmp = new DateTime($item['data_criacao'], new DateTimeZone('UTC'));
+        if ($tmp > $ultimo_item)
+            $ultimo_item = $tmp;
+        if (!empty($item['setor']))
+            $setores[] = $item['setor'];
+    }
+    $ultimo_item = $ultimo_item->getTimestamp();
+    $tmp = strftime('%d/%m/%Y %Hh%M - ',$data_criacao).strftime('%d/%m/%Y %Hh%M', $ultimo_item);
+    $pdf->PrintTexto($hCell, $tmp);
     $pdf->Ln();
     $pdf->PrintTexto($hCell, 'Quantidade de itens inspecionados: ', 'B');
     $pdf->PrintTexto($hCell, $itensTotal);
     $pdf->Ln();
     $pdf->PrintTexto($hCell, 'Setores: ', 'B');
-    $pdf->PrintTexto($hCell, 'xxx');
+    $setores = array_unique($setores);
+    sort($setores);
+    $setores = implode(', ', $setores);
+    $pdf->PrintTexto($hCell, $setores);
     $pdf->Ln();
 
-    $pdf->PrintTitulo('Lista dos Itens Inspecionados');
-    $pdf->MultiCell($wCell,$hCell,'A Tabela 2 mostra a seguir os equipamentos inspecionados agrupados por setor.');
-    $header = array('Nº','RASTREAMENTO/ SETOR','Material','CORRENTE [mm] CINTA [t]','COMPRIMENTO DA LINGA/CINTA','RAMAIS','APROVADA','MOTIVO');
+    $pdf->PrintTitulo('LISTA DOS ITENS INSPECIONADOS');
+    $pdf->MultiCell($wCell,$hCell,'A Tabela 2 a seguir mostra os equipamentos inspecionados agrupados por setor.');
+    $pdf->Ln();
+    $pdf->SetFont('', 'B', 9);
+    $pdf->SetTextColor(78, 128, 188);
+    $pdf->MultiCell($wCell, $pdf->GetCellHeight(1.0,1), 'Tabela 2', 1, 0, 'C');
+    $pdf->SetTextColor(0);
+    $pdf->SetFont('', '', 11);
+    $header = array('Nº','RASTREAMENTO/ SETOR','Material','CORRENTE [mm] CINTA [t]','COMPRIMENTO DA LINGA/CINTA [mm]','RAMAIS','APROVADA','MOTIVO');
     $data = array();
     foreach ($itensVistoriados as $item)
     {
@@ -721,13 +748,13 @@ EOT;
                 $material = 'Eslinga';
                 break;
             case 'itemGael':
-                $material = 'Gael';
+                $material = 'Garra';
                 break;
             case 'itemLema':
-                $material = 'Lema';
+                $material = 'Levantador';
                 break;
             case 'itemLila':
-                $material = 'Lila';
+                $material = 'Linga';
                 break;
             case 'itemLinc':
                 $material = 'Linga';
@@ -746,33 +773,166 @@ EOT;
     $pdf->BasicTable($data, array(17,30,21,27,28,15,21,31), $header, 8, 'C');
     $pdf->Ln();
 
-    $pdf->SetFont('Calibri','B',12);
-    $pdf->MultiCell($wCell, $hCell,
-<<< EOT
-A partir dos {$itensTotal} itens inspecionados podemos afirmar que {$itensReprovados} itens apresentaram algum problema como alongamentos, desgastes, amassamento, fora dos padrões exigidos em normas, etc. em XX??? itens o material pode ser recuperado com a colocação de placas de identificação de carga e a substituição de um elo de sustentação conforme descrito nos itens abaixo, mas na sua grande maioria eles devem ser substituídos por itens que se enquadrem as normas vigentes e {$itensAprovados} item está apto a continuar a trabalhar por atender todos os requisitos exigidos em normas.
-EOT
-    );
+    $pdf->SetFont('Calibri','B',11);
+    if ($itensTotal !== 1)
+        $tmp = "A partir dos {$itensTotal} itens inspecionados, podemos afirmar que ";
+    else
+        $tmp = "A partir de {$itensTotal} item inspecionado, podemos afirmar que ";
+    if ($itensReprovados !== 1)
+        $tmp .= "{$itensReprovados} itens apresentaram";
+    else
+        $tmp .= "{$itensReprovados} item apresentou";
+    $tmp .= ' algum problema, como alongamentos, desgastes, amassamento, fora dos padrões exigidos em normas, etc. Em ';
+    if ($itensRecuperaveis !== 1)
+        $tmp .= "{$itensRecuperaveis} itens";
+    else
+        $tmp .= "{$itensRecuperaveis} item";
+    $tmp .= ' o material pode ser recuperado com a colocação de placas de identificação de carga conforme descrito nos itens abaixo, mas na sua grande maioria eles devem ser substituídos por itens que se enquadrem nas normas vigentes e ';
+    if ($itensAprovados !== 1)
+        $tmp .= "{$itensAprovados} itens estão aptos";
+    else
+        $tmp .= "{$itensAprovados} item está apto";
+    $tmp .= ' a continuar a trabalhar por atender todos os requisitos exigidos em normas.';
+    $pdf->MultiCell($wCell, $hCell, $tmp);
 
     foreach ($itensVistoriados as $item)
     {
         $pdf->AddPage();
-        $pdf->SetFont('Arial','B',12);
+        $pdf->SetFont('Calibri','B',11);
         if (!empty($item['placa_rastreabilidade_seyconel']))
             $pdf->PrintTexto($hCell, "{$item['placa_rastreabilidade_seyconel']} - {$item['descricao']}", 'B');
         else
             $pdf->PrintTexto ($hCell, $item['descricao'], 'B');
         $pdf->Ln(2*$hCell);
-
-        $pdf->PrintTexto($hCell, 'Capacidade de carga: '.'xxx', 'B');
+        if (isset($item['capacidade']))
+            $pdf->PrintTexto($hCell, 'Capacidade de carga: '.$item['capacidade'], 'B');
         $pdf->Ln();
         $pdf->PrintTexto($hCell, 'Setor: '.$item['setor'], 'B');
         $pdf->Ln();
+        if (isset($item['ramal']))
+        {
+            $pdf->PrintTexto($hCell, 'Quantidade de ramais: '.$item['ramal'], 'B');
+            $pdf->Ln();
+        }
         // Fotos
-        $pdf->InserirImagens($item['fotos64'], 100, 50);
+        $pdf->InserirImagens($item['fotos64'], 100, 75);
         if ($item['item_aprovado'])
             $pdf->MultiCell($wCell, $hCell, '( X ) APROVADO  (   ) REPROVADO', 1, 0, 'C');
         else
             $pdf->MultiCell($wCell, $hCell, '(   ) APROVADO  ( X ) REPROVADO', 1, 0, 'C');
+        $pdf->Ln();
+        foreach ($item as $key => $valor)
+        {
+            switch ($key)
+            {
+                case 'abrasao':
+                        $tmp = 'Possui abrasão?';
+                        break;
+                case 'alavanca_danificada':
+                        $tmp = 'Alavanca danificada?';
+                        break;
+                case 'alongamento_externo':
+                        $tmp = 'Alongamento externo da corrente?';
+                        break;
+                case 'alongamento_interno':
+                        $tmp = 'Alongramento interno da corrente?';
+                        break;
+                case 'alongamento':
+                        $tmp = 'Alongamento?';
+                        break;
+                case 'amassados':
+                        $tmp = 'Amassados?';
+                        break;
+                case 'arames_rompidos':
+                        $tmp = 'Arames rompidos?';
+                        break;
+                case 'base_inferior_danificada':
+                        $tmp = 'Base inferior (parte de contato) danificada?';
+                        break;
+                case 'came_danificado':
+                        $tmp = 'Came danificado?';
+                        break;
+                case 'cortes':
+                        $tmp = 'Cortes?';
+                        break;
+                case 'danos_costura_corpo':
+                        $tmp = 'Danos na costura do corpo?';
+                        break;
+                case 'danos_costura_principal':
+                        $tmp = 'Danos na costura principal (transpasse)?';
+                        break;
+                case 'danos_olhais':
+                        $tmp = 'Danos nos olhais?';
+                        break;
+                case 'danos_por_calor':
+                        $tmp = 'Danos por calor?';
+                        break;
+                case 'deformacao':
+                        $tmp = 'Possui deformação?';
+                        break;
+                case 'deformacoes':
+                        $tmp = 'Possui deformações?';
+                        break;
+                case 'desenho_tecnico':
+                        $tmp = 'Desenho técnico?';
+                        break;
+                case 'desgastes_excessivos':
+                        $tmp = 'Desgastes excessivos?';
+                        break;
+                case 'diametro_nominal':
+                        $tmp = 'Diâmetro nominal da corrente?';
+                        break;
+                case 'etiqueta_identificacao':
+                        $tmp = 'Etiqueta de identificação?';
+                        break;
+                case 'exrt_ext_danificada':
+                        $tmp = 'Estrutura externa danificada?';
+                        break;
+                case 'identificacao_de_carga_legivel':
+                        $tmp = 'Identificação de carga legível?';
+                        break;
+                case 'identificacao':
+                        $tmp = 'Identificação?';
+                        break;
+                case 'medidas_batem_com_desenho':
+                        $tmp = 'Medidas batem com desenho?';
+                        break;
+                case 'olhal_danificado':
+                        $tmp = 'Olhal danificado?';
+                        break;
+                case 'olhal_em_bom_estado':
+                        $tmp = 'Olhal em bom estado?';
+                        break;
+                case 'pinos_danificado':
+                        $tmp = 'Pinos danificados?';
+                        break;
+                case 'placa_identificacao':
+                        $tmp = 'Placa de identificação?';
+                        break;
+                case 'reducao_de_elasticidade':
+                        $tmp = 'Redução de elasticidade?';
+                        break;
+                case 'rupturas_de_pernas':
+                        $tmp = 'Rupturas de pernas?';
+                        break;
+                case 'trava_danificada':
+                        $tmp = 'Trava danificada?';
+                        break;
+                case 'travas':
+                        $tmp = 'Travas?';
+                        break;
+                case 'trincas':
+                        $tmp = 'Trincas?';
+                        break;
+                default:
+                    $tmp = '';
+            }
+            if ($tmp === '')
+                continue;
+            $pdf->PrintTexto($hCell, $tmp.' ', 'B');
+            $pdf->PrintTexto($hCell, ($valor)? 'SIM' : 'NÃO');
+            $pdf->Ln();
+        }
         $pdf->Ln();
         $pdf->PrintTexto($hCell, 'Resultado: ', 'B');
         $pdf->PrintTexto($hCell, $item['observacao']);
@@ -780,7 +940,7 @@ EOT
     }
 
     $pdf->AddPage();
-    $pdf->SetFont('Calibri', 'B', 12);
+    $pdf->SetFont('Calibri', 'B', 11);
     $pdf->PrintTitulo('RESULTADO DA INSPEÇÃO');
 
     $header = array('INSPECIONADAS (PÇ)','APROVADAS (PÇ)','REPROVADAS (PÇ)');
@@ -814,7 +974,7 @@ EOT
     $pdf->Ln();
     
     $pdf->AddPage();
-    $pdf->SetFont('', 'B');
+    $pdf->SetFont('', 'B', 12);
     $pdf->MultiCell($wCell, $hCell, 'O setor de inspeções técnicas se coloca a disposição sobre dúvidas referentes a inspeção realizada.');
     $pdf->Ln(50);
     $pdf->Image('../assets/report_images/signature.png', 84.8, $pdf->GetY(), 95.1, 64.7);
@@ -846,7 +1006,7 @@ EOT
 Segue em anexo o relatório gerado automaticamente pelo sistema App SeyService.
             
 Relatório referente à empresa: {$cliente['nome']}
-Vistoria no setor: {$vistoria['nome']}
+Vistoria identificada por: {$vistoria['nome']}
 
 (Email enviado automaticamente)
 
@@ -885,6 +1045,7 @@ while ($row1 = $resul1->fetch_assoc())
     $itensTotal = 0;
     $itensAprovados = 0;
     $itensReprovados = 0;
+    $itensRecuperaveis = 0;
     foreach ($dbsVist as $myDB)
     {
         $resul3 = $mysqli->query("SELECT * FROM `{$myDB}` WHERE id_vistoria = ".$mysqli->escape_string($row1['id']).' AND id_user = '.$userID);
@@ -910,10 +1071,21 @@ while ($row1 = $resul1->fetch_assoc())
                 $itensAprovados++;
             else
                 $itensReprovados++;
+            if (isset($item['identificacao_de_carga_legivel']) && !$item['identificacao_de_carga_legivel'] && 
+                    !$item['arames_rompidos'] && !$item['rupturas_de_pernas'] && !$item['amassados'] &&
+                    !$item['deformacao'] && !$item['desgastes_excessivos'] && !$item['danos_por_calor'] &&
+                    !$item['reducao_de_elasticidade'])
+                $itensRecuperaveis++;
         }
     }
+    uasort($itensVistoriados, function ($a, $b){
+        $tmp = strcmp($a['setor'], $b['setor']);
+        if ($tmp === 0)
+                return strnatcmp($a['placa_rastreabilidade_seyconel'], $b['placa_rastreabilidade_seyconel']);
+        return $tmp;
+    });
     $vistoria = $row1;
-    elaboraRelatorio($cliente, $vistoria, $itensVistoriados, $itensTotal, $itensAprovados, $itensReprovados);
+    elaboraRelatorio($cliente, $vistoria, $itensVistoriados, $itensTotal, $itensAprovados, $itensReprovados, $itensRecuperaveis);
     foreach ($itensVistoriados as $item)
     {
         if (empty($item['fotos64']))
