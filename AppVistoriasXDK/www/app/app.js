@@ -120,7 +120,7 @@ app.controller('loginController', function($scope, $http, $localStorage, $locati
         var p = hex_sha512(user.password);
         $http({
             method: 'POST',
-            url: 'http://app.igoroliveira.eng.br/apps/makelogin.php',
+            url: 'http://app.seyconel.com.br/apps/makelogin.php',
             data: {
                 makelogin: 'true',
                 username: user.username,
@@ -653,8 +653,8 @@ app.controller('vistoriaController', function($scope, $routeParams, $http, $loca
 
 app.controller('sincronizarController', function($scope, $http, $localStorage, $timeout, $interval, $location, httpSincrono) {
     
-    var UrlSync = 'http://app.igoroliveira.eng.br/apps/dbsync.php'; // URL do arquivo PHP de sincronização
-    var UrlRel = 'http://app.igoroliveira.eng.br/apps/reportgenerator.php'; // URL do arquivo PHP de emissão de relatórios
+    var UrlSync = 'http://app.seyconel.com.br/apps/dbsync.php'; // URL do arquivo PHP de sincronização
+    var UrlRel = 'http://app.seyconel.com.br/apps/reportgenerator.php'; // URL do arquivo PHP de emissão de relatórios
     var token = 'asda';
     var httpBusy = 0;
     var dbs = [
