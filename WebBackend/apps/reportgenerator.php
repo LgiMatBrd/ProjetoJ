@@ -728,9 +728,10 @@ EOT;
     $pdf->MultiCell($wCell, $pdf->GetCellHeight(1.0,1), 'Tabela 2', 1, 0, 'C');
     $pdf->SetTextColor(0);
     $pdf->SetFont('', '', 11);
+    $tipoItem = array();
     $header = array('Nº','RASTREAMENTO/ SETOR','Material','CORRENTE [mm] CINTA [t]','COMPRIMENTO DA LINGA/CINTA [mm]','RAMAIS','APROVADA','MOTIVO');
     $data = array();
-    foreach ($itensVistoriados as $item)
+    foreach ($itensVistoriados as $key => $item)
     {
         $index = count($data);
         $data[] = array();
@@ -740,27 +741,35 @@ EOT;
         {
             case 'itemAces':
                 $material = 'Acessório';
+                $tipoItem[$key] = 'Acessórios  (Ganchos, Cadeados, olhais, Manilhas) (NR-11/NBR 13545/NBR 16798)';
                 break;
             case 'itemDies':
                 $material = 'Dispositivo';
+                $tipoItem[$key] = 'Dispositivos Especiais: (NR 11)';
                 break;
             case 'itemEctu':
                 $material = 'Eslinga';
+                $tipoItem[$key] = 'Eslingas, cintas planas e tubulares. (NR-11 NBR 15637 1 e 2)';
                 break;
             case 'itemGael':
                 $material = 'Garra';
+                $tipoItem[$key] = 'Garras de elevação (NR-11)';
                 break;
             case 'itemLema':
                 $material = 'Levantador';
+                $tipoItem[$key] = 'Levantador magnético (NR 11)';
                 break;
             case 'itemLila':
                 $material = 'Linga';
+                $tipoItem[$key] = 'Lingas e Laços de cabos de aço';
                 break;
             case 'itemLinc':
                 $material = 'Linga';
+                $tipoItem[$key] = 'Linga de corrente (NR-11/NBR 15516 1 e 2/NBR ISO 3076/NBR ISO 1834)';
                 break;
             default:
                 $material = '-';
+                $tipoItem[$key] = 'Não identificado';
         }
         $data[$index][] = $material;
         $data[$index][] = (isset($item['elemento_inicial']))? $item['elemento_inicial'] : (isset($item['capacidade']))? $item['capacidade'] : '-';
@@ -795,10 +804,12 @@ EOT;
     $tmp .= ' a continuar a trabalhar por atender todos os requisitos exigidos em normas.';
     $pdf->MultiCell($wCell, $hCell, $tmp);
 
-    foreach ($itensVistoriados as $item)
+    foreach ($itensVistoriados as $key => $item)
     {
         $pdf->AddPage();
         $pdf->SetFont('Calibri','B',11);
+        $pdf->MultiCell($wCell, $hCell, $tipoItem[$key], 1, 0, 'C');
+        
         if (!empty($item['placa_rastreabilidade_seyconel']))
             $pdf->PrintTexto($hCell, "{$item['placa_rastreabilidade_seyconel']} - {$item['descricao']}", 'B');
         else
