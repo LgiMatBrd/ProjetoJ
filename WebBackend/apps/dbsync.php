@@ -130,6 +130,8 @@ function receive()
                 continue;
             if (is_string($value))
                 $valores[$key] = "'$value'";
+            else if (is_bool($value))
+                $valores[$key] = ($value)? 1 : 0;
             else
                 $valores[$key] = $value;
             $keys[] = $key;
